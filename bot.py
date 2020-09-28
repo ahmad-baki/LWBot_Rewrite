@@ -27,6 +27,8 @@ async def on_error(event, *args, **kwargs):
     embed.set_footer(text=kwargs)
     await bot.get_user(lwConfig.ownerID).send(embed=embed)
 
+
+
 @bot.event
 async def on_command_error(ctx, error):
     if isinstance(error, CommandNotFound) or isinstance(error, MissingRequiredArgument):
@@ -35,8 +37,9 @@ async def on_command_error(ctx, error):
     embed.color = discord.Color.red()
     embed.description = f"```{error}```"
     embed.set_footer(text=type(error))
-    #await bot.get_user(lwConfig.ownerID).send(embed=embed)
+    # await bot.get_user(lwConfig.ownerID).send(embed=embed)
     await ctx.send(embed=embed)
+
 
 @bot.event
 async def on_ready():
@@ -53,6 +56,34 @@ async def on_message(message):
     if message.channel.id == lwConfig.memeChannelID and len(message.attachments) > 0:
         await message.add_reaction(lwHelperFunctions.getEmoji(bot, lwConfig.upvoteEmoji))
         await message.add_reaction(lwHelperFunctions.getEmoji(bot, lwConfig.downoteEmoji))
+
+
+@bot.command()
+async def ev(ctx, *, arg):
+    if await bot.is_owner(ctx.author):
+        try:
+            await eval(arg, {"ctx": ctx, "bot": bot})
+        except Exception as e:
+            if isinstance(e, TypeError):
+                pass
+            else:
+                raise e
+    else:
+        awoo = lwHelperFunctions.getEmoji(bot, "AwOo")
+        e = discord.Embed(title="You are not worthy ")
+        e.set_image(url=awoo.url)
+        e.color = discord.Color.blurple()
+        e.timestamp = datetime.datetime.now()
+        e.set_footer(text=ctx.author.name, icon_url=ctx.author.avatar_url)
+        await ctx.send(embed=e)
+
+# @bot.command()
+# async def ex(ctx, *, arg):
+#     if await bot.is_owner(ctx.author):
+#         exec(arg, {"ctx": ctx, "bot": bot}, {})
+#     else:
+#         await ctx.send("You are not worthy ")
+#         await ctx.send(lwHelperFunctions.getEmoji(bot, "AwOo"))
 
 
 @bot.command()
@@ -100,6 +131,7 @@ async def entries(ctx):
 
     await ctx.send(embed=e)
 
+
 @bot.command()
 async def stats(ctx):
     async with ctx.message.channel.typing():
@@ -109,16 +141,19 @@ async def stats(ctx):
         vList = {}
         for i in voteList.keys():
             vList[i] = voteList[i][0]
-        sortedDict = sorted(vList.items(), key=operator.itemgetter(1), reverse=True)
+        sortedDict = sorted(
+            vList.items(), key=operator.itemgetter(1), reverse=True)
         winnerMessage = await bot.get_channel(lwConfig.memeChannelID).fetch_message(sortedDict[0][0])
         score = voteList[sortedDict[0][0]][0]
         e = discord.Embed()
         e.title = f"Current top voted post with a score of {str(score)} {lwHelperFunctions.getEmoji(bot, lwConfig.upvoteEmoji)}"
-        
+
         e.description = winnerMessage.content
         e.set_image(url=winnerMessage.attachments[0].url)
-        e.set_author(name=winnerMessage.author, icon_url=winnerMessage.author.avatar_url)
-        e.color = winnerMessage.guild.get_member(winnerMessage.author.id).colour
+        e.set_author(name=winnerMessage.author,
+                     icon_url=winnerMessage.author.avatar_url)
+        e.color = winnerMessage.guild.get_member(
+            winnerMessage.author.id).colour
         date = winnerMessage.created_at
         e.description += f"\n`Message created at:  {str(date).split('.')[0]}`"
         e.timestamp = datetime.datetime.now()
@@ -128,6 +163,7 @@ async def stats(ctx):
             await ctx.message.channel.send(winnerMessage.attachments[0].url)
     else:
         await ctx.message.channel.send("no items in the voting list.")
+
 
 @bot.listen()
 async def on_raw_reaction_add(payload):
@@ -159,11 +195,12 @@ async def on_raw_reaction_add(payload):
             return
         if reaction.emoji == upvote:
             voteListHandler.changeVotingCounter(reaction.message, 1)
-            if reaction.count -1 >= lwConfig.upvotesForPin and not reaction.message.pinned:
+            if reaction.count - 1 >= lwConfig.upvotesForPin and not reaction.message.pinned:
                 await reaction.message.pin(reason="good meme")
         elif reaction.emoji == downvote:
             voteListHandler.changeVotingCounter(reaction.message, -1)
-        
+
+
 @bot.listen()
 async def on_raw_reaction_remove(payload):
     if payload.channel_id != lwConfig.memeChannelID:
@@ -181,6 +218,7 @@ async def on_raw_reaction_remove(payload):
             voteListHandler.changeVotingCounter(reaction.message, -1)
         elif reaction.emoji == lwHelperFunctions.getEmoji(bot, lwConfig.downoteEmoji):
             voteListHandler.changeVotingCounter(reaction.message, 1)
+
 
 async def checkGmoWebsite():
     while True:

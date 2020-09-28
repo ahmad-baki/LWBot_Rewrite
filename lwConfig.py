@@ -3,11 +3,11 @@ path = ""
 try:
     import os
     path = os.path.abspath(".")
-    with open(path + '/nConfig.json', 'r') as myfile:
+    with open(path + '/lwConfig.json', 'r') as myfile:
         data = myfile.read()
 except:
-    path = '/home/pi/Desktop/nBot'
-    with open(path + '/nCconfig.json', 'r') as myfile:
+    path = '/home/pi/Desktop/lwBot'
+    with open(path + '/lwCconfig.json', 'r') as myfile:
         data = myfile.read()
 
 

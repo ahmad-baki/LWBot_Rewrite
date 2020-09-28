@@ -85,19 +85,6 @@ async def ev(ctx, *, arg):
 #         await ctx.send("You are not worthy ")
 #         await ctx.send(lwHelperFunctions.getEmoji(bot, "AwOo"))
 
-
-@bot.command()
-async def add(ctx, *, arg):
-    msg = await bot.get_channel(lwConfig.memeChannelID).fetch_message(759434287102558228)
-    voteListHandler.changeVotingCounter(msg, 1)
-
-
-@bot.command()
-async def a(ctx):
-    lwHelperFunctions.updateConfig()
-    await ctx.send(lwConfig.prefix)
-
-
 @bot.command()
 async def emotes(ctx):
     e = discord.Embed(title="Emotes:")

@@ -7,7 +7,7 @@ try:
         data = myfile.read()
 except:
     path = '/home/pi/Desktop/lwBot'
-    with open(path + '/lwCconfig.json', 'r') as myfile:
+    with open(path + '/lwConfig.json', 'r') as myfile:
         data = myfile.read()
 
 

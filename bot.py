@@ -73,7 +73,7 @@ async def ev(ctx, *, arg):
         e = discord.Embed(title="You are not worthy ")
         e.set_image(url=awoo.url)
         e.color = discord.Color.blurple()
-        e.timestamp = datetime.datetime.now()
+        e.timestamp = datetime.datetime.utcnow()
         e.set_footer(text=ctx.author.name, icon_url=ctx.author.avatar_url)
         await ctx.send(embed=e)
 
@@ -90,7 +90,7 @@ async def emotes(ctx):
     e = discord.Embed(title="Emotes:")
     emotes = [f"<:{e.name}:{e.id}>" for e in bot.emojis]
     e.description = ''.join(emotes)
-    e.timestamp = datetime.datetime.now()
+    e.timestamp = datetime.datetime.utcnow()
     e.set_footer(text=ctx.author.name, icon_url=ctx.author.avatar_url)
     m = await ctx.send(embed=e)
     # for i in range(min(20, len(emotes))):
@@ -103,7 +103,7 @@ async def entries(ctx):
     voteList = voteListHandler.getVoteList()
     e = discord.Embed()
     e.color = discord.Color.purple()
-    e.timestamp = datetime.datetime.now()
+    e.timestamp = datetime.datetime.utcnow()
     e.set_footer(text=ctx.author.name, icon_url=ctx.author.avatar_url)
     e.set_author(name=bot.user, icon_url=bot.user.avatar_url)
     if not len(voteList) > 0:
@@ -143,7 +143,7 @@ async def stats(ctx):
             winnerMessage.author.id).colour
         date = winnerMessage.created_at
         e.description += f"\n`Message created at:  {str(date).split('.')[0]}`"
-        e.timestamp = datetime.datetime.now()
+        e.timestamp = datetime.datetime.utcnow()
         e.set_footer(text=ctx.author.name, icon_url=ctx.author.avatar_url)
         await ctx.message.channel.send(embed=e)
         if(not lwHelperFunctions.is_url_image(e.image.url)):

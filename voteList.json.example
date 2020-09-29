@@ -1,0 +1,10 @@
+{
+    "messageID": [
+        "votes",
+        "messageTimestamp"
+    ],
+    "messageID2": [
+        "votes",
+        "messageTimestamp"
+    ]
+}

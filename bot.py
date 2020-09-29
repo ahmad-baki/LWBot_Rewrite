@@ -62,7 +62,7 @@ async def on_message(message):
         await message.add_reaction(lwHelperFunctions.getEmoji(bot, lwConfig.upvoteEmoji))
         await message.add_reaction(lwHelperFunctions.getEmoji(bot, lwConfig.downoteEmoji))
     if message.content.startswith("awoo"):
-        await test(message, message.content)
+        await test(ctx=message, arg=message.content)
 
     
 @bot.command()

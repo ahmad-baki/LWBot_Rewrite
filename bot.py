@@ -57,12 +57,12 @@ async def on_message(message):
         await message.add_reaction(lwHelperFunctions.getEmoji(bot, lwConfig.upvoteEmoji))
         await message.add_reaction(lwHelperFunctions.getEmoji(bot, lwConfig.downoteEmoji))
 
-
+    
 @bot.command()
 async def ev(ctx, *, arg):
     if await bot.is_owner(ctx.author):
         try:
-            await eval(arg, {"ctx": ctx, "bot": bot})
+            await eval(arg, globals())#{"ctx": ctx, "bot": bot})
         except Exception as e:
             if isinstance(e, TypeError):
                 pass

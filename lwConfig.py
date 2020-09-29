@@ -6,7 +6,7 @@ try:
     with open(path + '/lwConfig.json', 'r') as myfile:
         data = myfile.read()
 except:
-    path = '/home/pi/Desktop/lwBot'
+    path = '/home/pi/lwBot'
     with open(path + '/lwConfig.json', 'r') as myfile:
         data = myfile.read()
 

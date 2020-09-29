@@ -62,7 +62,7 @@ async def on_message(message):
 async def ev(ctx, *, arg):
     if await bot.is_owner(ctx.author):
         try:
-            await eval(arg, globals={"ctx": ctx, "bot": bot})
+            await eval(arg, {"ctx": ctx, "bot": bot})
         except Exception as e:
             if isinstance(e, TypeError):
                 pass
@@ -79,7 +79,7 @@ async def ev(ctx, *, arg):
 
 @bot.command()
 async def test(ctx, *, arg):
-    ctx.send(arg)
+    await ctx.send(arg)
 
 @bot.command()
 async def emotes(ctx):

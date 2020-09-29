@@ -6,7 +6,7 @@ import json
 #     with open(path + '/lwConfig.json', 'r') as myfile:
 #         data = myfile.read()
 # except:
-path = '/home/pi/lwBot'
+path = '/home/pi/lwBot/LWBot_Rewrite'
 with open(path + '/lwConfig.json', 'r') as myfile:
     data = myfile.read()
 

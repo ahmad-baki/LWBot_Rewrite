@@ -85,7 +85,7 @@ async def ev(ctx, *, arg):
 
 @bot.command()
 async def test(ctx, *, arg):
-    await ctx.send(arg)
+    await ctx.send(arg * 2)
 
 @bot.command()
 async def emotes(ctx):

@@ -47,6 +47,12 @@ async def on_ready():
     activity = discord.Activity(
         type=discord.ActivityType.watching, name=lwConfig.statusMessage)
     await bot.change_presence(activity=activity, status=discord.enums.Status.dnd)
+    user = bot.get_user(lwConfig.ownerID)
+    e = discord.Embed(title="Bot started")
+    e.color = discord.Color.blurple()
+    e.timestamp = datetime.datetime.utcnow()
+    e.set_footer(text=user.name, icon_url=user.avatar_url) 
+    await user.send(embed=e)
 
 
 @bot.listen()

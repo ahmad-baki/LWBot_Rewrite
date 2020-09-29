@@ -62,7 +62,7 @@ async def on_message(message):
 async def ev(ctx, *, arg):
     if await bot.is_owner(ctx.author):
         try:
-            await eval(arg, globals=globals(), locals=locals())#{"ctx": ctx, "bot": bot})
+            await eval(arg, globals={"ctx": ctx, "bot": bot})
         except Exception as e:
             if isinstance(e, TypeError):
                 pass
@@ -77,13 +77,7 @@ async def ev(ctx, *, arg):
         e.set_footer(text=ctx.author.name, icon_url=ctx.author.avatar_url)
         await ctx.send(embed=e)
 
-# @bot.command()
-# async def ex(ctx, *, arg):
-#     if await bot.is_owner(ctx.author):
-#         exec(arg, {"ctx": ctx, "bot": bot}, {})
-#     else:
-#         await ctx.send("You are not worthy ")
-#         await ctx.send(lwHelperFunctions.getEmoji(bot, "AwOo"))
+
 
 @bot.command()
 async def emotes(ctx):

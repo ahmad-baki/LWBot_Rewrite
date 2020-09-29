@@ -62,7 +62,7 @@ async def on_message(message):
 async def ev(ctx, *, arg):
     if await bot.is_owner(ctx.author):
         try:
-            await eval(arg, globals())#{"ctx": ctx, "bot": bot})
+            await eval(arg, globals=globals(), locals=locals())#{"ctx": ctx, "bot": bot})
         except Exception as e:
             if isinstance(e, TypeError):
                 pass

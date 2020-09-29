@@ -77,7 +77,9 @@ async def ev(ctx, *, arg):
         e.set_footer(text=ctx.author.name, icon_url=ctx.author.avatar_url)
         await ctx.send(embed=e)
 
-
+@bot.command()
+async def test(ctx, *, arg):
+    ctx.send(arg)
 
 @bot.command()
 async def emotes(ctx):

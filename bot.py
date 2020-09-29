@@ -28,7 +28,6 @@ async def on_error(event, *args, **kwargs):
     await bot.get_user(lwConfig.ownerID).send(embed=embed)
 
 
-
 @bot.event
 async def on_command_error(ctx, error):
     if isinstance(error, CommandNotFound) or isinstance(error, MissingRequiredArgument):
@@ -62,6 +61,8 @@ async def on_message(message):
     if message.channel.id == lwConfig.memeChannelID and len(message.attachments) > 0:
         await message.add_reaction(lwHelperFunctions.getEmoji(bot, lwConfig.upvoteEmoji))
         await message.add_reaction(lwHelperFunctions.getEmoji(bot, lwConfig.downoteEmoji))
+    if message.content.startswith("awoo"):
+        await test(message, message.content)
 
     
 @bot.command()
@@ -83,9 +84,16 @@ async def ev(ctx, *, arg):
         e.set_footer(text=ctx.author.name, icon_url=ctx.author.avatar_url)
         await ctx.send(embed=e)
 
+
 @bot.command()
 async def test(ctx, *, arg):
-    await ctx.send(arg * 2)
+    e = discord.Embed(title="testing stuffu")
+    e.color = discord.Color.blurple()
+    e.description = arg
+    e.timestamp = datetime.datetime.utcnow()
+    e.set_footer(text=ctx.author.name, icon_url=ctx.author.avatar_url)
+    await ctx.send(embed=e)
+
 
 @bot.command()
 async def emotes(ctx):

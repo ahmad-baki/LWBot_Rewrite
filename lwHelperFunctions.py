@@ -5,6 +5,7 @@ import aiohttp
 import importlib
 import json
 import requests
+import datetime
 
 def getEmoji(bot, emojiName):
     emoji = discord.utils.get(bot.emojis, name=emojiName)
@@ -39,3 +40,11 @@ def is_url_image(image_url):
     if r.headers["content-type"] in image_formats:
         return True
     return False
+
+def simpleEmbed(author, title, description, image_url=""):
+    e = discord.Embed(title=title, description=description)
+    if image_url != "":
+        e.set_image(url=image_url)
+    e.color = discord.Color.blurple()
+    e.timestamp = datetime.datetime.utcnow()
+    e.set_footer(text=author.name, icon_url=author.avatar_url) 

@@ -69,7 +69,7 @@ async def on_message(message):
 async def ev(ctx, *, arg):
     if await bot.is_owner(ctx.author):
         try:
-            await eval(arg, {"ctx": ctx, "bot": bot})
+            await eval(arg, {"ctx": ctx, "bot": bot, "lwHelperFunctions": lwHelperFunctions, "discord": discord})
         except Exception as e:
             if isinstance(e, TypeError):
                 pass
@@ -84,6 +84,9 @@ async def ev(ctx, *, arg):
         e.set_footer(text=ctx.author.name, icon_url=ctx.author.avatar_url)
         await ctx.send(embed=e)
 
+@bot.command()
+async def embed(ctx, *args):
+    await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, *args))
 
 @bot.command()
 async def test(ctx, *, arg):

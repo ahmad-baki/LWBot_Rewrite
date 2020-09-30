@@ -48,3 +48,4 @@ def simpleEmbed(author, title, description, image_url=""):
     e.color = discord.Color.blurple()
     e.timestamp = datetime.datetime.utcnow()
     e.set_footer(text=author.name, icon_url=author.avatar_url) 
+    return e

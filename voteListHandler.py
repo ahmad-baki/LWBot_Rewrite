@@ -6,6 +6,7 @@ def updateVoteListFile(voteList):
     with open(lwConfig.path + '/voteList.json', 'w') as myfile:
         json.dump(voteList, myfile)
 
+#test
 def getVoteList():
     with open(lwConfig.path + '/voteList.json', 'r') as myfile:
         return json.loads(myfile.read())

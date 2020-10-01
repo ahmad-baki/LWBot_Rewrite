@@ -6,6 +6,7 @@ def updateReminder(reminder):
     with open(lwConfig.path + '/reminder.json', 'w') as myfile:
         json.dump(reminder, myfile)
 
+#test
 def getReminder():
     with open(lwConfig.path + '/reminder.json', 'r') as myfile:
         return myfile.read()

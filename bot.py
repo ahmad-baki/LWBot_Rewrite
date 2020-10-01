@@ -263,9 +263,11 @@ async def on_raw_reaction_remove(payload):
         elif reaction.emoji == lwHelperFunctions.getEmoji(bot, lwConfig.downoteEmoji):
             voteListHandler.changeVotingCounter(reaction.message, 1)
 
-#@tasks.loop(seconds=30)
+
+@tasks.loop(seconds=30)
 async def checkReminder():
     return
+
 
 @tasks.loop(seconds=3)
 async def checkGmoWebsite():
@@ -276,13 +278,14 @@ async def checkGmoWebsite():
             channel = bot.get_channel(lwConfig.newsChannelID)
             await channel.send(channel.guild.get_role(lwConfig.gmoRoleID).mention + " " + news)
 
+
 @checkGmoWebsite.error
 async def gmoNewsError(arg):
     channel = bot.get_channel(lwConfig.logChannelID)
-    await channel.send(embed=lwHelperFunctions.simpleEmbed(bot.user,"Error in checkGmoWebsite",arg))
+    await channel.send(embed=lwHelperFunctions.simpleEmbed(bot.user, "Error in checkGmoWebsite", arg))
 
 
-#aiohttpLogErrorCatch.ignore_aiohttp_ssl_eror(tasks.loop.current_loop)
+# aiohttpLogErrorCatch.ignore_aiohttp_ssl_eror(tasks.loop.current_loop)
 checkGmoWebsite.start()
 checkReminder.start()
 bot.run(lwConfig.token)

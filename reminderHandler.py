@@ -8,6 +8,7 @@ def updateReminder(reminder):
 
 def getReminder():
     with open(lwConfig.path + '/reminder.json', 'r') as myfile:
+        return myfile.read()
         return json.loads(myfile.read())
 
 def addReminder(author, time, message):

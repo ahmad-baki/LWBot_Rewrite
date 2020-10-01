@@ -177,11 +177,11 @@ async def stats(ctx):
 
 @bot.command()
 async def reminder(ctx, *, arg):
-    time = datetime.datetime.strptime(arg, '%d-%m-%Y %H:%M:%S')
-    ctx.send('message for the reminder:')
+    time = datetime.datetime.strptime(arg, '%d.%m.%Y %H:%M')
+    await ctx.send('message for the reminder:')
     m = await bot.wait_for('message',check=lambda m: m.author == ctx.author, timeout = 60)
-    ctx.send(time.strftime())
-    ctx.send(m.content)
+    await ctx.send(time.strftime('%d.%m.%Y %H:%M'))
+    await ctx.send(m.content)
     # reminderHandler.addReminder(ctx.author, )
 
 @bot.listen()

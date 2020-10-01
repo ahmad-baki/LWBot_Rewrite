@@ -12,5 +12,6 @@
     "delete_emoji_name": "",
     "latest_gmo_news_number": "",
     "news_channel_id": "",
-    "gmo_role_id": ""
+    "gmo_role_id": "",
+    "log_channel_id: ""
 }

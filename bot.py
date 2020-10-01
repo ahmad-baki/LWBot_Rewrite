@@ -4,8 +4,10 @@ https://discord.com/api/oauth2/authorize?bot_id=760125323580276757&permissions=8
 
 import discord
 from discord.ext import commands
-from discord.ext.commands import CommandNotFound
-from discord.ext.commands import MissingRequiredArgument
+from discord.ext import tasks
+from discord.ext.commands.errors import CommandNotFound
+from discord.ext.commands.errors import MissingRequiredArgument
+
 import traceback
 import asyncio
 import datetime
@@ -20,7 +22,7 @@ import voteListHandler
 import reminderHandler
 
 bot = commands.Bot(command_prefix=lwConfig.prefix)
-bot.owner_id = lwConfig.ownerID
+bot.owner_ids = lwConfig.ownerID
 
 
 @bot.event
@@ -29,7 +31,8 @@ async def on_error(event, *args, **kwargs):
     embed.color = discord.Color.red()
     embed.description = f"```{traceback.format_exc()}```"
     embed.set_footer(text=kwargs)
-    await bot.get_user(lwConfig.ownerID).send(embed=embed)
+    channel = bot.get_channel(lwConfig.logChannelID)
+    await channel.send(embed=embed)
 
 
 @bot.event
@@ -40,7 +43,6 @@ async def on_command_error(ctx, error):
     embed.color = discord.Color.red()
     embed.description = f"```{error}```"
     embed.set_footer(text=type(error))
-    # await bot.get_user(lwConfig.ownerID).send(embed=embed)
     await ctx.send(embed=embed)
 
 
@@ -50,12 +52,12 @@ async def on_ready():
     activity = discord.Activity(
         type=discord.ActivityType.watching, name=lwConfig.statusMessage)
     await bot.change_presence(activity=activity, status=discord.enums.Status.dnd)
-    user = bot.get_user(lwConfig.ownerID)
     e = discord.Embed(title="Bot started")
     e.color = discord.Color.blurple()
     e.timestamp = datetime.datetime.utcnow()
-    e.set_footer(text=user.name, icon_url=user.avatar_url)
-    await user.send(embed=e)
+    e.set_footer(text=bot.user.name, icon_url=bot.user.avatar_url)
+    channel = bot.get_channel(lwConfig.logChannelID)
+    await channel.send(embed=e)
 
 
 @bot.listen()
@@ -189,13 +191,14 @@ async def reminder(ctx, *, arg):
         await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Please enter a message for the reminder", "Dont answer for 60 seconds to time out."))
         m = await bot.wait_for('message', check=lambda m: m.author == ctx.author, timeout=60)
     except Exception as e:
-        if isinstance(e,TimeoutError):
+        if isinstance(e, TimeoutError):
             await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Timed out.", "Try again if you want to set a reminder."))
         elif isinstance(e, ValueError):
             await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Wrong date format.", "your Date should be in the format\nreminder DAY.MONTH.YEAR HOURS:MINUTES\nExample: reminder 1.10.2020 6:34."))
         return
 
     reminderHandler.addReminder(ctx.author, time, m.content)
+
 
 @bot.command()
 async def myreminders(ctx):
@@ -204,6 +207,7 @@ async def myreminders(ctx):
         await ctx.send(reminder[ctx.author])
     else:
         await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "You have no reminders.", f"Type {bot.command_prefix}reminder to create one."))
+
 
 @bot.listen()
 async def on_raw_reaction_add(payload):
@@ -259,11 +263,11 @@ async def on_raw_reaction_remove(payload):
         elif reaction.emoji == lwHelperFunctions.getEmoji(bot, lwConfig.downoteEmoji):
             voteListHandler.changeVotingCounter(reaction.message, 1)
 
-
+#@tasks.loop(seconds=30)
 async def checkReminder():
     return
 
-
+@tasks.loop(seconds=3)
 async def checkGmoWebsite():
     while True:
         await asyncio.sleep(3)
@@ -272,8 +276,13 @@ async def checkGmoWebsite():
             channel = bot.get_channel(lwConfig.newsChannelID)
             await channel.send(channel.guild.get_role(lwConfig.gmoRoleID).mention + " " + news)
 
+@checkGmoWebsite.error
+async def gmoNewsError(arg):
+    channel = bot.get_channel(lwConfig.logChannelID)
+    await channel.send(embed=lwHelperFunctions.simpleEmbed(bot.user,"Error in checkGmoWebsite",arg))
 
-aiohttpLogErrorCatch.ignore_aiohttp_ssl_eror(asyncio.get_running_loop())
-bot.loop.create_task(checkReminder())
-bot.loop.create_task(checkGmoWebsite())
+
+#aiohttpLogErrorCatch.ignore_aiohttp_ssl_eror(tasks.loop.current_loop)
+checkGmoWebsite.start()
+checkReminder.start()
 bot.run(lwConfig.token)

@@ -14,8 +14,6 @@ import datetime
 import operator
 import os
 
-import aiohttpLogErrorCatch
-
 import lwConfig
 import lwHelperFunctions
 import voteListHandler
@@ -287,6 +285,5 @@ async def gmoNewsError(arg):
 
 
 checkGmoWebsite.start()
-aiohttpLogErrorCatch.ignore_aiohttp_ssl_eror(checkGmoWebsite)
 checkReminder.start()
 bot.run(lwConfig.token)

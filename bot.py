@@ -269,15 +269,14 @@ async def checkReminder():
 
 @tasks.loop(seconds=3)
 async def checkGmoWebsite():
+    await bot.wait_until_ready()
     print("1")
     raise Exception("test")
     print("2")
-    while True:
-        await asyncio.sleep(3)
-        news = await lwHelperFunctions.getGmoNews()
-        if news != None:
-            channel = bot.get_channel(lwConfig.newsChannelID)
-            await channel.send(channel.guild.get_role(lwConfig.gmoRoleID).mention + " " + news)
+    news = await lwHelperFunctions.getGmoNews()
+    if news != None:
+        channel = bot.get_channel(lwConfig.newsChannelID)
+        await channel.send(channel.guild.get_role(lwConfig.gmoRoleID).mention + " " + news)
 
 
 @checkGmoWebsite.error

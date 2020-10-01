@@ -275,7 +275,7 @@ async def checkGmoWebsite():
 
 
 @checkGmoWebsite.before_loop
-async def beforeGmoNews(arg):
+async def beforeGmoNews():
     await bot.wait_until_ready()
     print("gmoLoopStart")
     channel = bot.get_channel(lwConfig.logChannelID)

@@ -10,6 +10,7 @@ import traceback
 import asyncio
 import datetime
 import operator
+import os 
 
 import lwConfig
 import lwHelperFunctions
@@ -76,7 +77,8 @@ async def ev(ctx, *, arg):
                 "lwHelperFunctions": lwHelperFunctions,
                 "discord": discord,
                 "datetime": datetime,
-                "reminderHandler": reminderHandler
+                "reminderHandler": reminderHandler,
+                "os": os
             })
         except Exception as e:
             if isinstance(e, TypeError):

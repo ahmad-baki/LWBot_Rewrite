@@ -277,6 +277,7 @@ async def checkGmoWebsite():
 @checkGmoWebsite.before_loop
 async def beforeGmoNews():
     await bot.wait_until_ready()
+    asyncio.sleep(1)
     print("gmoLoopStart")
     channel = bot.get_channel(lwConfig.logChannelID)
     await channel.send(embed=lwHelperFunctions.simpleEmbed(bot.user, "gmoNewsCheck loop start", arg))

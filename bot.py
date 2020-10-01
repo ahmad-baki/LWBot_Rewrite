@@ -269,6 +269,7 @@ async def checkReminder():
 
 @tasks.loop(seconds=3)
 async def checkGmoWebsite():
+    print("gmoStart")
     news = await lwHelperFunctions.getGmoNews()
     if news != None:
         channel = bot.get_channel(lwConfig.newsChannelID)

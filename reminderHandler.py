@@ -7,11 +7,7 @@ def updateReminder(reminder):
         json.dump(reminder, myfile)
 
 def getReminder():
-    # creates file if it does not exist
-    with open(lwConfig.path + '/reminder.json', 'a+') as myfile:
-        myfile.seek(0)
-        if myfile.read() == "":
-            myfile.write("{}")
+    with open(lwConfig.path + '/reminder.json', 'r') as myfile:
         return json.loads(myfile.read())
 
 def addReminder(author, time, message):

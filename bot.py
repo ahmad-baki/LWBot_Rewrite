@@ -179,8 +179,7 @@ async def stats(ctx):
 
 
 @bot.command()
-async def reminder(ctx, *args):
-    arg = ''.join(args)
+async def reminder(ctx, *, arg):
     try:
         time = datetime.datetime.strptime(arg, '%d.%m.%Y %H:%M')
         if time < datetime.datetime.now():
@@ -204,7 +203,7 @@ async def myreminders(ctx):
     if ctx.author in list(r.keys()):
         await ctx.send(reminder[ctx.author])
     else:
-        await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "You have no reminders.", f"Type {bot.command_prefix}reminder to create one."))
+        await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "You have no reminders.", f"Type {bot.command_prefix}reminder [date] to create one."))
 
 
 @bot.listen()

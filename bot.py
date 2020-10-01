@@ -46,7 +46,6 @@ async def on_command_error(ctx, error):
 
 @bot.event
 async def on_ready():
-    print(f'Welcome.\nLogged in as {bot.user}, {bot.user.id}.')
     activity = discord.Activity(
         type=discord.ActivityType.watching, name=lwConfig.statusMessage)
     await bot.change_presence(activity=activity, status=discord.enums.Status.dnd)
@@ -267,25 +266,25 @@ async def checkReminder():
     return
 
 
-@tasks.loop(seconds=3)
+@tasks.loop(seconds=300)
 async def checkGmoWebsite():
-    print("gmoStart")
     news = await lwHelperFunctions.getGmoNews()
     if news != None:
         channel = bot.get_channel(lwConfig.newsChannelID)
         await channel.send(channel.guild.get_role(lwConfig.gmoRoleID).mention + " " + news)
 
 
-@checkGmoWebsite.error
-async def gmoNewsError(arg):
+@checkGmoWebsite.before_loop
+async def beforeGmoNews(arg):
+    await bot.wait_until_ready()
     channel = bot.get_channel(lwConfig.logChannelID)
-    await channel.send(embed=lwHelperFunctions.simpleEmbed(bot.user, "Error in checkGmoWebsite", arg))
+    await channel.send(embed=lwHelperFunctions.simpleEmbed(bot.user, "gmoNewsCheck loop start", arg))
+
 
 @checkGmoWebsite.after_loop
-async def a():
-    print("aa")
-    if checkGmoWebsite.is_being_cancelled():
-        print("b")
+async def afterGmoNews():
+    channel = bot.get_channel(lwConfig.logChannelID)
+    await channel.send(embed=lwHelperFunctions.simpleEmbed(bot.user, "gmoNewsCheck loop stopped. restarting now", arg))
     checkGmoWebsite.restart()
 
 checkGmoWebsite.start()

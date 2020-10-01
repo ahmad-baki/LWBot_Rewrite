@@ -280,14 +280,14 @@ async def beforeGmoNews():
     await asyncio.sleep(1)
     print("gmoLoopStart")
     channel = bot.get_channel(lwConfig.logChannelID)
-    await channel.send(embed=lwHelperFunctions.simpleEmbed(bot.user, "gmoNewsCheck loop start", arg))
+    await channel.send(embed=lwHelperFunctions.simpleEmbed(bot.user, "gmoNewsCheck loop start"))
 
 
 @checkGmoWebsite.after_loop
 async def afterGmoNews():
     print("gmoLoop crashed")
     channel = bot.get_channel(lwConfig.logChannelID)
-    await channel.send(embed=lwHelperFunctions.simpleEmbed(bot.user, "gmoNewsCheck loop stopped. restarting now", arg))
+    await channel.send(embed=lwHelperFunctions.simpleEmbed(bot.user, "gmoNewsCheck loop stopped. restarting now"))
     checkGmoWebsite.restart()
 
 checkGmoWebsite.start()

@@ -14,7 +14,6 @@ def getEmoji(bot, emojiName):
     return None
 
 async def getGmoNews():
-    global LATEST_GMO_NEWS_NUMBER
     url = "https://www.gymnasium-oberstadt.de/"
     async with aiohttp.ClientSession() as session:
         async with session.get(url) as r:

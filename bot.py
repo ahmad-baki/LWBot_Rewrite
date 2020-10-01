@@ -269,10 +269,6 @@ async def checkReminder():
 
 @tasks.loop(seconds=3)
 async def checkGmoWebsite():
-    await bot.wait_until_ready()
-    print("1")
-    raise Exception("test")
-    print("2")
     news = await lwHelperFunctions.getGmoNews()
     if news != None:
         channel = bot.get_channel(lwConfig.newsChannelID)
@@ -289,6 +285,7 @@ async def a():
     print("aa")
     if checkGmoWebsite.is_being_cancelled():
         print("b")
+    checkGmoWebsite.restart()
 
 checkGmoWebsite.start()
 checkReminder.start()

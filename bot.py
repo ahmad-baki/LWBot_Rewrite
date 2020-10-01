@@ -179,7 +179,8 @@ async def stats(ctx):
 
 
 @bot.command()
-async def reminder(ctx, *, arg):
+async def reminder(ctx, *args):
+    arg = ''.join(args)
     try:
         time = datetime.datetime.strptime(arg, '%d.%m.%Y %H:%M')
         if time < datetime.datetime.now():
@@ -191,7 +192,7 @@ async def reminder(ctx, *, arg):
         if isinstance(e, TimeoutError):
             await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Timed out.", "Try again if you want to set a reminder."))
         elif isinstance(e, ValueError):
-            await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Wrong date format.", "your Date should be in the format\nreminder DAY.MONTH.YEAR HOURS:MINUTES\nExample: reminder 1.10.2020 6:34."))
+            await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Wrong date format.", "your Date should be in the format\nreminder DAY.MONTH.YEAR  HOURS:MINUTES\nExample: reminder 1.10.2020  6:34."))
         return
 
     reminderHandler.addReminder(ctx.author, time, m.content)

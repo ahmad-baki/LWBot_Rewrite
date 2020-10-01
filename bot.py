@@ -14,6 +14,7 @@ import operator
 import lwConfig
 import lwHelperFunctions
 import voteListHandler
+import reminderHandler
 
 bot = commands.Bot(command_prefix=lwConfig.prefix)
 bot.owner_id = lwConfig.ownerID
@@ -50,7 +51,7 @@ async def on_ready():
     e = discord.Embed(title="Bot started")
     e.color = discord.Color.blurple()
     e.timestamp = datetime.datetime.utcnow()
-    e.set_footer(text=user.name, icon_url=user.avatar_url) 
+    e.set_footer(text=user.name, icon_url=user.avatar_url)
     await user.send(embed=e)
 
 
@@ -64,12 +65,19 @@ async def on_message(message):
     if message.content.startswith("awoo"):
         await test(ctx=message, arg=message.content)
 
-    
+
 @bot.command()
 async def ev(ctx, *, arg):
     if await bot.is_owner(ctx.author):
         try:
-            await eval(arg, {"ctx": ctx, "bot": bot, "lwHelperFunctions": lwHelperFunctions, "discord": discord})
+            await eval(arg, {
+                "ctx": ctx,
+                "bot": bot,
+                "lwHelperFunctions": lwHelperFunctions,
+                "discord": discord,
+                "datetime": datetime,
+                "reminderHandler": reminderHandler
+            })
         except Exception as e:
             if isinstance(e, TypeError):
                 pass
@@ -84,9 +92,11 @@ async def ev(ctx, *, arg):
         e.set_footer(text=ctx.author.name, icon_url=ctx.author.avatar_url)
         await ctx.send(embed=e)
 
+
 @bot.command()
 async def embed(ctx, *args):
     await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, *args))
+
 
 @bot.command()
 async def test(ctx, *, arg):
@@ -165,6 +175,15 @@ async def stats(ctx):
         await ctx.message.channel.send("no items in the voting list.")
 
 
+@bot.command()
+async def reminder(ctx, *, arg):
+    time = datetime.datetime.strptime(arg, '%d-%m-%Y %H:%M:%S')
+    ctx.send('message for the reminder:')
+    m = await bot.wait_for('message',check=lambda m: m.author == ctx.author, timeout = 60)
+    ctx.send(time.strftime())
+    ctx.send(m.content)
+    # reminderHandler.addReminder(ctx.author, )
+
 @bot.listen()
 async def on_raw_reaction_add(payload):
     if payload.channel_id != lwConfig.memeChannelID:
@@ -220,6 +239,10 @@ async def on_raw_reaction_remove(payload):
             voteListHandler.changeVotingCounter(reaction.message, 1)
 
 
+async def checkReminder():
+    return
+
+
 async def checkGmoWebsite():
     while True:
         await asyncio.sleep(3)
@@ -228,5 +251,6 @@ async def checkGmoWebsite():
             channel = bot.get_channel(lwConfig.newsChannelID)
             await channel.send(channel.guild.get_role(lwConfig.gmoRoleID).mention + " " + news)
 
+bot.loop.create_task(checkReminder())
 bot.loop.create_task(checkGmoWebsite())
 bot.run(lwConfig.token)

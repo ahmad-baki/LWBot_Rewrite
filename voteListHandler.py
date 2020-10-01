@@ -7,7 +7,9 @@ def updateVoteListFile(voteList):
         json.dump(voteList, myfile)
 
 def getVoteList():
-    with open(lwConfig.path + '/voteList.json', 'r') as myfile:
+    # creates file if it does not exist
+    with open(lwConfig.path + '/voteList.json', 'a+') as myfile:
+        myfile.seek(0)
         return json.loads(myfile.read())
 
 def changeVotingCounter(message, amountToChange):

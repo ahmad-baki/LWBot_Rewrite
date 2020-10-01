@@ -192,11 +192,18 @@ async def reminder(ctx, *, arg):
         if isinstance(e,TimeoutError):
             await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Timed out.", "Try again if you want to set a reminder."))
         elif isinstance(e, ValueError):
-            await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Wrong date format.", "your Date should be in the format\nDAY.MONTH.YEAR HOURS:MINUTES\nExample:1.10.2020 6:34."))
+            await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Wrong date format.", "your Date should be in the format\nreminder DAY.MONTH.YEAR HOURS:MINUTES\nExample: reminder 1.10.2020 6:34."))
         return
 
     reminderHandler.addReminder(ctx.author, time, m.content)
 
+@bot.command()
+async def myreminders(ctx):
+    r = reminderHandler.getReminder()
+    if ctx.author in list(r.keys()):
+        await ctx.send(reminder[ctx.author])
+    else:
+        await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "You have no reminders.", f"Type {bot.command_prefix}reminder to create one."))
 
 @bot.listen()
 async def on_raw_reaction_add(payload):
@@ -265,7 +272,8 @@ async def checkGmoWebsite():
             channel = bot.get_channel(lwConfig.newsChannelID)
             await channel.send(channel.guild.get_role(lwConfig.gmoRoleID).mention + " " + news)
 
+
+aiohttpLogErrorCatch.ignore_aiohttp_ssl_eror(asyncio.get_running_loop())
 bot.loop.create_task(checkReminder())
 bot.loop.create_task(checkGmoWebsite())
 bot.run(lwConfig.token)
-aiohttpLogErrorCatch.ignore_aiohttp_ssl_eror(asyncio.get_running_loop())

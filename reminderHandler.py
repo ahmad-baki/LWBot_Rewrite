@@ -10,6 +10,8 @@ def getReminder():
     # creates file if it does not exist
     with open(lwConfig.path + '/reminder.json', 'a+') as myfile:
         myfile.seek(0)
+        if myfile.read() == "":
+            myfile.write("{}")
         return json.loads(myfile.read())
 
 def addReminder(author, time, message):

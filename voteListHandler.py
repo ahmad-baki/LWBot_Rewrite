@@ -2,14 +2,18 @@ import lwConfig
 import json
 import datetime
 
+
 def updateVoteListFile(voteList):
     with open(lwConfig.path + '/voteList.json', 'w') as myfile:
         json.dump(voteList, myfile)
+
 
 def getVoteList():
     # creates file if it does not exist
     with open(lwConfig.path + '/voteList.json', 'a+') as myfile:
         myfile.seek(0)
+        if myfile.read() == "":
+            myfile.write("{}")
         return json.loads(myfile.read())
 
 def changeVotingCounter(message, amountToChange):

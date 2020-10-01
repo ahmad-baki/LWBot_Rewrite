@@ -178,11 +178,11 @@ async def stats(ctx):
 @bot.command()
 async def reminder(ctx, *, arg):
     time = datetime.datetime.strptime(arg, '%d.%m.%Y %H:%M')
-    await ctx.send('message for the reminder:')
+    if time < datetime.datetime.now():
+        await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Reminder in the past", "not allowed."))
+    await ctx.send('add message for the reminder:')
     m = await bot.wait_for('message',check=lambda m: m.author == ctx.author, timeout = 60)
-    await ctx.send(time.strftime('%d.%m.%Y %H:%M'))
-    await ctx.send(m.content)
-    # reminderHandler.addReminder(ctx.author, )
+    reminderHandler.addReminder(ctx.author, time, m.content)
 
 @bot.listen()
 async def on_raw_reaction_add(payload):

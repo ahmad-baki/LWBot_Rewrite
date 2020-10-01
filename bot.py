@@ -271,6 +271,7 @@ async def checkReminder():
 
 @tasks.loop(seconds=3)
 async def checkGmoWebsite():
+    raise Exception("test")
     while True:
         await asyncio.sleep(3)
         news = await lwHelperFunctions.getGmoNews()
@@ -285,7 +286,7 @@ async def gmoNewsError(arg):
     await channel.send(embed=lwHelperFunctions.simpleEmbed(bot.user, "Error in checkGmoWebsite", arg))
 
 
-# aiohttpLogErrorCatch.ignore_aiohttp_ssl_eror(tasks.loop.current_loop)
 checkGmoWebsite.start()
+aiohttpLogErrorCatch.ignore_aiohttp_ssl_eror(checkGmoWebsite)
 checkReminder.start()
 bot.run(lwConfig.token)

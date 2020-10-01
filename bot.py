@@ -10,7 +10,9 @@ import traceback
 import asyncio
 import datetime
 import operator
-import os 
+import os
+
+import aiohttpLogErrorCatch
 
 import lwConfig
 import lwHelperFunctions
@@ -179,12 +181,22 @@ async def stats(ctx):
 
 @bot.command()
 async def reminder(ctx, *, arg):
-    time = datetime.datetime.strptime(arg, '%d.%m.%Y %H:%M')
-    if time < datetime.datetime.now():
-        await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Reminder in the past", "not allowed."))
-    await ctx.send('add message for the reminder:')
-    m = await bot.wait_for('message',check=lambda m: m.author == ctx.author, timeout = 60)
+    try:
+        time = datetime.datetime.strptime(arg, '%d.%m.%Y %H:%M')
+        if time < datetime.datetime.now():
+            await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Reminder in the past?", "not allowed."))
+            return
+        await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Please enter a message for the reminder", "Dont answer for 60 seconds to time out."))
+        m = await bot.wait_for('message', check=lambda m: m.author == ctx.author, timeout=60)
+    except Exception as e:
+        if isinstance(e,TimeoutError):
+            await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Timed out.", "Try again if you want to set a reminder."))
+        elif isinstance(e, ValueError):
+            await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Wrong date format.", "your Date should be in the format\nDAY.MONTH.YEAR HOURS:MINUTES\nExample:1.10.2020 6:34."))
+        return
+
     reminderHandler.addReminder(ctx.author, time, m.content)
+
 
 @bot.listen()
 async def on_raw_reaction_add(payload):
@@ -256,3 +268,4 @@ async def checkGmoWebsite():
 bot.loop.create_task(checkReminder())
 bot.loop.create_task(checkGmoWebsite())
 bot.run(lwConfig.token)
+aiohttpLogErrorCatch.ignore_aiohttp_ssl_eror(asyncio.get_running_loop())

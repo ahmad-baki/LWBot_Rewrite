@@ -269,7 +269,9 @@ async def checkReminder():
 
 @tasks.loop(seconds=3)
 async def checkGmoWebsite():
+    print("1")
     raise Exception("test")
+    print("2")
     while True:
         await asyncio.sleep(3)
         news = await lwHelperFunctions.getGmoNews()
@@ -283,6 +285,11 @@ async def gmoNewsError(arg):
     channel = bot.get_channel(lwConfig.logChannelID)
     await channel.send(embed=lwHelperFunctions.simpleEmbed(bot.user, "Error in checkGmoWebsite", arg))
 
+@checkGmoWebsite.after_loop
+async def a():
+    print("aa")
+    if checkGmoWebsite.is_being_cancelled():
+        print("b")
 
 checkGmoWebsite.start()
 checkReminder.start()

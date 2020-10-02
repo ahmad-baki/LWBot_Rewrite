@@ -284,7 +284,7 @@ async def checkReminder():
                 author = bot.get_guild(lwConfig.serverID).get_member(int(authorID))
                 color = author.color
                 await channel.send(content=author.mention, embed=lwHelperFunctions.simpleEmbed(author, "Reminder", reminder[1], color=color))
-                reminderHandler.removeReminder(authorID, *r[authorID])
+                reminderHandler.removeReminder(authorID, *reminder)
 
 
 @tasks.loop(seconds=300)

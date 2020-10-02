@@ -69,7 +69,7 @@ async def on_message(message):
         await test(ctx=message, arg=message.content)
 
 
-@bot.command(name="eval", aliases="ev")
+@bot.command(name="eval", aliases=["ev","evaluate"])
 async def _eval(ctx, *, arg):
     if await bot.is_owner(ctx.author):
         try:

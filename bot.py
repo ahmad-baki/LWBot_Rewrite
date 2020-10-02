@@ -2,7 +2,6 @@
 https://discord.com/api/oauth2/authorize?bot_id=760125323580276757&permissions=8&scope=bot
 '''
 
-from datetime import date
 import discord
 from discord.ext import commands
 from discord.ext import tasks
@@ -42,7 +41,7 @@ async def on_command_error(ctx, error):
     embed = discord.Embed(title=error)
     embed.color = discord.Color.red()
     traceback_str = traceback.format_exception(
-        etype=type(error), value=error, tb=error.__traceback__)
+        etype=str(type(error)), value=error, tb=error.__traceback__)
     embed.description = f"```{traceback_str}```"
     embed.set_footer(text=type(error))
     await ctx.send(embed=embed)
@@ -295,7 +294,7 @@ async def checkGmoWebsite():
 async def beforeGmoNews():
     await bot.wait_until_ready()
     channel = bot.get_channel(lwConfig.logChannelID)
-    await channel.send(embed=lwHelperFunctions.simpleEmbed(bot.user, "gmoNewsCheck loop start", color=discord.Color.dark_magenta()))
+    await channel.send(embed=lwHelperFunctions.simpleEmbed(bot.user, "gmoNewsCheck loop start", color=discord.Color.dark_blue()))
 
 
 @checkGmoWebsite.after_loop
@@ -309,7 +308,7 @@ async def afterGmoNews():
 async def beforeReminderCheck():
     await bot.wait_until_ready()
     channel = bot.get_channel(lwConfig.logChannelID)
-    await channel.send(embed=lwHelperFunctions.simpleEmbed(bot.user, "reminder loop start", color=discord.Color.dark_magenta()))
+    await channel.send(embed=lwHelperFunctions.simpleEmbed(bot.user, "reminder loop start", color=discord.Color.dark_blue()))
 
 
 @checkReminder.after_loop

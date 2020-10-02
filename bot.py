@@ -211,7 +211,11 @@ async def reminder(ctx, *, arg):
 async def myreminders(ctx):
     reminder = reminderHandler.getReminder()
     if str(ctx.author.id) in list(reminder.keys()):
-        await ctx.send(reminder[str(ctx.author.id)])
+        remindersStr = ""
+        for singleReminder in reminder[str(ctx.author.id)]:
+            remindersStr += f"{singleReminder[0]}: {singleReminder[1]}\n"
+        await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Your Reminders", remindersStr, ctx.author.colour))
+        # await ctx.send(reminder[str(ctx.author.id)])
     else:
         await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "You have no reminders.", f"Type {bot.command_prefix}reminder [date] to create one."))
 

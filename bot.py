@@ -187,15 +187,15 @@ async def reminder(ctx, *, arg):
             return
         await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Please enter a message for the reminder", "Dont answer for 60 seconds to time out."))
         m = await bot.wait_for('message', check=lambda m: m.author == ctx.author, timeout=60)
-        await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "new reminder set for " + time, m.content))
     except Exception as e:
         if isinstance(e, TimeoutError):
             await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Timed out.", "Try again if you want to set a reminder."))
         elif isinstance(e, ValueError):
             await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Wrong date format.", "your Date should be in the format\nreminder DAY.MONTH.YEAR  HOURS:MINUTES\nExample: reminder 1.10.2020  6:34."))
-        await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, str(e), ""))
+        await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Error", str(e)))
         return
 
+    await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "new reminder set for " + time, m.content))
     reminderHandler.addReminder(ctx.author, time, m.content)
 
 

@@ -2,6 +2,7 @@
 https://discord.com/api/oauth2/authorize?bot_id=760125323580276757&permissions=8&scope=bot
 '''
 
+from asyncio import futures
 import discord
 from discord.ext import commands
 from discord.ext import tasks
@@ -41,7 +42,7 @@ async def on_command_error(ctx, error):
     embed = discord.Embed(title=error)
     embed.color = discord.Color.red()
     traceback_str = traceback.format_exception(
-        etype=str(type(error)), value=error, tb=error.__traceback__)
+        etype=str(type(error)), value=str(error), tb=error.__traceback__)
     await ctx.send(f"```{''.join(traceback_str)}```")
     embed.description = f"```{''.join(traceback_str)}```"
     embed.set_footer(text=type(error))
@@ -193,11 +194,13 @@ async def reminder(ctx, *, arg):
         m = await bot.wait_for('message', check=lambda m: m.author == ctx.author, timeout=60)
     except ValueError:
         await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Wrong date format.", "your Date should be in the format\nreminder DAY.MONTH.YEAR  HOURS:MINUTES\nExample: reminder 1.10.2020  6:34.", color=discord.Color.red()))
-    except TimeoutError:
+        return
+    except futures.TimeoutError:
         await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Timed out.", "Try again if you want to set a reminder.", color=discord.Color.red()))
+        return
     else:
-        reminderHandler.addReminder(ctx.author, arg, m.content)
-        await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author.id, "new reminder set for " + arg, m.content))
+        reminderHandler.addReminder(ctx.author.id, arg, m.content)
+        await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "new reminder set for " + arg, m.content))
         return
     await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Some Error occured", "Your reminder could not be set.", color=discord.Color.red()))
 

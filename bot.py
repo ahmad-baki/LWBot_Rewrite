@@ -180,13 +180,13 @@ async def stats(ctx):
 
 @bot.command()
 async def reminder(ctx, *, arg):
-    try:
-        time = datetime.datetime.strptime(arg, '%d.%m.%Y %H:%M')
-        if time < datetime.datetime.now():
-            await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Reminder in the past?", "not allowed."))
-            return
-        await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Please enter a message for the reminder", "Dont answer for 60 seconds to time out."))
-        m = await bot.wait_for('message', check=lambda m: m.author == ctx.author, timeout=60)
+    # try:
+    time = datetime.datetime.strptime(arg, '%d.%m.%Y %H:%M')
+    if time < datetime.datetime.now():
+        await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Reminder in the past?", "not allowed."))
+        return
+    await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Please enter a message for the reminder", "Dont answer for 60 seconds to time out."))
+    m = await bot.wait_for('message', check=lambda m: m.author == ctx.author, timeout=60)
     # except Exception as e:
     #     if isinstance(e, TimeoutError):
     #         await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Timed out.", "Try again if you want to set a reminder."))
@@ -279,7 +279,7 @@ async def checkGmoWebsite():
 @checkGmoWebsite.before_loop
 async def beforeGmoNews():
     await bot.wait_until_ready()
-    await asyncio.sleep(1)
+    await asyncio.sleep(5)
     print("gmoLoopStart")
     channel = bot.get_channel(lwConfig.logChannelID)
     await channel.send(embed=lwHelperFunctions.simpleEmbed(bot.user, "gmoNewsCheck loop start"))

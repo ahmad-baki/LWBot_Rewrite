@@ -42,7 +42,7 @@ async def on_command_error(ctx, error):
     embed.color = discord.Color.red()
     traceback_str = traceback.format_exception(
         etype=str(type(error)), value=error, tb=error.__traceback__)
-    await ctx.send(traceback_str)
+    await ctx.send("```"+traceback_str+"```")
     embed.description = f"```{traceback_str}```"
     embed.set_footer(text=type(error))
     await ctx.send(embed=embed)

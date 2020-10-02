@@ -213,7 +213,7 @@ async def myreminders(ctx):
     if str(ctx.author.id) in list(reminder.keys()):
         remindersStr = ""
         for singleReminder in reminder[str(ctx.author.id)]:
-            remindersStr += f"{singleReminder[0]}: {singleReminder[1]}\n"
+            remindersStr += f"{singleReminder[0]}: {singleReminder[1]}\n\n"
         await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Your Reminders", remindersStr, color=ctx.author.colour))
         # await ctx.send(reminder[str(ctx.author.id)])
     else:

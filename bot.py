@@ -282,7 +282,7 @@ async def checkReminder():
             if time <= now:
                 channel = bot.get_channel(lwConfig.botChannelID)
                 author = bot.get_user(authorID)
-                color = bot.get_guild(lwConfig.serverID).get_member(authorID).color
+                color = bot.get_guild(lwConfig.serverID).get_member(int(authorID)).color
                 await channel.send(content=author.mention, embed=lwHelperFunctions.simpleEmbed(author, "Reminder", reminder[1], color=color))
                 reminderHandler.removeReminder(authorID, *r[authorID])
 

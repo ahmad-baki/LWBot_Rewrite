@@ -42,8 +42,8 @@ async def on_command_error(ctx, error):
     embed.color = discord.Color.red()
     traceback_str = traceback.format_exception(
         etype=str(type(error)), value=error, tb=error.__traceback__)
-    await ctx.send("```"+traceback_str+"```")
-    embed.description = f"```{traceback_str}```"
+    await ctx.send(f"```{''.join(traceback_str)}```")
+    embed.description = f"```{''.join(traceback_str)}```"
     embed.set_footer(text=type(error))
     await ctx.send(embed=embed)
 
@@ -295,7 +295,7 @@ async def checkGmoWebsite():
 async def beforeGmoNews():
     await bot.wait_until_ready()
     channel = bot.get_channel(lwConfig.logChannelID)
-    await channel.send(embed=lwHelperFunctions.simpleEmbed(bot.user, "gmoNewsCheck loop start", color=discord.Color.blue()))
+    await channel.send(embed=lwHelperFunctions.simpleEmbed(bot.user, "gmoNewsCheck loop start", color=discord.Color.green()))
 
 
 @checkGmoWebsite.after_loop
@@ -309,7 +309,7 @@ async def afterGmoNews():
 async def beforeReminderCheck():
     await bot.wait_until_ready()
     channel = bot.get_channel(lwConfig.logChannelID)
-    await channel.send(embed=lwHelperFunctions.simpleEmbed(bot.user, "reminder loop start", color=discord.Color.blue()))
+    await channel.send(embed=lwHelperFunctions.simpleEmbed(bot.user, "reminder loop start", color=discord.Color.green()))
 
 
 @checkReminder.after_loop

@@ -195,8 +195,8 @@ async def reminder(ctx, *, arg):
         await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Error", str(e)))
         return
 
-    await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "new reminder set for " + time, m.content))
-    reminderHandler.addReminder(ctx.author, time, m.content)
+    await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "new reminder set for " + arg, m.content))
+    reminderHandler.addReminder(ctx.author, arg, m.content)
 
 
 @bot.command()

@@ -2,6 +2,7 @@
 https://discord.com/api/oauth2/authorize?bot_id=760125323580276757&permissions=8&scope=bot
 '''
 
+from datetime import date
 import discord
 from discord.ext import commands
 from discord.ext import tasks
@@ -68,8 +69,8 @@ async def on_message(message):
         await test(ctx=message, arg=message.content)
 
 
-@bot.command()
-async def ev(ctx, *, arg):
+@bot.command(name="eval", aliases="ev")
+async def _eval(ctx, *, arg):
     if await bot.is_owner(ctx.author):
         try:
             await eval(arg, {
@@ -180,23 +181,20 @@ async def stats(ctx):
 
 @bot.command()
 async def reminder(ctx, *, arg):
-    # try:
-    time = datetime.datetime.strptime(arg, '%d.%m.%Y %H:%M')
-    if time < datetime.datetime.now():
-        await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Reminder in the past?", "not allowed."))
-        return
-    await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Please enter a message for the reminder", "Dont answer for 60 seconds to time out."))
-    m = await bot.wait_for('message', check=lambda m: m.author == ctx.author, timeout=60)
-    # except Exception as e:
-    #     if isinstance(e, TimeoutError):
-    #         await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Timed out.", "Try again if you want to set a reminder."))
-    #     elif isinstance(e, ValueError):
-    #         await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Wrong date format.", "your Date should be in the format\nreminder DAY.MONTH.YEAR  HOURS:MINUTES\nExample: reminder 1.10.2020  6:34."))
-    #     await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Error", str(e)))
-    #     return
-
-    await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "new reminder set for " + arg, m.content))
-    reminderHandler.addReminder(ctx.author, arg, m.content)
+    try:
+        time = datetime.datetime.strptime(arg, '%d.%m.%Y %H:%M')
+        if time < datetime.datetime.now():
+            await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Reminder in the past?", "not allowed."))
+            return
+        await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Please enter a message for the reminder", "Dont answer for 60 seconds to time out."))
+        m = await bot.wait_for('message', check=lambda m: m.author == ctx.author, timeout=60)
+    except ValueError:
+        await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Wrong date format.", "your Date should be in the format\nreminder DAY.MONTH.YEAR  HOURS:MINUTES\nExample: reminder 1.10.2020  6:34."))
+    except TimeoutError:
+        await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Timed out.", "Try again if you want to set a reminder."))
+    else:
+        reminderHandler.addReminder(ctx.author, arg, m.content)
+    await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author.id, "new reminder set for " + arg, m.content))
 
 
 @bot.command()
@@ -265,7 +263,18 @@ async def on_raw_reaction_remove(payload):
 
 @tasks.loop(seconds=30)
 async def checkReminder():
-    return
+    r = reminderHandler.getReminder()
+    now = datetime.datetime.now()
+    authors = list(r.keys())
+    for authorID in authors:
+        for reminder in r[authorID]:
+            time = datetime.datetime.strptime(reminder[0], '%d.%m.%Y %H:%M')
+            if time <= now:
+                channel = bot.get_channel(lwConfig.botChannelID)
+                author = bot.get_user(authorID)
+                await channel.send(content=author.mention, embed=lwHelperFunctions.simpleEmbed(author, "Reminder", reminder[1]))
+                reminderHandler.removeReminder(authorID, *r[authorID])
+
 
 
 @tasks.loop(seconds=300)
@@ -282,6 +291,7 @@ async def beforeGmoNews():
     await asyncio.sleep(5)
     print("gmoLoopStart")
     channel = bot.get_channel(lwConfig.logChannelID)
+    await channel.send("test")
     await channel.send(embed=lwHelperFunctions.simpleEmbed(bot.user, "gmoNewsCheck loop start"))
 
 

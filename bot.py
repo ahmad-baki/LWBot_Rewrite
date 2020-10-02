@@ -198,11 +198,12 @@ async def reminder(ctx, *, arg):
     except futures.TimeoutError:
         await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Timed out.", "Try again if you want to set a reminder.", color=discord.Color.red()))
         return
+    except Exception as e:
+        await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Some Error occured", "Your reminder could not be set.", color=discord.Color.red()))
     else:
         reminderHandler.addReminder(ctx.author.id, arg, m.content)
         await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "new reminder set for " + arg, m.content))
         return
-    await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Some Error occured", "Your reminder could not be set.", color=discord.Color.red()))
 
 
 

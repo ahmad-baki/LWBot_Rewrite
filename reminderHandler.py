@@ -18,7 +18,7 @@ def addReminder(author, time, message):
     authors = list(reminder.keys())
     if not str(author) in authors:
         reminder[str(author)] = []
-        reminder[str(author)].append((time, message))
+    reminder[str(author)].append((time, message))
     updateReminder(reminder)
 
 

@@ -19,6 +19,7 @@ def addReminder(author, time, message):
     if not str(author) in authors:
         reminder[str(author)] = []
         reminder[str(author)].append((time, message))
+    updateReminder(reminder)
 
 
 def removeReminder(author, time, message):
@@ -28,3 +29,4 @@ def removeReminder(author, time, message):
         if (time, message) in reminder[str(author)]:
             reminder[str(author)].pop(
                 reminder[str(author)].index(time, message))
+    updateReminder(reminder)

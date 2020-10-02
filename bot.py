@@ -41,7 +41,8 @@ async def on_command_error(ctx, error):
         return
     embed = discord.Embed(title=error)
     embed.color = discord.Color.red()
-    traceback_str = traceback.format_exception(etype=type(error), value=error, tb=error.__traceback__)
+    traceback_str = traceback.format_exception(
+        etype=type(error), value=error, tb=error.__traceback__)
     embed.description = f"```{traceback_str}```"
     embed.set_footer(text=type(error))
     await ctx.send(embed=embed)
@@ -71,7 +72,7 @@ async def on_message(message):
         await test(ctx=message, arg=message.content)
 
 
-@bot.command(name="eval", aliases=["ev","evaluate"])
+@bot.command(name="eval", aliases=["ev", "evaluate"])
 async def _eval(ctx, *, arg):
     if await bot.is_owner(ctx.author):
         try:
@@ -186,17 +187,20 @@ async def reminder(ctx, *, arg):
     try:
         time = datetime.datetime.strptime(arg, '%d.%m.%Y %H:%M')
         if time < datetime.datetime.now():
-            await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Reminder in the past?", "not allowed."))
+            await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Reminder in the past?", "not allowed.", color=discord.Color.orange()))
             return
-        await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Please enter a message for the reminder", "Dont answer for 60 seconds to time out."))
+        await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Please enter a message for the reminder", "Dont answer for 60 seconds to time out.", color=discord.Color.gold()))
         m = await bot.wait_for('message', check=lambda m: m.author == ctx.author, timeout=60)
     except ValueError:
-        await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Wrong date format.", "your Date should be in the format\nreminder DAY.MONTH.YEAR  HOURS:MINUTES\nExample: reminder 1.10.2020  6:34."))
+        await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Wrong date format.", "your Date should be in the format\nreminder DAY.MONTH.YEAR  HOURS:MINUTES\nExample: reminder 1.10.2020  6:34.", color=discord.Color.red()))
     except TimeoutError:
-        await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Timed out.", "Try again if you want to set a reminder."))
+        await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Timed out.", "Try again if you want to set a reminder.", color=discord.Color.red()))
     else:
         reminderHandler.addReminder(ctx.author, arg, m.content)
-    await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author.id, "new reminder set for " + arg, m.content))
+        await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author.id, "new reminder set for " + arg, m.content))
+        return
+    await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Some Error occured", "Your reminder could not be set.", color=discord.Color.red()))
+
 
 
 @bot.command()
@@ -274,9 +278,9 @@ async def checkReminder():
             if time <= now:
                 channel = bot.get_channel(lwConfig.botChannelID)
                 author = bot.get_user(authorID)
-                await channel.send(content=author.mention, embed=lwHelperFunctions.simpleEmbed(author, "Reminder", reminder[1]))
+                color = bot.get_guild(lwConfig.serverID).get_member(authorID).color
+                await channel.send(content=author.mention, embed=lwHelperFunctions.simpleEmbed(author, "Reminder", reminder[1], color=color))
                 reminderHandler.removeReminder(authorID, *r[authorID])
-
 
 
 @tasks.loop(seconds=300)
@@ -290,17 +294,28 @@ async def checkGmoWebsite():
 @checkGmoWebsite.before_loop
 async def beforeGmoNews():
     await bot.wait_until_ready()
-    await asyncio.sleep(5)
-    print("gmoLoopStart")
     channel = bot.get_channel(lwConfig.logChannelID)
-    await channel.send(embed=lwHelperFunctions.simpleEmbed(bot.user, "gmoNewsCheck loop start"))
+    await channel.send(embed=lwHelperFunctions.simpleEmbed(bot.user, "gmoNewsCheck loop start", color=discord.Color.dark_magenta()))
 
 
 @checkGmoWebsite.after_loop
 async def afterGmoNews():
-    print("gmoLoop crashed")
     channel = bot.get_channel(lwConfig.logChannelID)
-    await channel.send(embed=lwHelperFunctions.simpleEmbed(bot.user, "gmoNewsCheck loop stopped. restarting now"))
+    await channel.send(embed=lwHelperFunctions.simpleEmbed(bot.user, "gmoNewsCheck loop stopped. restarting now", color=discord.Color.orange()))
+    checkGmoWebsite.restart()
+
+
+@checkReminder.before_loop
+async def beforeReminderCheck():
+    await bot.wait_until_ready()
+    channel = bot.get_channel(lwConfig.logChannelID)
+    await channel.send(embed=lwHelperFunctions.simpleEmbed(bot.user, "reminder loop start", color=discord.Color.dark_magenta()))
+
+
+@checkReminder.after_loop
+async def afterReminderCheck():
+    channel = bot.get_channel(lwConfig.logChannelID)
+    await channel.send(embed=lwHelperFunctions.simpleEmbed(bot.user, "reminder loop stopped. restarting now", color=discord.Color.orange()))
     checkGmoWebsite.restart()
 
 checkGmoWebsite.start()

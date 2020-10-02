@@ -40,11 +40,11 @@ def is_url_image(image_url):
         return True
     return False
 
-def simpleEmbed(author, title, description = "", image_url=""):
+def simpleEmbed(author, title, description = "", image_url="", color=discord.Color.blurple()):
     e = discord.Embed(title=title, description=description)
     if image_url != "":
         e.set_image(url=image_url)
-    e.color = discord.Color.blurple()
+    e.color = color
     e.timestamp = datetime.datetime.utcnow()
     e.set_footer(text=author.name, icon_url=author.avatar_url) 
     return e

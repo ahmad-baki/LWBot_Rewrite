@@ -30,6 +30,4 @@ def removeReminder(author, time, message):
         if [time, message] in reminder[str(author)]:
             reminder[str(author)].pop(
                 reminder[str(author)].index([time, message]))
-        else:
-            print([time, message] in reminder[str(author)])
     updateReminder(reminder)

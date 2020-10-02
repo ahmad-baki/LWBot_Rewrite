@@ -40,7 +40,7 @@ def is_url_image(image_url):
         return True
     return False
 
-def simpleEmbed(author, title, description, image_url=""):
+def simpleEmbed(author, title, description = "", image_url=""):
     e = discord.Embed(title=title, description=description)
     if image_url != "":
         e.set_image(url=image_url)

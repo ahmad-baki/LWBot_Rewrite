@@ -39,9 +39,9 @@ async def on_command_error(ctx, error):
     error = getattr(error, 'original', error)
     if isinstance(error, CommandNotFound) or isinstance(error, MissingRequiredArgument):
         return
-    embed = discord.Embed(title=f'new Error in command {ctx.command}()')
+    embed = discord.Embed(title=error)
     embed.color = discord.Color.red()
-    traceback_str = ''.join(traceback.format_tb(error.__traceback__))
+    traceback_str = traceback.format_exception(etype=type(error), value=error, tb=error.__traceback__)
     embed.description = f"```{traceback_str}```"
     embed.set_footer(text=type(error))
     await ctx.send(embed=embed)
@@ -293,7 +293,6 @@ async def beforeGmoNews():
     await asyncio.sleep(5)
     print("gmoLoopStart")
     channel = bot.get_channel(lwConfig.logChannelID)
-    await channel.send(bot.user.id)
     await channel.send(embed=lwHelperFunctions.simpleEmbed(bot.user, "gmoNewsCheck loop start"))
 
 

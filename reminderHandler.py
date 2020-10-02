@@ -23,6 +23,7 @@ def addReminder(author, time, message):
 
 
 def removeReminder(author, time, message):
+    print(time + " -- " + message)
     reminder = getReminder()
     authors = list(reminder.keys())
     if str(author) in authors:

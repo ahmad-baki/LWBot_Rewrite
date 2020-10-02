@@ -42,7 +42,7 @@ async def on_command_error(ctx, error):
     embed = discord.Embed(title=error)
     embed.color = discord.Color.red()
     traceback_str = traceback.format_exception(
-        etype=str(type(error)), value=str(error), tb=error.__traceback__)
+        etype=type(error), value=error, tb=error.__traceback__)
     await ctx.send(f"```{''.join(traceback_str)}```")
     embed.description = f"```{''.join(traceback_str)}```"
     embed.set_footer(text=type(error))
@@ -209,8 +209,8 @@ async def reminder(ctx, *, arg):
 @bot.command()
 async def myreminders(ctx):
     r = reminderHandler.getReminder()
-    if ctx.author in list(r.keys()):
-        await ctx.send(reminder[ctx.author])
+    if str(ctx.author.id) in list(r.keys()):
+        await ctx.send(reminder[str(ctx.author.id)])
     else:
         await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "You have no reminders.", f"Type {bot.command_prefix}reminder [date] to create one."))
 

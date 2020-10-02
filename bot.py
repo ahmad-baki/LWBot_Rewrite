@@ -36,7 +36,7 @@ async def on_error(event, *args, **kwargs):
 
 @bot.event
 async def on_command_error(ctx, error):
-    #error = getattr(error, 'original', error)
+    error = getattr(error, 'original', error)
     if isinstance(error, CommandNotFound) or isinstance(error, MissingRequiredArgument):
         return
     embed = discord.Embed(title=error)
@@ -208,8 +208,8 @@ async def reminder(ctx, *, arg):
 
 @bot.command()
 async def myreminders(ctx):
-    r = reminderHandler.getReminder()
-    if str(ctx.author.id) in list(r.keys()):
+    reminder = reminderHandler.getReminder()
+    if str(ctx.author.id) in list(reminder.keys()):
         await ctx.send(reminder[str(ctx.author.id)])
     else:
         await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "You have no reminders.", f"Type {bot.command_prefix}reminder [date] to create one."))

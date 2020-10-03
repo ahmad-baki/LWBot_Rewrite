@@ -46,9 +46,9 @@ async def on_command_error(ctx, error):
     # print(type(errormsg))
     # print(repr(errormsg))
     traceback_str = str(''.join(traceback.format_exception(
-        etype=type(error), value=repr(error), tb=error.__traceback__)))
-    await ctx.send(f"```{errormsg}```")
-    embed.description = f"```{repr(errormsg)}```"
+        etype=type(error), value=error, tb=error.__traceback__)))
+    await ctx.send(f"```{traceback_str}```")
+    embed.description = f"```{repr(traceback_str)}```"
     # embed.set_footer(text=type(error))
     await ctx.send(embed=embed)
 

@@ -211,10 +211,13 @@ async def reminder(ctx, *, arg):
 async def myreminders(ctx):
     reminder = reminderHandler.getReminder()
     if str(ctx.author.id) in list(reminder.keys()):
-        remindersStr = ""
+        e = discord.Embed(title="Your Reminders")
+        e.color = ctx.author.color
+        e.timestamp = datetime.datetime.utcnow()
+        e.set_footer(text=ctx.author.name, icon_url=ctx.author.avatar_url) 
         for singleReminder in reminder[str(ctx.author.id)]:
-            remindersStr += f"{singleReminder[0]}: {singleReminder[1]}\n\n"
-        await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Your Reminders", remindersStr, color=ctx.author.colour))
+            e.add_field(name=singleReminder[0], value=singleReminder[1], inline=False)
+        await ctx.send(embed=e)
         # await ctx.send(reminder[str(ctx.author.id)])
     else:
         await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "You have no reminders.", f"Type {bot.command_prefix}reminder [date] to create one."))

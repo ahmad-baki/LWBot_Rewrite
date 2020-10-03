@@ -280,7 +280,7 @@ async def on_raw_reaction_add(payload):
         if reaction.message.author == user and (reaction.emoji == upvote or reaction.emoji == downvote):
             await reaction.remove(user)
             errormsg = await reaction.message.channel.send(f"{user.mention} you cannot up/downvote your own post.")
-            deleteEmoji = lwHelperFunctions.getEmoji(lwConfig.deleteEmojiName)
+            deleteEmoji = lwHelperFunctions.getEmoji(bot, lwConfig.deleteEmojiName)
             await errormsg.add_reaction(deleteEmoji)
             try:
                 reaction, user = await bot.wait_for('reaction_add', timeout=30.0, check=lambda reaction, user: user == user and reaction.emoji.name == deleteEmoji.name)

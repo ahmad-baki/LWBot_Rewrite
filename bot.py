@@ -285,7 +285,8 @@ async def on_raw_reaction_add(payload):
             try:
                 reaction, user = await bot.wait_for('reaction_add', timeout=30.0, check=lambda reaction, user: user == user and reaction.emoji.name == deleteEmoji.name)
             except futures.TimeoutError:
-                await errormsg.delete()
+                pass
+            await errormsg.delete()
             return
         
         # change voting counter

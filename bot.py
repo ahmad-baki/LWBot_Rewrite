@@ -45,7 +45,7 @@ async def on_command_error(ctx, error):
         etype=type(error), value=error, tb=error.__traceback__)
     await ctx.send(f"```{''.join(traceback_str)}```")
     embed.description = f"```{''.join(traceback_str)}```"
-    embed.set_footer(text=type(error))
+    # embed.set_footer(text=type(error))
     await ctx.send(embed=embed)
 
 

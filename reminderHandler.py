@@ -28,5 +28,5 @@ def removeReminder(author, time, message):
     if str(author.id) in authors:
         if [time, message] in reminder[str(author.id)]:
             reminder[str(author.id)].pop(
-                reminder[str(author)].index([time, message]))
+                reminder[str(author.id)].index([time, message]))
     updateReminder(reminder)

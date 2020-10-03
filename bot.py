@@ -184,7 +184,7 @@ async def stats(ctx):
 
 
 @bot.command()
-async def reminder(ctx, *, arg):
+async def reminder(ctx, *, arg, aliases=["remindme"]):
     try:
         time = datetime.datetime.strptime(arg, '%d.%m.%Y %H:%M')
         if time < datetime.datetime.now():

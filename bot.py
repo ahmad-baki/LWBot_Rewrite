@@ -193,7 +193,7 @@ async def reminder(ctx, *, arg):
         await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Please enter a message for the reminder", "Dont answer for 60 seconds to time out.", color=discord.Color.gold()))
         m = await bot.wait_for('message', check=lambda m: m.author == ctx.author, timeout=60)
     except ValueError:
-        await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Wrong date format.", "your Date should be in the format\nreminder DAY.MONTH.YEAR  HOURS:MINUTES\nExample: reminder 1.10.2020  6:34.", color=discord.Color.red()))
+        await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Wrong date format.", "your Date should be in the format\n`reminder dd.mm.yyyy hh:mm`\n`Example: reminder 1.10.2020  6:34`", color=discord.Color.red()))
         return
     except futures.TimeoutError:
         await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Timed out.", "Try again if you want to set a reminder.", color=discord.Color.red()))
@@ -206,7 +206,7 @@ async def reminder(ctx, *, arg):
         return
 
 
-@bot.command()
+@bot.command(aliases=["mr"])
 async def myreminders(ctx):
     reminder = reminderHandler.getReminder()
     if str(ctx.author.id) in list(reminder.keys()) and len(reminder[str(ctx.author.id)]) > 0:

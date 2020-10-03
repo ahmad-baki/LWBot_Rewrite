@@ -183,8 +183,8 @@ async def stats(ctx):
         await ctx.message.channel.send("no items in the voting list.")
 
 
-@bot.command()
-async def reminder(ctx, *, arg, aliases=["remindme"]):
+@bot.command(aliases=["remindme"])
+async def reminder(ctx, *, arg):
     try:
         time = datetime.datetime.strptime(arg, '%d.%m.%Y %H:%M')
         if time < datetime.datetime.now():

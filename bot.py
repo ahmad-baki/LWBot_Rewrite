@@ -283,7 +283,12 @@ async def on_raw_reaction_add(payload):
             deleteEmoji = lwHelperFunctions.getEmoji(bot, lwConfig.deleteEmojiName)
             await errormsg.add_reaction(deleteEmoji)
             try:
-                reaction, user = await bot.wait_for('reaction_add', timeout=30.0, check=lambda reaction, user: user == user and reaction.emoji.name == deleteEmoji.name)
+                def check(reaction, _user):
+                    print(reaction.emoji.name)
+                    print(deleteEmoji.name)
+                    return user == _user and reaction.emoji.name == deleteEmoji.name
+# lambda reaction, user: user == user and reaction.emoji.name == deleteEmoji.name
+                reaction, user = await bot.wait_for('reaction_add', timeout=30.0, check=check)
             except futures.TimeoutError:
                 pass
             await errormsg.delete()

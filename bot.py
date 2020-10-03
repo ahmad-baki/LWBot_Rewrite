@@ -209,15 +209,44 @@ async def reminder(ctx, *, arg):
 @bot.command()
 async def myreminders(ctx):
     reminder = reminderHandler.getReminder()
-    if str(ctx.author.id) in list(reminder.keys()):
-        e = discord.Embed(title="Your Reminders")
-        e.color = ctx.author.color
-        e.timestamp = datetime.datetime.utcnow()
+    if str(ctx.author.id) in list(reminder.keys()) or len(reminder[str(ctx.author.id)]) == 0:
+        e = discord.Embed(title="Your Reminders", color=ctx.author.color,
+                          timestamp=datetime.datetime.utcnow())
         e.set_footer(text=ctx.author.name, icon_url=ctx.author.avatar_url)
         for singleReminder in reminder[str(ctx.author.id)]:
             e.add_field(name=singleReminder[0],
                         value=singleReminder[1], inline=False)
         await ctx.send(embed=e)
+    else:
+        await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "You have no reminders.", f"Type {bot.command_prefix}reminder [date] to create one."))
+
+
+@bot.command(aliases=["rmr"])
+async def removereminder(ctx):
+    reminder = reminderHandler.getReminder()
+    if str(ctx.author.id) in list(reminder.keys()) or len(reminder[str(ctx.author.id)]) == 0:
+        e = discord.Embed(title="Your Reminders", color=ctx.author.color,
+                          timestamp=datetime.datetime.utcnow())
+        e.set_footer(text=ctx.author.name, icon_url=ctx.author.avatar_url)
+        reminderCount = len(reminder[str(ctx.author.id)])
+        for i in range(reminderCount):
+            singleReminder = reminder[str(ctx.author.id)][i]
+            e.add_field(name=f"[{i}] {singleReminder[0]}",
+                        value=singleReminder[1], inline=False)
+        await ctx.send(embed=e)
+        await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Please enter a index to remove", "Dont answer for 60 seconds to time out.", color=discord.Color.gold()))
+        try:
+            m = await bot.wait_for('message', check=lambda m: m.author == ctx.author, timeout=60)
+            index = int(m.content)
+            if 0 <= index < reminderCount:
+                reminderHandler.removeReminder(
+                    ctx.author, *reminder[str(ctx.author.id)][index])
+            else:
+                raise ValueError
+        except futures.TimeoutError:
+            await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Timed out.", "Try again if you want to remove a reminder.", color=discord.Color.red()))
+        except ValueError:
+            await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "ValueError", "Your message was not a number or the number is not in the indices.", color=discord.Color.red()))
     else:
         await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "You have no reminders.", f"Type {bot.command_prefix}reminder [date] to create one."))
 

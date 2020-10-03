@@ -25,8 +25,8 @@ def addReminder(author, time, message):
 def removeReminder(author, time, message):
     reminder = getReminder()
     authors = list(reminder.keys())
-    if str(author) in authors:
-        if [time, message] in reminder[str(author)]:
-            reminder[str(author)].pop(
+    if str(author.id) in authors:
+        if [time, message] in reminder[str(author.id)]:
+            reminder[str(author.id)].pop(
                 reminder[str(author)].index([time, message]))
     updateReminder(reminder)

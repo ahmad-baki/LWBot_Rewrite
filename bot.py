@@ -241,6 +241,7 @@ async def removereminder(ctx):
             if 0 <= index < reminderCount:
                 reminderHandler.removeReminder(
                     ctx.author, *reminder[str(ctx.author.id)][index])
+                await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Reminder removed.", f"Your reminder\n```{reminder[str(ctx.author.id)][index][1]}``` was removed."))
             else:
                 raise ValueError
         except futures.TimeoutError:

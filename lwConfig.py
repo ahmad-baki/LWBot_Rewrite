@@ -28,3 +28,4 @@ gmoRoleID = config["gmo_role_id"]
 serverID = config["server_id"]
 logChannelID = config["log_channel_id"]
 botChannelID = config["bot_channel_id"]
+# awakeChannelIDs = config["awake_channel_IDs"]     # json file needs this as a list

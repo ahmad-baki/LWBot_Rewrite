@@ -252,8 +252,10 @@ async def removereminder(ctx):
 
 @bot.listen()
 async def on_raw_reaction_add(payload):
+    # check if the channel of the reaction is the specified channel
     if payload.channel_id != lwConfig.memeChannelID:
         return
+    # get user, message and reaction
     user = bot.get_user(payload.user_id)
     msg = await bot.get_channel(payload.channel_id).fetch_message(payload.message_id)
     reaction = None
@@ -262,34 +264,47 @@ async def on_raw_reaction_add(payload):
             reaction = reac
     if reaction == None:
         return
-    if payload.emoji.name == lwConfig.deleteEmojiName and msg.author == bot.user and user in msg.mentions:
-        if bot.user in await reaction.users().flatten():
-            await msg.delete()
-        else:
-            await reaction.remove(user)
-        return
+
+    # if payload.emoji.name == lwConfig.deleteEmojiName and msg.author == bot.user and user in msg.mentions:
+    #     if bot.user in await reaction.users().flatten():
+    #         await msg.delete()
+    #     else:
+    #         await reaction.remove(user)
+    #     return
+
+    # get up-/downvote emojis
     upvote = lwHelperFunctions.getEmoji(bot, lwConfig.upvoteEmoji)
     downvote = lwHelperFunctions.getEmoji(bot, lwConfig.downoteEmoji)
     if user != bot.user:
+        # in case the message author tries to up-/downvote their own post
         if reaction.message.author == user and (reaction.emoji == upvote or reaction.emoji == downvote):
             await reaction.remove(user)
             errormsg = await reaction.message.channel.send(f"{user.mention} you cannot up/downvote your own post.")
-            for i in bot.emojis:
-                if i.name == lwConfig.deleteEmojiName:
-                    await errormsg.add_reaction(i)
+            deleteEmoji = lwHelperFunctions.getEmoji(lwConfig.deleteEmojiName)
+            await errormsg.add_reaction(deleteEmoji)
+            try:
+                reaction, user = await bot.wait_for('reaction_add', timeout=30.0, check=lambda reaction, user: user == user and reaction.emoji.name == deleteEmoji.name)
+            except futures.TimeoutError:
+                await errormsg.delete()
             return
+        
+        # change voting counter
         if reaction.emoji == upvote:
             voteListHandler.changeVotingCounter(reaction.message, 1)
+            # pin message when it has the specified amount of upvotes
             if reaction.count - 1 >= lwConfig.upvotesForPin and not reaction.message.pinned:
                 await reaction.message.pin(reason="good meme")
         elif reaction.emoji == downvote:
             voteListHandler.changeVotingCounter(reaction.message, -1)
 
 
+
 @bot.listen()
 async def on_raw_reaction_remove(payload):
+    # check if the channel of the reaction is the specified channel
     if payload.channel_id != lwConfig.memeChannelID:
         return
+    # get user, message and reaction
     user = bot.get_user(payload.user_id)
     msg = await bot.get_channel(payload.channel_id).fetch_message(payload.message_id)
     reaction = None
@@ -298,6 +313,7 @@ async def on_raw_reaction_remove(payload):
             reaction = reac
     if reaction == None:
         return
+    # change voting counter
     if user != bot.user and user != reaction.message.author:
         if reaction.emoji == lwHelperFunctions.getEmoji(bot, lwConfig.upvoteEmoji):
             voteListHandler.changeVotingCounter(reaction.message, -1)

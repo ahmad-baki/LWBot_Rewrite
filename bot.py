@@ -209,7 +209,7 @@ async def reminder(ctx, *, arg):
 @bot.command()
 async def myreminders(ctx):
     reminder = reminderHandler.getReminder()
-    if str(ctx.author.id) in list(reminder.keys()) or len(reminder[str(ctx.author.id)]) == 0:
+    if str(ctx.author.id) in list(reminder.keys()) and len(reminder[str(ctx.author.id)]) > 0:
         e = discord.Embed(title="Your Reminders", color=ctx.author.color,
                           timestamp=datetime.datetime.utcnow())
         e.set_footer(text=ctx.author.name, icon_url=ctx.author.avatar_url)

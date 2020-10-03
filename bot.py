@@ -44,6 +44,8 @@ async def on_command_error(ctx, error):
     errormsg = traceback.format_tb(error.__traceback__)
     errormsg += traceback.format_exception_only(type(error), error)
     errormsg = ''.join(errormsg)
+    print(type(errormsg))
+    print(repr(errormsg))
     # traceback_str = str(''.join(traceback.format_exception(
     #     etype=type(error), value=repr(error), tb=error.__traceback__)))
     await ctx.send(f"```{errormsg}```")

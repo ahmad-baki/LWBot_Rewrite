@@ -43,10 +43,11 @@ async def on_command_error(ctx, error):
     embed.color = discord.Color.red()
     errormsg = traceback.format_tb(error.__traceback__)
     errormsg += traceback.format_exception_only(type(error), error)
+    errormsg = ''.join(errormsg)
     # traceback_str = str(''.join(traceback.format_exception(
     #     etype=type(error), value=repr(error), tb=error.__traceback__)))
     await ctx.send(f"```{errormsg}```")
-    embed.description = f"```{errormsg}```"
+    embed.description = f"```{repr(errormsg)}```"
     # embed.set_footer(text=type(error))
     await ctx.send(embed=embed)
 

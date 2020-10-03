@@ -198,13 +198,12 @@ async def reminder(ctx, *, arg):
     except futures.TimeoutError:
         await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Timed out.", "Try again if you want to set a reminder.", color=discord.Color.red()))
         return
-    except Exception as e:
+    except Exception:
         await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Some Error occured", "Your reminder could not be set.", color=discord.Color.red()))
     else:
         reminderHandler.addReminder(ctx.author.id, arg, m.content)
         await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "new reminder set for " + arg, m.content))
         return
-
 
 
 @bot.command()
@@ -214,11 +213,11 @@ async def myreminders(ctx):
         e = discord.Embed(title="Your Reminders")
         e.color = ctx.author.color
         e.timestamp = datetime.datetime.utcnow()
-        e.set_footer(text=ctx.author.name, icon_url=ctx.author.avatar_url) 
+        e.set_footer(text=ctx.author.name, icon_url=ctx.author.avatar_url)
         for singleReminder in reminder[str(ctx.author.id)]:
-            e.add_field(name=singleReminder[0], value=singleReminder[1], inline=False)
+            e.add_field(name=singleReminder[0],
+                        value=singleReminder[1], inline=False)
         await ctx.send(embed=e)
-        # await ctx.send(reminder[str(ctx.author.id)])
     else:
         await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "You have no reminders.", f"Type {bot.command_prefix}reminder [date] to create one."))
 
@@ -277,12 +276,13 @@ async def on_raw_reaction_remove(payload):
         elif reaction.emoji == lwHelperFunctions.getEmoji(bot, lwConfig.downoteEmoji):
             voteListHandler.changeVotingCounter(reaction.message, 1)
 
-# @bot.listen()
-# async def on_voice_state_update(member, before, after):
-#     afkChannel = member.guild.afk_channel
-#     if after.channel and before.channel:    #if the member didn't just join or quit, but moved channels
-#         if after.channel == afkChannel and before.channel.id in awakeChannelIDs:
-#             await member.move_to(before.channel)
+
+@bot.listen()
+async def on_voice_state_update(member, before, after):
+    afkChannel = member.guild.afk_channel
+    if after.channel and before.channel:  # if the member didn't just join or quit, but moved channels
+        if after.channel == afkChannel and before.channel.id in lwConfig.awakeChannelIDs:
+            await member.move_to(before.channel)
 
 
 @tasks.loop(seconds=30)
@@ -295,7 +295,8 @@ async def checkReminder():
             time = datetime.datetime.strptime(reminder[0], '%d.%m.%Y %H:%M')
             if time <= now:
                 channel = bot.get_channel(lwConfig.botChannelID)
-                author = bot.get_guild(lwConfig.serverID).get_member(int(authorID))
+                author = bot.get_guild(
+                    lwConfig.serverID).get_member(int(authorID))
                 color = author.color
                 await channel.send(content=author.mention, embed=lwHelperFunctions.simpleEmbed(author, "Reminder", reminder[1], color=color))
                 reminderHandler.removeReminder(authorID, *reminder)

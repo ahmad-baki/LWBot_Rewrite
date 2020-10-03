@@ -8,10 +8,11 @@
     "prefix": "",
     "upvotes_for_pin": "",
     "delete_after_days": "",
-    "owner_id": "",
+    "owner_id": "[],
     "delete_emoji_name": "",
     "latest_gmo_news_number": "",
     "news_channel_id": "",
     "gmo_role_id": "",
-    "log_channel_id: ""
+    "log_channel_id: "",
+    "awake_channel_IDs": []
 }

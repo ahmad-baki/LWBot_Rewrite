@@ -39,17 +39,11 @@ async def on_command_error(ctx, error):
     error = getattr(error, 'original', error)
     if isinstance(error, CommandNotFound) or isinstance(error, MissingRequiredArgument):
         return
-    embed = discord.Embed(title="error")
+    embed = discord.Embed(title=repr(error))
     embed.color = discord.Color.red()
-    # errormsg = ''.join(traceback.format_tb(error.__traceback__))
-    # errormsg += ''.join(traceback.format_exception_only(type(error), error))
-    # print(type(errormsg))
-    # print(repr(errormsg))
     traceback_str = str(''.join(traceback.format_exception(
         etype=type(error), value=error, tb=error.__traceback__)))
-    await ctx.send(f"```{traceback_str}```")
-    embed.description = f"```{repr(traceback_str)}```"
-    # embed.set_footer(text=type(error))
+    embed.description = f"```{traceback_str}```"
     await ctx.send(embed=embed)
 
 

@@ -284,7 +284,7 @@ async def addKurse(ctx, *, args):
         # if the ctx.author does not already have the role, add it
         if arg not in substitutionHandler.getMyCourseRoleNames(ctx.author):
             roleID = [r.id for r in substitutionHandler.getMyCourseRoles(
-                ctx.author) if r.name == arg][0]
+                ctx.guild) if r.name == arg][0]
             await ctx.author.add_roles(ctx.guild.get_role(roleID))
 
     kurse = substitutionHandler.getMyCourseRoleNames(ctx.author)
@@ -302,7 +302,7 @@ async def removeKurs(ctx, arg):
         return
     # get the role id by name
     roleID = [r.id for r in substitutionHandler.getMyCourseRoles(
-        ctx.author) if r.name == arg][0]
+        ctx.guild) if r.name == arg][0]
     # get the role by the id
     role = ctx.guild.get_role(roleID)
     await ctx.author.remove_roles(role)

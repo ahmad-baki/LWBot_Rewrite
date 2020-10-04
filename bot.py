@@ -256,7 +256,7 @@ async def removereminder(ctx):
 
 @bot.command()
 async def kurse(ctx):
-    if not lwConfig.courseRoleSeperatorID in [c.id for c in substitutionHandler.getMyCourseRoles(ctx)]:
+    if not lwConfig.courseRoleSeperatorID in [c.id for c in substitutionHandler.getMyCourseRoles(ctx.author)]:
         await ctx.author.add_roles(ctx.guild.get_role(lwConfig.courseRoleSeperatorID))
     kurse = substitutionHandler.getMyCourseRoleNames(ctx.author)
     await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Deine Kurse: ", f"```{', '.join(kurse)}```\nverwende den command addKurse [kurs1 kurs2 ...] um mehr hinzuzufügen."))
@@ -264,7 +264,7 @@ async def kurse(ctx):
 
 @bot.command(aliases=["ak"])
 async def addKurse(ctx, *args):
-    if not lwConfig.courseRoleSeperatorID in [c.id for c in substitutionHandler.getMyCourseRoles(ctx)]:
+    if not lwConfig.courseRoleSeperatorID in [c.id for c in substitutionHandler.getMyCourseRoles(ctx.author)]:
         await ctx.author.add_roles(ctx.guild.get_role(lwConfig.courseRoleSeperatorID))
     for arg in args:
         if arg not in substitutionHandler.getCourseRoleNames(ctx.guild):
@@ -274,7 +274,7 @@ async def addKurse(ctx, *args):
                 ctx.author) if r.name == arg]
             await ctx.author.add_roles(ctx.guild.get_role(roleID))
 
-    kurse = substitutionHandler.getCourseRoleNames(ctx)
+    kurse = substitutionHandler.getCourseRoleNames(ctx.author)
     await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Deine Kurse: ", f"```{', '.join(kurse)}```"))
 
 

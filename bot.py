@@ -311,7 +311,7 @@ async def removeKurse(ctx, *, args):
         # delete the role if no members have it now
         if len(role.members) == 0:
             await role.delete(reason="not used anymore")
-    await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, f"Die Rolle {arg} wurde erfolgreich entfernt."))
+    await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, f"Die Rolle(n) {', '.join(args)} wurde erfolgreich entfernt."))
     
 
 

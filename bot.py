@@ -249,6 +249,16 @@ async def removereminder(ctx):
     else:
         await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "You have no reminders.", f"Type {bot.command_prefix}reminder [date] to create one."))
 
+@bot.command()
+async def kurse(ctx):
+        kurse = []
+        for r in ctx.guild.roles:
+            if "Kurse" in r.name:
+                break
+            kurse.append(r.name)
+        await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Die Kurse: ", ' '.join(kurse)))
+        
+    
 
 @bot.listen()
 async def on_raw_reaction_add(payload):

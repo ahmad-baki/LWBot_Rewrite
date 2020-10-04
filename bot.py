@@ -317,7 +317,7 @@ async def removeKurse(ctx, *, args):
 @bot.command(aliases=["mp"])
 async def myplan(ctx):
     plan = substitutionHandler.getSubstitutionPlan()
-    embed = discord.Embed(title="Dein Vertretungdplan", description="Stunde, Art, Kurs, Lehrer, Raum, Bemerkungen", color=ctx.author.color)
+    embed = discord.Embed(title="Dein Vertretungsplan", description="```Stunde, Art, Kurs, Lehrer, Raum, Bemerkungen```", color=ctx.author.color)
     embed.timestamp = datetime.datetime.now()
     embed.set_footer(text=ctx.author.name, icon_url=ctx.author.avatar_url) 
     courses = substitutionHandler.getMyCourseRoleNames(ctx.author)
@@ -325,17 +325,14 @@ async def myplan(ctx):
         value = ""
         for i in range(len(plan[date])):
             field = plan[date][i]
-            print(field["altes_Fach"])
-            print(field["neues_Fach"])
             if field["altes_Fach"] in courses:
                 course = field["altes_Fach"]
             elif field["neues_Fach"] in courses:
                 course = field["neues_Fach"]
             else:
                 continue
-            print(course)
             if course in courses:
-                value += f'{field["Stunde"]}, {field["Art"]}, {course}, {field["Vertreter"]}, {field["Raum"]}, {field["Bemerkungen"]}\n'
+                value += f'``{field["Stunde"]}, {field["Art"]}, {course}, {field["Vertreter"]}, {field["Raum"]}, {field["Bemerkungen"]}``\n'
         if value.strip() != "":
             embed.add_field(name=date, value=value, inline=False)
     await ctx.send(embed=embed)

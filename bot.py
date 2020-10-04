@@ -41,7 +41,8 @@ async def on_command_error(ctx, error):
     if isinstance(error, CommandNotFound) or isinstance(error, MissingRequiredArgument):
         return
     if isinstance(error, NotOwner):
-        await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Du hast keine Berechtigung, diesen Command auszuführen.", color=discord.Color.red()))
+        await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Du hast keine Berechtigung diesen Command auszuführen.", color=discord.Color.red()))
+        return
     embed = discord.Embed(title=repr(error))
     embed.color = discord.Color.red()
     traceback_str = str(''.join(traceback.format_exception(
@@ -261,8 +262,11 @@ async def kurse(ctx):
 @bot.command()
 @commands.is_owner()
 async def addKurs(ctx, arg):
-    await substitutionHandler.createCourseRole(ctx, arg)
-    await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Die Kurse: ", ', '.join(kurse)))
+    if arg not in substitutionHandler.getCourseRoleNames(ctx):
+        await substitutionHandler.createCourseRole(ctx, arg)
+        await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Die Kurse: ", ', '.join(kurse)))
+    else:
+        await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Eine Rolle für diesen Kurs existiert bereits.", color=discord.Color.red()))
 
 @bot.listen()
 async def on_raw_reaction_add(payload):

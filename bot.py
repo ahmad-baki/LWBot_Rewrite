@@ -264,11 +264,14 @@ async def kurse(ctx):
 
 @bot.command(aliases=["ak"])
 async def addKurse(ctx, *args):
+    if not lwConfig.courseRoleSeperatorID in [c.id for c in substitutionHandler.getMyCourseRoles(ctx)]:
+        await ctx.author.add_roles(ctx.guild.get_role(lwConfig.courseRoleSeperatorID))
     for arg in args:
         if arg not in substitutionHandler.getCourseRoleNames(ctx.guild):
             await substitutionHandler.createCourseRole(ctx, arg)
         if arg not in substitutionHandler.getCourseRoleNames(ctx.author):
-            roleID = [r.id for r in substitutionHandler.getMyCourseRoles(ctx.author) if r.name == arg]
+            roleID = [r.id for r in substitutionHandler.getMyCourseRoles(
+                ctx.author) if r.name == arg]
             await ctx.author.add_roles(ctx.guild.get_role(roleID))
 
     kurse = substitutionHandler.getCourseRoleNames(ctx)

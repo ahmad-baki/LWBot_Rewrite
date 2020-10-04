@@ -431,7 +431,7 @@ async def checkGmoWebsite():
 
 @tasks.loop(seconds=300)
 async def updateSubstitutionPlan():
-    substitutionHandler.getCurrentSubstitutionPlan()
+    await substitutionHandler.getCurrentSubstitutionPlan()
 
 
 @updateSubstitutionPlan.before_loop

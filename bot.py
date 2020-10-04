@@ -319,13 +319,16 @@ async def myplan(ctx):
     plan = substitutionHandler.getSubstitutionPlan()
     embed = discord.Embed(title="Dein Vertretungdplan", description="Stunde, Art, Kurs, Lehrer, Raum, Bemerkungen", color=ctx.author.color)
     embed.timestamp = datetime.datetime.now()
-    e.set_footer(text=ctx.author.name, icon_url=ctx.author.avatar_url) 
+    embed.set_footer(text=ctx.author.name, icon_url=ctx.author.avatar_url) 
     courses = substitutionHandler.getMyCourseRoleNames(ctx.author)
     for date in list(plan.keys()):
         for i in range(len(plan[date])):
             field = plan[date][i]
+            print(field["altes_Fach"])
+            print(field["neues_Fach"])
             course = [field["altes_Fach"].replace("---", "-").strip(), field["neues_Fach"].replace("---", "-").strip()]
             course = course[0 if len(course[0]) > len(course[1]) else 1]
+            print(course)
             if course in courses:
                 value = f'{field["Stunde"]}, {field["Art"]}, {field["Kurs"]}, {field["Lehrer"]}, {field["Raum"]}, {field["Bemerkungen"]}'
                 embed.add_field(name=date, value=value, inline=False)

@@ -19,6 +19,7 @@ import lwConfig
 import lwHelperFunctions
 import voteListHandler
 import reminderHandler
+import substitutionHandler
 
 bot = commands.Bot(command_prefix=lwConfig.prefix)
 bot.owner_ids = lwConfig.ownerID
@@ -251,12 +252,8 @@ async def removereminder(ctx):
 
 @bot.command()
 async def kurse(ctx):
-        kurse = []
-        for r in ctx.guild.roles:
-            if "Kurse" in r.name:
-                break
-            kurse.append(r.name)
-        await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Die Kurse: ", ' '.join(kurse)))
+        kurse = substitutionHandler.getCourseRoleNames(ctx)
+        await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Die Kurse: ", ', '.join(kurse)))
         
     
 

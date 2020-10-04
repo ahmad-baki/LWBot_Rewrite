@@ -253,22 +253,38 @@ async def removereminder(ctx):
     else:
         await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "You have no reminders.", f"Type {bot.command_prefix}reminder [date] to create one."))
 
+
 @bot.command()
 async def kurse(ctx):
-    kurse = substitutionHandler.getCourseRoleNames(ctx)
-    await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Die Kurse: ", ', '.join(kurse)))
+    if not lwConfig.courseRoleSeperatorID in [c.id for c in substitutionHandler.getMyCourseRoles(ctx)]:
+        await ctx.author.add_roles(ctx.guild.get_role(lwConfig.courseRoleSeperatorID))
+    kurse = substitutionHandler.getMyCourseRoleNames(ctx.author)
+    await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Deine Kurse: ", f"```{', '.join(kurse)}```\nverwende den command addKurse [kurs1 kurs2 ...] um mehr hinzuzufügen."))
 
 
-@bot.command()
-@commands.is_owner()
-async def addKurs(ctx, *args):
+@bot.command(aliases=["ak"])
+async def addKurse(ctx, *args):
     for arg in args:
-        if arg not in substitutionHandler.getCourseRoleNames(ctx):
+        if arg not in substitutionHandler.getCourseRoleNames(ctx.guild):
             await substitutionHandler.createCourseRole(ctx, arg)
-        else:
-            await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, f"Eine Rolle für den Kurs {arg} existiert bereits.", color=discord.Color.red()))
+        if arg not in substitutionHandler.getCourseRoleNames(ctx.author):
+            roleID = [r.id for r in substitutionHandler.getMyCourseRoles(ctx.author) if r.name == arg]
+            await ctx.author.add_roles(ctx.guild.get_role(roleID))
+
     kurse = substitutionHandler.getCourseRoleNames(ctx)
-    await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Die Kurse: ", ', '.join(kurse)))
+    await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Deine Kurse: ", f"```{', '.join(kurse)}```"))
+
+
+# @bot.command()
+# @commands.is_owner()
+# async def addKurs(ctx, *args):
+#     for arg in args:
+#         if arg not in substitutionHandler.getCourseRoleNames(ctx):
+#             await substitutionHandler.createCourseRole(ctx, arg)
+#         else:
+#             await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, f"Eine Rolle für den Kurs {arg} existiert bereits.", color=discord.Color.red()))
+#     kurse = substitutionHandler.getCourseRoleNames(ctx)
+#     await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Die Kurse: ", ', '.join(kurse)))
 
 @bot.listen()
 async def on_raw_reaction_add(payload):
@@ -293,7 +309,8 @@ async def on_raw_reaction_add(payload):
         if reaction.message.author == user and (reaction.emoji == upvote or reaction.emoji == downvote):
             await reaction.remove(user)
             errormsg = await reaction.message.channel.send(f"{user.mention} you cannot up/downvote your own post.")
-            deleteEmoji = lwHelperFunctions.getEmoji(bot, lwConfig.deleteEmojiName)
+            deleteEmoji = lwHelperFunctions.getEmoji(
+                bot, lwConfig.deleteEmojiName)
             await errormsg.add_reaction(deleteEmoji)
             try:
                 reaction, user = await bot.wait_for('reaction_add', timeout=30.0, check=lambda _reaction, _user: _user == user and _reaction.emoji.name == deleteEmoji.name)
@@ -301,7 +318,7 @@ async def on_raw_reaction_add(payload):
                 pass
             await errormsg.delete()
             return
-        
+
         # change voting counter
         if reaction.emoji == upvote:
             voteListHandler.changeVotingCounter(reaction.message, 1)
@@ -310,7 +327,6 @@ async def on_raw_reaction_add(payload):
                 await reaction.message.pin(reason="good meme")
         elif reaction.emoji == downvote:
             voteListHandler.changeVotingCounter(reaction.message, -1)
-
 
 
 @bot.listen()

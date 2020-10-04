@@ -1,16 +1,18 @@
+import lwConfig
 
-
-def getCourseRoles(ctx):
+def getMyCourseRoles(ctxAuthor):
     kurse = []
     # all course roles except the @everyone role
-    for r in ctx.guild.roles[1:len(ctx.guild.roles)]:
+    for r in ctxAuthor.roles[1:len(ctxAuthor.guild.roles)]:
         if "Kurse" in r.name:
             break
         kurse.append(r)
     return kurse
 
-def getCourseRoleNames(ctx):
-    return [c.name for c in getCourseRoles(ctx)]
+
+def getMyCourseRoleNames(ctx):
+    return [c.name for c in getMyCourseRoles(ctx)]
+
 
 async def createCourseRole(ctx, name):
     await ctx.guild.create_role(name=name)

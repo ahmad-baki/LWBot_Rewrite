@@ -322,6 +322,7 @@ async def myplan(ctx):
     embed.set_footer(text=ctx.author.name, icon_url=ctx.author.avatar_url) 
     courses = substitutionHandler.getMyCourseRoleNames(ctx.author)
     for date in list(plan.keys()):
+        value = ""
         for i in range(len(plan[date])):
             field = plan[date][i]
             print(field["altes_Fach"])
@@ -334,8 +335,9 @@ async def myplan(ctx):
                 continue
             print(course)
             if course in courses:
-                value = f'{field["Stunde"]}, {field["Art"]}, {course}, {field["Lehrer"]}, {field["Raum"]}, {field["Bemerkungen"]}'
-                embed.add_field(name=date, value=value, inline=False)
+                value += f'{field["Stunde"]}, {field["Art"]}, {course}, {field["Vertreter"]}, {field["Raum"]}, {field["Bemerkungen"]}\n'
+        if value.strip() != "":
+            embed.add_field(name=date, value=value, inline=False)
     await ctx.send(embed=embed)
 
 @bot.listen()

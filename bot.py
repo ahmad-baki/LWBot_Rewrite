@@ -259,22 +259,26 @@ async def kurse(ctx):
     if not lwConfig.courseRoleSeperatorID in [c.id for c in substitutionHandler.getMyCourseRoles(ctx.author)]:
         await ctx.author.add_roles(ctx.guild.get_role(lwConfig.courseRoleSeperatorID))
     kurse = substitutionHandler.getMyCourseRoleNames(ctx.author)
-    await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Deine Kurse: ", f"```{', '.join(kurse)}```\nverwende den command addKurse [kurs1 kurs2 ...] um mehr hinzuzufügen."))
-
+    if len(kurse) > 0:
+        await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Deine Kurse: ", f"```{', '.join(kurse)}```"))
+    else:
+        await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Du hast keine Kurse ausgewählt. ", "Verwende den command addKurse [kurs1 kurs2 ...] um mehr hinzuzufügen.\nBeispiel: `addKurs EN4 PH1`\ngibt dir die Kursrollen EN4 und PH1."))
+        
 
 @bot.command(aliases=["ak"])
-async def addKurse(ctx, *args):
+async def addKurse(ctx, *, args):
+    args = args.split(" ")
     if not lwConfig.courseRoleSeperatorID in [c.id for c in substitutionHandler.getMyCourseRoles(ctx.author)]:
         await ctx.author.add_roles(ctx.guild.get_role(lwConfig.courseRoleSeperatorID))
     for arg in args:
-        if arg not in substitutionHandler.getCourseRoleNames(ctx.guild):
+        if arg not in substitutionHandler.getMyCourseRoleNames(ctx.guild):
             await substitutionHandler.createCourseRole(ctx, arg)
-        if arg not in substitutionHandler.getCourseRoleNames(ctx.author):
+        if arg not in substitutionHandler.getMyCourseRoleNames(ctx.author):
             roleID = [r.id for r in substitutionHandler.getMyCourseRoles(
                 ctx.author) if r.name == arg]
             await ctx.author.add_roles(ctx.guild.get_role(roleID))
 
-    kurse = substitutionHandler.getCourseRoleNames(ctx.author)
+    kurse = substitutionHandler.getMyCourseRoleNames(ctx.author)
     await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Deine Kurse: ", f"```{', '.join(kurse)}```"))
 
 

@@ -312,20 +312,24 @@ async def removeKurse(ctx, *, args):
         if len(role.members) == 0:
             await role.delete(reason="not used anymore")
     await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, f"Die Rolle(n) {', '.join(args)} wurde erfolgreich entfernt."))
-    
 
 
-
-# @bot.command()
-# @commands.is_owner()
-# async def addKurs(ctx, *args):
-#     for arg in args:
-#         if arg not in substitutionHandler.getCourseRoleNames(ctx):
-#             await substitutionHandler.createCourseRole(ctx, arg)
-#         else:
-#             await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, f"Eine Rolle für den Kurs {arg} existiert bereits.", color=discord.Color.red()))
-#     kurse = substitutionHandler.getCourseRoleNames(ctx)
-#     await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Die Kurse: ", ', '.join(kurse)))
+@bot.command(aliases=["mp"])
+async def myplan(ctx):
+    plan = substitutionHandler.getSubstitutionPlan()
+    embed = discord.Embed(title="Dein Vertretungdplan", description="Stunde, Art, Kurs, Lehrer, Raum, Bemerkungen", color=ctx.author.color)
+    embed.timestamp = datetime.datetime.now()
+    e.set_footer(text=ctx.author.name, icon_url=ctx.author.avatar_url) 
+    courses = substitutionHandler.getMyCourseRoleNames(ctx.author)
+    for date in list(plan.keys()):
+        for i in range(len(plan[date])):
+            field = plan[date][i]
+            course = [field["altes_Fach"].replace("---", "-").strip(), field["neues_Fach"].replace("---", "-").strip()]
+            course = course[0 if len(course[0]) > len(course[1]) else 1]
+            if course in courses:
+                value = f'{field["Stunde"]}, {field["Art"]}, {field["Kurs"]}, {field["Lehrer"]}, {field["Raum"]}, {field["Bemerkungen"]}'
+                embed.add_field(name=date, value=value, inline=False)
+    await ctx.send(embed=embed)
 
 @bot.listen()
 async def on_raw_reaction_add(payload):
@@ -423,6 +427,25 @@ async def checkGmoWebsite():
     if news != None:
         channel = bot.get_channel(lwConfig.newsChannelID)
         await channel.send(channel.guild.get_role(lwConfig.gmoRoleID).mention + " " + news)
+
+
+@tasks.loop(seconds=300)
+async def updateSubstitutionPlan():
+    return
+
+
+@updateSubstitutionPlan.before_loop
+async def beforeSubstitutionPlan():
+    await bot.wait_until_ready()
+    channel = bot.get_channel(lwConfig.logChannelID)
+    await channel.send(embed=lwHelperFunctions.simpleEmbed(bot.user, "Vertretungplan loop start", color=discord.Color.green()))
+
+
+@updateSubstitutionPlan.before_loop
+async def afterGmoNews():
+    channel = bot.get_channel(lwConfig.logChannelID)
+    await channel.send(embed=lwHelperFunctions.simpleEmbed(bot.user, "Vertretungplan loop stopped. restarting now", color=discord.Color.orange()))
+    checkGmoWebsite.restart()
 
 
 @checkGmoWebsite.before_loop

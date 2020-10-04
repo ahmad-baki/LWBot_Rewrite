@@ -6,7 +6,7 @@ from asyncio import futures
 import discord
 from discord.ext import commands
 from discord.ext import tasks
-from discord.ext.commands.errors import CommandNotFound
+from discord.ext.commands.errors import CommandNotFound, NotOwner
 from discord.ext.commands.errors import MissingRequiredArgument
 
 import traceback
@@ -40,6 +40,8 @@ async def on_command_error(ctx, error):
     error = getattr(error, 'original', error)
     if isinstance(error, CommandNotFound) or isinstance(error, MissingRequiredArgument):
         return
+    if isinstance(error, NotOwner):
+        await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Du hast keine Berechtigung, diesen Command auszuführen.", color=discord.Color.red()))
     embed = discord.Embed(title=repr(error))
     embed.color = discord.Color.red()
     traceback_str = str(''.join(traceback.format_exception(
@@ -260,7 +262,7 @@ async def kurse(ctx):
 @commands.is_owner()
 async def addKurs(ctx, arg):
     await substitutionHandler.createCourseRole(ctx, arg)
-
+    await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Die Kurse: ", ', '.join(kurse)))
 
 @bot.listen()
 async def on_raw_reaction_add(payload):

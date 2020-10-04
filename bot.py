@@ -292,23 +292,25 @@ async def addKurse(ctx, *, args):
 
 
 @bot.command(aliases=["rk"])
-async def removeKurs(ctx, arg):
+async def removeKurse(ctx, *, args):
+    args = args.split(" ")
     # give the ctx.author the course seperator role if he does not have it already
     if not lwConfig.courseRoleSeperatorID in [c.id for c in substitutionHandler.getMyCourseRoles(ctx.author)]:
         await ctx.author.add_roles(ctx.guild.get_role(lwConfig.courseRoleSeperatorID))
-    # check if the ctx.author has the role that he wants to remove
-    if arg not in substitutionHandler.getMyCourseRoleNames(ctx.author):
-        await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Du besitzt diese Kursrolle nicht.", color=discord.Color.red()))
-        return
-    # get the role id by name
-    roleID = [r.id for r in substitutionHandler.getMyCourseRoles(
-        ctx.guild) if r.name == arg][0]
-    # get the role by the id
-    role = ctx.guild.get_role(roleID)
-    await ctx.author.remove_roles(role)
-    # delete the role if no members have it now
-    if len(role.members) == 0:
-        await role.delete(reason="not used anymore")
+    for arg in args:
+        # check if the ctx.author has the role that he wants to remove
+        if arg not in substitutionHandler.getMyCourseRoleNames(ctx.author):
+            await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Du besitzt diese Kursrolle nicht.", color=discord.Color.red()))
+            return
+        # get the role id by name
+        roleID = [r.id for r in substitutionHandler.getMyCourseRoles(
+            ctx.guild) if r.name == arg][0]
+        # get the role by the id
+        role = ctx.guild.get_role(roleID)
+        await ctx.author.remove_roles(role)
+        # delete the role if no members have it now
+        if len(role.members) == 0:
+            await role.delete(reason="not used anymore")
     await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, f"Die Rolle {arg} wurde erfolgreich entfernt."))
     
 

@@ -441,7 +441,7 @@ async def beforeSubstitutionPlan():
     await channel.send(embed=lwHelperFunctions.simpleEmbed(bot.user, "Vertretungplan loop start", color=discord.Color.green()))
 
 
-@updateSubstitutionPlan.before_loop
+@updateSubstitutionPlan.after_loop
 async def afterGmoNews():
     channel = bot.get_channel(lwConfig.logChannelID)
     await channel.send(embed=lwHelperFunctions.simpleEmbed(bot.user, "Vertretungplan loop stopped. restarting now", color=discord.Color.orange()))

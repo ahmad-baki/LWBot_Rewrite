@@ -258,13 +258,13 @@ async def removereminder(ctx):
 async def kurse(ctx):
     if not lwConfig.courseRoleSeperatorID in [c.id for c in substitutionHandler.getMyCourseRoles(ctx.author)]:
         await ctx.author.add_roles(ctx.guild.get_role(lwConfig.courseRoleSeperatorID))
-        await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Du hast keine Kurse ausgewählt. ", "Verwende den command addKurse [kurs1 kurs2 ...] um mehr hinzuzufügen.\nBeispiel: ```addKurs EN4 PH1```\ngibt dir die Kursrollen EN4 und PH1."))
+        await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Du hast keine Kurse ausgewählt. ", "Verwende den command addKurse [kurs1 kurs2 ...] um mehr hinzuzufügen.\nBeispiel: ```addKurse EN4 PH1```\ngibt dir die Kursrollen EN4 und PH1."))
         return
     kurse = substitutionHandler.getMyCourseRoleNames(ctx.author)
     if len(kurse) > 0:
         await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Deine Kurse: ", f"```{', '.join(kurse)}```"))
     else:
-        await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Du hast keine Kurse ausgewählt. ", "Verwende den command addKurse [kurs1 kurs2 ...] um mehr hinzuzufügen.\nBeispiel: ```addKurs EN4 PH1```\ngibt dir die Kursrollen EN4 und PH1."))
+        await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Du hast keine Kurse ausgewählt. ", "Verwende den command addKurse [kurs1 kurs2 ...] um mehr hinzuzufügen.\nBeispiel: ```addKurse EN4 PH1```\ngibt dir die Kursrollen EN4 und PH1."))
         
 
 @bot.command(aliases=["ak"])

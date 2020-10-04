@@ -252,10 +252,15 @@ async def removereminder(ctx):
 
 @bot.command()
 async def kurse(ctx):
-        kurse = substitutionHandler.getCourseRoleNames(ctx)
-        await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Die Kurse: ", ', '.join(kurse)))
-        
-    
+    kurse = substitutionHandler.getCourseRoleNames(ctx)
+    await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Die Kurse: ", ', '.join(kurse)))
+
+
+@bot.command()
+@commands.is_owner()
+async def addKurs(ctx, arg):
+    await substitutionHandler.createCourseRole(ctx, arg)
+
 
 @bot.listen()
 async def on_raw_reaction_add(payload):
@@ -271,13 +276,6 @@ async def on_raw_reaction_add(payload):
             reaction = reac
     if reaction == None:
         return
-
-    # if payload.emoji.name == lwConfig.deleteEmojiName and msg.author == bot.user and user in msg.mentions:
-    #     if bot.user in await reaction.users().flatten():
-    #         await msg.delete()
-    #     else:
-    #         await reaction.remove(user)
-    #     return
 
     # get up-/downvote emojis
     upvote = lwHelperFunctions.getEmoji(bot, lwConfig.upvoteEmoji)

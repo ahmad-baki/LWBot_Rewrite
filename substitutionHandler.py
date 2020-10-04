@@ -11,3 +11,6 @@ def getCourseRoles(ctx):
 
 def getCourseRoleNames(ctx):
     return [c.name for c in getCourseRoles(ctx)]
+
+async def createCourseRole(ctx, name):
+    await ctx.guild.create_role(name=name)

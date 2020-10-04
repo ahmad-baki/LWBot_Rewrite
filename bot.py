@@ -326,11 +326,15 @@ async def myplan(ctx):
             field = plan[date][i]
             print(field["altes_Fach"])
             print(field["neues_Fach"])
-            course = [field["altes_Fach"].replace("---", "-").strip(), field["neues_Fach"].replace("---", "-").strip()]
-            course = course[0 if len(course[0]) > len(course[1]) else 1]
+            if field["altes_Fach"] in courses:
+                course = field["altes_Fach"]
+            elif field["neues_Fach"] in courses:
+                course = field["neues_Fach"]
+            else:
+                continue
             print(course)
             if course in courses:
-                value = f'{field["Stunde"]}, {field["Art"]}, {field["Kurs"]}, {field["Lehrer"]}, {field["Raum"]}, {field["Bemerkungen"]}'
+                value = f'{field["Stunde"]}, {field["Art"]}, {course}, {field["Lehrer"]}, {field["Raum"]}, {field["Bemerkungen"]}'
                 embed.add_field(name=date, value=value, inline=False)
     await ctx.send(embed=embed)
 

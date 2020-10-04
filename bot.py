@@ -431,7 +431,7 @@ async def checkGmoWebsite():
 
 @tasks.loop(seconds=300)
 async def updateSubstitutionPlan():
-    return
+    substitutionHandler.getCurrentSubstitutionPlan()
 
 
 @updateSubstitutionPlan.before_loop
@@ -475,6 +475,7 @@ async def afterReminderCheck():
     await channel.send(embed=lwHelperFunctions.simpleEmbed(bot.user, "reminder loop stopped. restarting now", color=discord.Color.orange()))
     checkGmoWebsite.restart()
 
+updateSubstitutionPlan.start()
 checkGmoWebsite.start()
 checkReminder.start()
 bot.run(lwConfig.token)

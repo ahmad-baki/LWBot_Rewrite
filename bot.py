@@ -318,7 +318,7 @@ async def removeKurse(ctx, *, args):
 async def myplan(ctx):
     plan = substitutionHandler.getSubstitutionPlan()
     embed = discord.Embed(title="Dein Vertretungsplan", description="```Stunde, Art, Kurs, Lehrer, Raum, Bemerkungen```", color=ctx.author.color)
-    embed.timestamp = datetime.datetime.now()
+    embed.timestamp = datetime.datetime.utcnow()
     embed.set_footer(text=ctx.author.name, icon_url=ctx.author.avatar_url) 
     courses = substitutionHandler.getMyCourseRoleNames(ctx.author)
     for date in list(plan.keys()):

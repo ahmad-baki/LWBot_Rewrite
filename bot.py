@@ -261,12 +261,14 @@ async def kurse(ctx):
 
 @bot.command()
 @commands.is_owner()
-async def addKurs(ctx, arg):
-    if arg not in substitutionHandler.getCourseRoleNames(ctx):
-        await substitutionHandler.createCourseRole(ctx, arg)
-        await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Die Kurse: ", ', '.join(kurse)))
-    else:
-        await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Eine Rolle für diesen Kurs existiert bereits.", color=discord.Color.red()))
+async def addKurs(ctx, *args):
+    for arg in args:
+        if arg not in substitutionHandler.getCourseRoleNames(ctx):
+            await substitutionHandler.createCourseRole(ctx, arg)
+        else:
+            await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, f"Eine Rolle für den Kurs {arg} existiert bereits.", color=discord.Color.red()))
+    kurse = substitutionHandler.getCourseRoleNames(ctx)
+    await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Die Kurse: ", ', '.join(kurse)))
 
 @bot.listen()
 async def on_raw_reaction_add(payload):

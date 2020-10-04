@@ -4,9 +4,10 @@ def getMyCourseRoles(ctxAuthor):
     kurse = []
     # all course roles except the @everyone role
     for r in ctxAuthor.roles[1:len(ctxAuthor.roles)]:
-        if "Kurse" in r.name:
+        if not "Kurse" in r.name:
+            kurse.append(r)
+        else:
             break
-        kurse.append(r)
     return kurse
 
 

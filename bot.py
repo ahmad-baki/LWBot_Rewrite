@@ -374,7 +374,7 @@ async def myplan(ctx):
             result += "``\n"
         
         if result.strip() != "":
-            embed.add_field(name=date, value=value, inline=False)
+            embed.add_field(name=date, value=result, inline=False)
     await ctx.send(embed=embed)
 
 

@@ -14,6 +14,7 @@ import asyncio
 import datetime
 import operator
 import os
+import subprocess
 
 import lwConfig
 import lwHelperFunctions
@@ -86,7 +87,8 @@ async def _eval(ctx, *, arg):
                 "discord": discord,
                 "datetime": datetime,
                 "reminderHandler": reminderHandler,
-                "os": os
+                "os": os,
+                "subprocess": subprocess
             })
         except Exception as e:
             if isinstance(e, TypeError):

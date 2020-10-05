@@ -122,7 +122,7 @@ async def getCurrentSubstitutionPlan():
     url1,url2,url3 = (await get_plan_urls(lwConfig.subPlanUsername, lwConfig.subPlanPassword))
     
     # currentPlan = getSubstitutionPlan()
-    now = datetime.now().strftime("%d.%m.%Y")
+    now = datetime.now()#.strftime("%d.%m.%Y")
     
 
     # remove everything and get the newest substitution plan data

@@ -5,6 +5,8 @@ import aiohttp
 import asyncio
 from datetime import datetime
 from jsondiff import diff, insert, delete
+import base64
+import gzip
 
 def getMyCourseRoles(ctxAuthor):
     kurse = []
@@ -58,11 +60,7 @@ async def get_plan_urls(username, password):
         }
     }
     async with aiohttp.ClientSession() as session:
-        # async with session.get("https://app.dsbcontrol.de/JsonHandler.ashx/GetData") as r:
-        #     if r.status == 200:
-        # x = session.request('POST', "https://app.dsbcontrol.de/JsonHandler.ashx/GetData", data=body)
         async with session.post("https://app.dsbcontrol.de/JsonHandler.ashx/GetData", json=body) as response:
-            # response = requests.post("https://app.dsbcontrol.de/JsonHandler.ashx/GetData", json=body)
             rjson = await response.json()
             response_data = json.loads(gzip.decompress(
                 base64.b64decode(rjson["d"])).decode("utf-8"))

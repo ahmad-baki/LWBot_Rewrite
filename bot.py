@@ -88,7 +88,8 @@ async def _eval(ctx, *, arg):
                 "datetime": datetime,
                 "reminderHandler": reminderHandler,
                 "os": os,
-                "subprocess": subprocess
+                "subprocess": subprocess,
+                "substitutionHandler": substitutionHandler
             })
         except Exception as e:
             if isinstance(e, TypeError):

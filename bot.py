@@ -318,9 +318,10 @@ async def removeKurse(ctx, *, args):
 @bot.command(aliases=["mp"])
 async def myplan(ctx):
     plan = substitutionHandler.getSubstitutionPlan()
-    embed = discord.Embed(title="Dein Vertretungsplan", description="```Stunde, Art, Kurs, Lehrer, Raum, Bemerkungen```", color=ctx.author.color)
+    embed = discord.Embed(title="Dein Vertretungsplan",
+                          description="```Stunde, Art, Kurs, Lehrer, Raum, Bemerkungen```", color=ctx.author.color)
     embed.timestamp = datetime.datetime.utcnow()
-    embed.set_footer(text=ctx.author.name, icon_url=ctx.author.avatar_url) 
+    embed.set_footer(text=ctx.author.name, icon_url=ctx.author.avatar_url)
     courses = substitutionHandler.getMyCourseRoleNames(ctx.author)
     for date in list(plan.keys()):
         value = ""
@@ -337,6 +338,7 @@ async def myplan(ctx):
         if value.strip() != "":
             embed.add_field(name=date, value=value, inline=False)
     await ctx.send(embed=embed)
+
 
 @bot.listen()
 async def on_raw_reaction_add(payload):

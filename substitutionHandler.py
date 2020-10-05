@@ -118,20 +118,12 @@ async def getCurrentSubstitutionPlan():
         kurs["Bemerkungen"] = zeile[7].text
         return kurs
 
-
-    # url1 = "https://app.dsbcontrol.de/data/38dd6cc1-b58f-4ac8-ad40-857966e388f8/3808589d-620c-4e6d-9561-8e79939042a5/subst_001.htm"
-    # url2 = "https://app.dsbcontrol.de/data/38dd6cc1-b58f-4ac8-ad40-857966e388f8/3808589d-620c-4e6d-9561-8e79939042a5/subst_002.htm"
-    # url3 = "https://app.dsbcontrol.de/data/38dd6cc1-b58f-4ac8-ad40-857966e388f8/3808589d-620c-4e6d-9561-8e79939042a5/subst_003.htm"
-    
+ 
     url1,url2,url3 = (await get_plan_urls(lwConfig.subPlanUsername, lwConfig.subPlanPassword))
     
     # currentPlan = getSubstitutionPlan()
-    # now = datetime.now().strftime("%d.%m.%Y")
+    now = datetime.now().strftime("%d.%m.%Y")
     
-    # remove old substitution plans
-    # for i in list(currentPlan.keys()):
-    #     if (now - datetime.strptime(i.split()[0], "%d.%m.%Y")).days >= 1:
-    #         currentPlan.pop(i)
 
     # remove everything and get the newest substitution plan data
 
@@ -142,7 +134,13 @@ async def getCurrentSubstitutionPlan():
     newPlan[date1] = table1
     newPlan[date2] = table2
     newPlan[date3] = table3
+    # remove old substitution plans
+    
+    for i in list(newPlan.keys()):
+        if (now - datetime.strptime(i.split()[0], "%d.%m.%Y")).days >= 0:
+            newPlan.pop(i)
     updateSubstitutionPlan(newPlan)
+
     # ##
     # changes = {}
     # changeCounter = 0

@@ -110,11 +110,11 @@ async def getCurrentSubstitutionPlan():
         kurs = {}
         kurs["Klasse"] = zeile[0].text
         kurs["Stunde"] = zeile[1].text
-        kurs["Art"] = zeile[6].text
         kurs["altes_Fach"] = zeile[2].text
-        kurs["neues_Fach"] = zeile[4].text
         kurs["Vertreter"] = zeile[3].text.replace("+", "-")
+        kurs["neues_Fach"] = zeile[4].text
         kurs["Raum"] = zeile[5].text.replace("---","-")
+        kurs["Art"] = zeile[6].text
         kurs["Bemerkungen"] = zeile[7].text
         return kurs
 

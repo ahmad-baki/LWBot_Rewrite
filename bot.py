@@ -326,7 +326,8 @@ async def myplan(ctx):
         await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Du hast keine Kurse ausgewählt. ", "Verwende den command addKurse [kurs1 kurs2 ...] um mehr hinzuzufügen.\nBeispiel: ```addKurse EN4 PH1```\ngibt dir die Kursrollen EN4 und PH1."))
         return
     plan = substitutionHandler.getSubstitutionPlan()
-    embed = discord.Embed(title="Dein Vertretungsplan", color=ctx.author.color)
+    embed = discord.Embed(title="Dein persönlicher Vertretungsplan: ", color=ctx.author.color)
+    embed.description = "```Stunde Kurs Lehrer Raum Art Bemerkungen```"
     embed.timestamp = datetime.datetime.utcnow()
     embed.set_footer(text=ctx.author.name, icon_url=ctx.author.avatar_url)
     courses = substitutionHandler.getMyCourseRoleNames(ctx.author)

@@ -344,7 +344,6 @@ async def myplan(ctx):
                 continue
             if course in courses:
                 substitutions.append(field)
-                # value += f'``{field["Stunde"]}, {field["Art"]}, {course}, {field["Vertreter"]}, {field["Raum"]}, {field["Bemerkungen"]}``\n'
 
         # get the max field length for all substitutions
         length = [0, 0, 0, 0, 0, 0]
@@ -379,7 +378,6 @@ async def myplan(ctx):
                 # stretch the strings if needed
                 substitutions[i][k] = substitutions[i][k].ljust(length[j])
                 j += 1
-                # value += f'``{field["Stunde"]}, {field["Art"]}, {course}, {field["Vertreter"]}, {field["Raum"]}, {field["Bemerkungen"]}``\n'
                 result += substitutions[i][k] + ("" if k == (list(substitutions[i].keys())[len(substitutions[i].keys()) - 1]) else "  ")
             result += f"``\n``{'-'*(sum(length) + 10)}``\n"
 

@@ -380,7 +380,7 @@ async def myplan(ctx):
                 substitutions[i][k] = substitutions[i][k].ljust(length[j])
                 j += 1
                 # value += f'``{field["Stunde"]}, {field["Art"]}, {course}, {field["Vertreter"]}, {field["Raum"]}, {field["Bemerkungen"]}``\n'
-                result += substitutions[i][k] + ("" if k == (substitutions[i].keys()[len(substitutions[i].keys()) - 1]) else "  ")
+                result += substitutions[i][k] + ("" if k == (list(substitutions[i].keys())[len(substitutions[i].keys()) - 1]) else "  ")
             result += f"``\n``{'-'*(sum(length) + 10)}``\n"
 
         if result.strip() != "":

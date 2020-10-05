@@ -356,7 +356,7 @@ async def myplan(ctx):
                         substitutions[i][k] = substitutions[i]["altes_Fach"]
                     elif substitutions[i]["neues_Fach"] in courses:
                         substitutions[i][k] = substitutions[i]["neues_Fach"]
-                elif k == "neues_Fach":
+                elif k == "neues_Fach" or k == "Klasse":
                     continue
 
                 length[j] = max(j, len(substitutions[i][k]))
@@ -373,7 +373,7 @@ async def myplan(ctx):
             j = 0
             result += "``"
             for k in list(substitutions[i].keys()):
-                if k == "neues_Fach":
+                if k == "neues_Fach" or k == "Klasse":
                     continue
                 # stretch the strings if needed
                 substitutions[i][k] = substitutions[i][k].ljust(length[j])

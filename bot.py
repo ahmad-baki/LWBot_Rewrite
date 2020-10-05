@@ -327,7 +327,7 @@ async def myplan(ctx):
         return
     plan = substitutionHandler.getSubstitutionPlan()
     embed = discord.Embed(title="Dein persönlicher Vertretungsplan: ", color=ctx.author.color)
-    embed.description = "```Stunde Kurs Lehrer Raum Art Bemerkungen```"
+    embed.description = "`Stunde Art Kurs Lehrer Raum Bemerkungen`"
     embed.timestamp = datetime.datetime.utcnow()
     embed.set_footer(text=ctx.author.name, icon_url=ctx.author.avatar_url)
     courses = substitutionHandler.getMyCourseRoleNames(ctx.author)

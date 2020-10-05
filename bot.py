@@ -331,9 +331,8 @@ async def myplan(ctx):
     embed.timestamp = datetime.datetime.utcnow()
     embed.set_footer(text=ctx.author.name, icon_url=ctx.author.avatar_url)
     courses = substitutionHandler.getMyCourseRoleNames(ctx.author)
-    substitutions = []
     for date in list(plan.keys()):
-        value = ""
+        substitutions = []
         for i in range(len(plan[date])):
             field = plan[date][i]
             if field["altes_Fach"] in courses:
@@ -348,16 +347,21 @@ async def myplan(ctx):
         
         # get the max field length for all substitutions
         length = [0, 0, 0, 0, 0, 0]
-        for i in len(range(substitutions)):
+        for i in range(len(substitutions)):
             # j is the length index
             j = 0
             for k in list(substitutions[i].keys()):
                 length[j] = max(len[j], len(substitutions[i][k]))
                 j += 1
         
+
+        # sort substitutions by time of lesson
+        substitutions = sorted(substitutions, key=lambda k: k['Stunde'].split()[0]) 
+
+
         # stretch strings and apply them to the result string
         result = ""
-        for i in len(range(substitutions)):
+        for i in range(len(substitutions)):
             # j is the length index
             j = 0
             result += "``"

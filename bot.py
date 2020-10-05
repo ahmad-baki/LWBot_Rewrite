@@ -380,7 +380,7 @@ async def myplan(ctx):
                 j += 1
                 # value += f'``{field["Stunde"]}, {field["Art"]}, {course}, {field["Vertreter"]}, {field["Raum"]}, {field["Bemerkungen"]}``\n'
                 result += substitutions[i][k] + "  "
-            result += "``\n``"+ "-"*34 +"``\n"
+            result += f"``\n``{'-'*sum(length)}``\n"
 
         if result.strip() != "":
             embed.add_field(name=date, value=result, inline=False)

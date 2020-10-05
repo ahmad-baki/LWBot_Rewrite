@@ -262,7 +262,7 @@ async def kurse(ctx):
         await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Du hast keine Kurse ausgewählt. ", "Verwende den command addKurse [kurs1 kurs2 ...] um mehr hinzuzufügen.\nBeispiel: ```addKurse EN4 PH1```\ngibt dir die Kursrollen EN4 und PH1."))
         await ctx.send("Debug: no course role")
         return
-    # asyncio.sleep(3)
+    asyncio.sleep(3)
     # if the ctx.author has at least one course role, send it
     kurse = substitutionHandler.getMyCourseRoleNames(ctx.author)
     if len(kurse) > 0:

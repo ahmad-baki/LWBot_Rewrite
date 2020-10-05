@@ -360,7 +360,7 @@ async def myplan(ctx):
                 elif k == "neues_Fach" or k == "Klasse":
                     continue
 
-                length[j] = max(j, len(substitutions[i][k]))
+                length[j] = max(length[j], len(substitutions[i][k]))
                 j += 1
 
         # sort substitutions by time of lesson

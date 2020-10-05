@@ -351,7 +351,7 @@ async def myplan(ctx):
             # j is the length index
             j = 0
             for k in list(substitutions[i].keys()):
-                length[j] = max(len[j], len(substitutions[i][k]))
+                length[j] = max(j, len(substitutions[i][k]))
                 j += 1
         
 

@@ -262,9 +262,6 @@ async def kurse(ctx):
     # give the ctx.author the course seperator role if he does not have it already
     if not lwConfig.courseRoleSeperatorID in [c.id for c in ctx.author.roles]:
         await ctx.author.add_roles(ctx.guild.get_role(lwConfig.courseRoleSeperatorID))
-        await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Du hast keine Kurse ausgewählt. ", "Verwende den command addKurse [kurs1 kurs2 ...] um mehr hinzuzufügen.\nBeispiel: ```addKurse EN4 PH1```\ngibt dir die Kursrollen EN4 und PH1."))
-        return
-    asyncio.sleep(3)
     # if the ctx.author has at least one course role, send it
     kurse = substitutionHandler.getMyCourseRoleNames(ctx.author)
     if len(kurse) > 0:

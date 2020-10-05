@@ -344,20 +344,27 @@ async def myplan(ctx):
             if course in courses:
                 substitutions.append(field)
                 # value += f'``{field["Stunde"]}, {field["Art"]}, {course}, {field["Vertreter"]}, {field["Raum"]}, {field["Bemerkungen"]}``\n'
-        
+
         # get the max field length for all substitutions
         length = [0, 0, 0, 0, 0, 0]
         for i in range(len(substitutions)):
             # j is the length index
             j = 0
             for k in list(substitutions[i].keys()):
+                if k == "altes_Fach":
+                    if substitutions["altes_Fach"] in courses:
+                        substitutions[i][k] = substitutions["altes_Fach"]
+                    elif substitutions["neues_Fach"] in courses:
+                        substitutions[i][k] = substitutions["neues_Fach"]
+                elif k == "neues_Fach":
+                    continue
+
                 length[j] = max(j, len(substitutions[i][k]))
                 j += 1
-        
 
         # sort substitutions by time of lesson
-        substitutions = sorted(substitutions, key=lambda k: k['Stunde'].split()[0]) 
-
+        substitutions = sorted(
+            substitutions, key=lambda k: k['Stunde'].split()[0])
 
         # stretch strings and apply them to the result string
         result = ""
@@ -366,13 +373,15 @@ async def myplan(ctx):
             j = 0
             result += "``"
             for k in list(substitutions[i].keys()):
-                #stretch the strings if needed
+                elif k == "neues_Fach":
+                    continue
+                # stretch the strings if needed
                 substitutions[i][k] = substitutions[i][k].ljust(length[j])
-                j+= 1
+                j += 1
                 # value += f'``{field["Stunde"]}, {field["Art"]}, {course}, {field["Vertreter"]}, {field["Raum"]}, {field["Bemerkungen"]}``\n'
                 result += substitutions[i][k] + " "
             result += "``\n"
-        
+
         if result.strip() != "":
             embed.add_field(name=date, value=result, inline=False)
     await ctx.send(embed=embed)

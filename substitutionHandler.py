@@ -34,6 +34,49 @@ def getSubstitutionPlan():
     with open(lwConfig.path + '/substitutionPlan.json', 'r') as myfile:
         return json.loads(myfile.read())
 
+async def get_plan_urls(username, password):
+    date_string = datetime.now().strftime("%Y-%m-%dT%H:%M:%S:%f0")
+
+    data = json.dumps({
+        "AppId": "2092d12c-8470-4ef8-8c70-584965f9ffe5",
+        "UserId": username,
+        "UserPw": password,
+        "AppVersion": "2.5.9",  # latest in PlayStore since 2016/02/18
+        "Device": "VirtualBox",
+        "OsVersion": "27 8.1.0",
+        "Language": "de",
+        "Date": date_string,
+        "LastUpdate": date_string,
+        "BundleId": "de.heinekingmedia.dsbmobile"
+    }, separators=(",", ":")).encode("utf-8")
+
+    body = {
+        "req": {
+            # data is sent gzip compressed and base64 encoded
+            "Data": base64.b64encode(gzip.compress(data)).decode("utf-8"),
+            "DataType": 1
+        }
+    }
+    async with aiohttp.ClientSession() as session:
+        # async with session.get("https://app.dsbcontrol.de/JsonHandler.ashx/GetData") as r:
+        #     if r.status == 200:
+        # x = session.request('POST', "https://app.dsbcontrol.de/JsonHandler.ashx/GetData", data=body)
+        async with session.post("https://app.dsbcontrol.de/JsonHandler.ashx/GetData", json=body) as response:
+            # response = requests.post("https://app.dsbcontrol.de/JsonHandler.ashx/GetData", json=body)
+            rjson = await response.json()
+            response_data = json.loads(gzip.decompress(
+                base64.b64decode(rjson["d"])).decode("utf-8"))
+            for result in response_data['ResultMenuItems']:
+                if result['Title'] != 'Inhalte':
+                    continue
+                for child in result['Childs']:
+                    if child['MethodName'] != 'timetable':
+                        continue
+                    for child2 in child['Root']['Childs']:
+                        if child2['Title'] != 'Schüler mobil':
+                            continue
+                        return list(map(lambda plan: plan['Detail'], child2['Childs']))
+            return []
 
 async def getCurrentSubstitutionPlan():
     async def get_only_grade_n(iterable, n):
@@ -81,9 +124,9 @@ async def getCurrentSubstitutionPlan():
     # url1 = "https://app.dsbcontrol.de/data/38dd6cc1-b58f-4ac8-ad40-857966e388f8/3808589d-620c-4e6d-9561-8e79939042a5/subst_001.htm"
     # url2 = "https://app.dsbcontrol.de/data/38dd6cc1-b58f-4ac8-ad40-857966e388f8/3808589d-620c-4e6d-9561-8e79939042a5/subst_002.htm"
     # url3 = "https://app.dsbcontrol.de/data/38dd6cc1-b58f-4ac8-ad40-857966e388f8/3808589d-620c-4e6d-9561-8e79939042a5/subst_003.htm"
-    url1 = "https://app.dsbcontrol.de/data/38dd6cc1-b58f-4ac8-ad40-857966e388f8/c2d7bfe3-7cd5-4f07-9ae6-99c4bec10079/subst_001.htm"
-    url2 = "https://app.dsbcontrol.de/data/38dd6cc1-b58f-4ac8-ad40-857966e388f8/c2d7bfe3-7cd5-4f07-9ae6-99c4bec10079/subst_002.htm"
-    url3 = "https://app.dsbcontrol.de/data/38dd6cc1-b58f-4ac8-ad40-857966e388f8/c2d7bfe3-7cd5-4f07-9ae6-99c4bec10079/subst_003.htm"
+    
+    url1,url2,url3 = (await get_plan_urls(lwConfig.subPlanUsername, lwConfig.subPlanPassword))
+    
     # currentPlan = getSubstitutionPlan()
     # now = datetime.now().strftime("%d.%m.%Y")
     

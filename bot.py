@@ -352,10 +352,10 @@ async def myplan(ctx):
             j = 0
             for k in list(substitutions[i].keys()):
                 if k == "altes_Fach":
-                    if substitutions["altes_Fach"] in courses:
-                        substitutions[i][k] = substitutions["altes_Fach"]
-                    elif substitutions["neues_Fach"] in courses:
-                        substitutions[i][k] = substitutions["neues_Fach"]
+                    if substitutions[i]["altes_Fach"] in courses:
+                        substitutions[i][k] = substitutions[i]["altes_Fach"]
+                    elif substitutions[i]["neues_Fach"] in courses:
+                        substitutions[i][k] = substitutions[i]["neues_Fach"]
                 elif k == "neues_Fach":
                     continue
 

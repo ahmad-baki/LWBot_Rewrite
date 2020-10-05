@@ -373,7 +373,7 @@ async def myplan(ctx):
             j = 0
             result += "``"
             for k in list(substitutions[i].keys()):
-                elif k == "neues_Fach":
+                if k == "neues_Fach":
                     continue
                 # stretch the strings if needed
                 substitutions[i][k] = substitutions[i][k].ljust(length[j])

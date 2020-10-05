@@ -317,12 +317,21 @@ async def removeKurse(ctx, *, args):
 
 @bot.command(aliases=["mp"])
 async def myplan(ctx):
+    # give the ctx.author the course seperator role if he does not have it already
+    if not lwConfig.courseRoleSeperatorID in [c.id for c in ctx.author.roles]:
+        await ctx.author.add_roles(ctx.guild.get_role(lwConfig.courseRoleSeperatorID))
+    # if the ctx.author has at least no course role, tell him and return
+    kurse = substitutionHandler.getMyCourseRoleNames(ctx.author)
+    if len(kurse) == 0:
+        await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Du hast keine Kurse ausgewählt. ", "Verwende den command addKurse [kurs1 kurs2 ...] um mehr hinzuzufügen.\nBeispiel: ```addKurse EN4 PH1```\ngibt dir die Kursrollen EN4 und PH1."))
+        return
     plan = substitutionHandler.getSubstitutionPlan()
     embed = discord.Embed(title="Dein Vertretungsplan",
                           description="```Stunde, Art, Kurs, Lehrer, Raum, Bemerkungen```", color=ctx.author.color)
     embed.timestamp = datetime.datetime.utcnow()
     embed.set_footer(text=ctx.author.name, icon_url=ctx.author.avatar_url)
     courses = substitutionHandler.getMyCourseRoleNames(ctx.author)
+    substitutions = []
     for date in list(plan.keys()):
         value = ""
         for i in range(len(plan[date])):
@@ -334,8 +343,33 @@ async def myplan(ctx):
             else:
                 continue
             if course in courses:
-                value += f'``{field["Stunde"]}, {field["Art"]}, {course}, {field["Vertreter"]}, {field["Raum"]}, {field["Bemerkungen"]}``\n'
-        if value.strip() != "":
+                substitutions.append(field)
+                # value += f'``{field["Stunde"]}, {field["Art"]}, {course}, {field["Vertreter"]}, {field["Raum"]}, {field["Bemerkungen"]}``\n'
+        
+        # get the max field length for all substitutions
+        length = [0, 0, 0, 0, 0, 0]
+        for i in len(range(substitutions)):
+            # j is the length index
+            j = 0
+            for k in list(substitutions[i].keys()):
+                length[j] = max(len[j], len(substitutions[i][k]))
+                j += 1
+        
+        # stretch strings and apply them to the result string
+        result = ""
+        for i in len(range(substitutions)):
+            # j is the length index
+            j = 0
+            result += "``"
+            for k in list(substitutions[i].keys()):
+                #stretch the strings if needed
+                substitutions[i][k] = substitutions[i][k].ljust(length[j])
+                j+= 1
+                # value += f'``{field["Stunde"]}, {field["Art"]}, {course}, {field["Vertreter"]}, {field["Raum"]}, {field["Bemerkungen"]}``\n'
+                result += substitutions[i][k] + " "
+            result += "``\n"
+        
+        if result.strip() != "":
             embed.add_field(name=date, value=value, inline=False)
     await ctx.send(embed=embed)
 

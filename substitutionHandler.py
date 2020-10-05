@@ -78,10 +78,12 @@ async def getCurrentSubstitutionPlan():
         return kurs
 
 
-    url1 = "https://app.dsbcontrol.de/data/38dd6cc1-b58f-4ac8-ad40-857966e388f8/3808589d-620c-4e6d-9561-8e79939042a5/subst_001.htm"
-    url2 = "https://app.dsbcontrol.de/data/38dd6cc1-b58f-4ac8-ad40-857966e388f8/3808589d-620c-4e6d-9561-8e79939042a5/subst_002.htm"
-    url3 = "https://app.dsbcontrol.de/data/38dd6cc1-b58f-4ac8-ad40-857966e388f8/3808589d-620c-4e6d-9561-8e79939042a5/subst_003.htm"
-
+    # url1 = "https://app.dsbcontrol.de/data/38dd6cc1-b58f-4ac8-ad40-857966e388f8/3808589d-620c-4e6d-9561-8e79939042a5/subst_001.htm"
+    # url2 = "https://app.dsbcontrol.de/data/38dd6cc1-b58f-4ac8-ad40-857966e388f8/3808589d-620c-4e6d-9561-8e79939042a5/subst_002.htm"
+    # url3 = "https://app.dsbcontrol.de/data/38dd6cc1-b58f-4ac8-ad40-857966e388f8/3808589d-620c-4e6d-9561-8e79939042a5/subst_003.htm"
+    url1 = "https://app.dsbcontrol.de/data/38dd6cc1-b58f-4ac8-ad40-857966e388f8/c2d7bfe3-7cd5-4f07-9ae6-99c4bec10079/subst_001.htm"
+    url2 = "https://app.dsbcontrol.de/data/38dd6cc1-b58f-4ac8-ad40-857966e388f8/c2d7bfe3-7cd5-4f07-9ae6-99c4bec10079/subst_002.htm"
+    url3 = "https://app.dsbcontrol.de/data/38dd6cc1-b58f-4ac8-ad40-857966e388f8/c2d7bfe3-7cd5-4f07-9ae6-99c4bec10079/subst_003.htm"
     # currentPlan = getSubstitutionPlan()
     # now = datetime.now().strftime("%d.%m.%Y")
     

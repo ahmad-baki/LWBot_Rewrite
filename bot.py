@@ -326,7 +326,8 @@ async def myplan(ctx):
         await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Du hast keine Kurse ausgewählt. ", "Verwende den command addKurse [kurs1 kurs2 ...] um mehr hinzuzufügen.\nBeispiel: ```addKurse EN4 PH1```\ngibt dir die Kursrollen EN4 und PH1."))
         return
     plan = substitutionHandler.getSubstitutionPlan()
-    embed = discord.Embed(title="Dein persönlicher Vertretungsplan: ", color=ctx.author.color)
+    embed = discord.Embed(
+        title="Dein persönlicher Vertretungsplan: ", color=ctx.author.color)
     embed.description = "`Stunde Art Kurs Lehrer Raum Bemerkungen`"
     embed.timestamp = datetime.datetime.utcnow()
     embed.set_footer(text=ctx.author.name, icon_url=ctx.author.avatar_url)
@@ -380,7 +381,7 @@ async def myplan(ctx):
                 j += 1
                 # value += f'``{field["Stunde"]}, {field["Art"]}, {course}, {field["Vertreter"]}, {field["Raum"]}, {field["Bemerkungen"]}``\n'
                 result += substitutions[i][k] + "  "
-            result += f"``\n``{'-'*sum(length)}``\n"
+            result += f"``\n``{'-'*(sum(length) + 10)}``\n"
 
         if result.strip() != "":
             embed.add_field(name=date, value=result, inline=False)

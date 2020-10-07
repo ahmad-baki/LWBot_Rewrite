@@ -523,8 +523,10 @@ async def updateSubstitutionPlan():
                 value += i + "\n"
             addedEmbed.add_field(name=date,value=value,inline=False)
 
-    await channel.send(embed=rmEmbed)
-    await channel.send(embed=addedEmbed)
+    if len(rmEmbed.fields) > 0: 
+        await channel.send(embed=rmEmbed)
+    if len(addedEmbed.fields) > 0: 
+        await channel.send(embed=addedEmbed)
 
 
 @updateSubstitutionPlan.before_loop

@@ -121,7 +121,7 @@ async def getCurrentSubstitutionPlan():
  
     url1,url2,url3 = (await get_plan_urls(lwConfig.subPlanUsername, lwConfig.subPlanPassword))
     
-    # currentPlan = getSubstitutionPlan()
+    currentPlan = getSubstitutionPlan()
     
 
     # remove everything and get the newest substitution plan data
@@ -140,28 +140,4 @@ async def getCurrentSubstitutionPlan():
     #     if (now - datetime.strptime(i.split()[0], "%d.%m.%Y")).days >= 0:
     #         newPlan.pop(i)
     updateSubstitutionPlan(newPlan)
-
-    # ##
-    # changes = {}
-    # changeCounter = 0
-    # changes[now] = {
-    #     "inserted": {
-    #         "infos": [],
-    #         "substitutions": []
-    #     },
-    #     "updated": {
-    #         "infos": [],
-    #         "substitutions": []
-    #     },
-    #     "deleted": {
-    #         "infos": [],
-    #         "substitutions": []
-    #     }
-    # }
-
-    # # completely new day
-    # if now not in currentPlan:
-    #     changes[now]["inserted"] = newPlan
-    #     changeCounter += len(newPlan)
-
-    # diff_dict = diff(currentPlan, newPlan, syntax="symmetric")
+    return (currentPlan, newPlan)

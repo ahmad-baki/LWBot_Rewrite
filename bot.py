@@ -505,8 +505,8 @@ async def updateSubstitutionPlan():
                     removals[date].append(i)
     channel = bot.get_channel(lwConfig.logChannelID)
 
-    rmEmbed = discord.Embed(title="Added", color=discord.Color.red())
-    addedEmbed = discord.Embed(title="Removed", color=discord.Color.green())
+    rmEmbed = discord.Embed(title="Removed", color=discord.Color.red())
+    addedEmbed = discord.Embed(title="Added", color=discord.Color.green())
     rmEmbed.description = "removed substitions [BETA]"
     addedEmbed.description = "added substitions [BETA]"
     for date in removals.keys():

@@ -175,26 +175,26 @@ def format_plan(plan, guild, embed, courses=[]):
                 length[j] = max(length[j], len(substitutions[i][k]))
                 j += 1
             
-            # sort substitutions by time of lesson
-            substitutions = sorted(
-                substitutions, key=lambda k: k['Stunde'].split()[0])
+        # sort substitutions by time of lesson
+        substitutions = sorted(
+            substitutions, key=lambda k: k['Stunde'].split()[0])
 
-            # stretch strings and apply them to the result string
-            result = ""
-            for i in range(len(substitutions)):
-                # j is the length index
-                j = 0
-                result += "``"
-                for k in list(substitutions[i].keys()):
-                    if k == "neues_Fach" or k == "Klasse":
-                        continue
-                    # stretch the strings if needed
-                    substitutions[i][k] = substitutions[i][k].ljust(length[j])
-                    j += 1
-                    result += substitutions[i][k] + ("" if k == (list(substitutions[i].keys())[
-                                                    len(substitutions[i].keys()) - 1]) else "  ")
-                result += f"``\n``{'-'*(sum(length) + 10)}``\n"
+        # stretch strings and apply them to the result string
+        result = ""
+        for i in range(len(substitutions)):
+            # j is the length index
+            j = 0
+            result += "``"
+            for k in list(substitutions[i].keys()):
+                if k == "neues_Fach" or k == "Klasse":
+                    continue
+                # stretch the strings if needed
+                substitutions[i][k] = substitutions[i][k].ljust(length[j])
+                j += 1
+                result += substitutions[i][k] + ("" if k == (list(substitutions[i].keys())[
+                                                len(substitutions[i].keys()) - 1]) else "  ")
+            result += f"``\n``{'-'*(sum(length) + 10)}``\n"
 
-            if result.strip() != "":
-                embed.add_field(name=date, value=result, inline=False)
+        if result.strip() != "":
+            embed.add_field(name=date, value=result, inline=False)
     return embed

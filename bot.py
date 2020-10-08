@@ -443,7 +443,6 @@ async def checkGmoWebsite():
 @tasks.loop(seconds=300)
 async def updateSubstitutionPlan():
     currentPlan, newPlan = await substitutionHandler.getCurrentSubstitutionPlan()
-    print("a")
     try:
         additions = {}
         removals = {}
@@ -452,7 +451,6 @@ async def updateSubstitutionPlan():
             removals[date] = []
             if date not in currentPlan.keys():
                 additions[date] = newPlan[date]
-                # print(json.dumps(newPlan[date]))
             else:
                 for k in newPlan[date]:
                     if k not in currentPlan[date]:

@@ -337,59 +337,9 @@ async def myplan(ctx):
     embed.timestamp = datetime.datetime.utcnow()
     embed.set_footer(text=ctx.author.name, icon_url=ctx.author.avatar_url)
     courses = substitutionHandler.getMyCourseRoleNames(ctx.author)
-    for date in list(plan.keys()):
-        substitutions = []
-        for i in range(len(plan[date])):
-            field = plan[date][i]
-            if field["altes_Fach"] in courses:
-                course = field["altes_Fach"]
-            elif field["neues_Fach"] in courses:
-                course = field["neues_Fach"]
-            else:
-                continue
-            if course in courses:
-                substitutions.append(field)
 
-        # get the max field length for all substitutions
-        length = [0, 0, 0, 0, 0, 0]
-        for i in range(len(substitutions)):
-            # j is the length index
-            j = 0
-            for k in list(substitutions[i].keys()):
-                if k == "altes_Fach":
-                    if substitutions[i]["altes_Fach"] in courses:
-                        substitutions[i][k] = substitutions[i]["altes_Fach"]
-                    elif substitutions[i]["neues_Fach"] in courses:
-                        substitutions[i][k] = substitutions[i]["neues_Fach"]
-                elif k == "neues_Fach" or k == "Klasse":
-                    continue
-
-                length[j] = max(length[j], len(substitutions[i][k]))
-                j += 1
-
-        # sort substitutions by time of lesson
-        substitutions = sorted(
-            substitutions, key=lambda k: k['Stunde'].split()[0])
-
-        # stretch strings and apply them to the result string
-        result = ""
-        for i in range(len(substitutions)):
-            # j is the length index
-            j = 0
-            result += "``"
-            for k in list(substitutions[i].keys()):
-                if k == "neues_Fach" or k == "Klasse":
-                    continue
-                # stretch the strings if needed
-                substitutions[i][k] = substitutions[i][k].ljust(length[j])
-                j += 1
-                result += substitutions[i][k] + ("" if k == (list(substitutions[i].keys())[
-                                                 len(substitutions[i].keys()) - 1]) else "  ")
-            result += f"``\n``{'-'*(sum(length) + 10)}``\n"
-
-        if result.strip() != "":
-            embed.add_field(name=date, value=result, inline=False)
-    await ctx.send(embed=embed)
+    e = substitutionHandler.format_plan(plan, ctx.guild, embed, courses)
+    await ctx.send(embed=e)
 
 
 @bot.listen()
@@ -493,6 +443,7 @@ async def checkGmoWebsite():
 @tasks.loop(seconds=300)
 async def updateSubstitutionPlan():
     currentPlan, newPlan = await substitutionHandler.getCurrentSubstitutionPlan()
+    print("a")
     try:
         additions = {}
         removals = {}
@@ -503,31 +454,21 @@ async def updateSubstitutionPlan():
                 additions[date] = newPlan[date]
                 # print(json.dumps(newPlan[date]))
             else:
-                for i in newPlan[date]:
-                    if i not in currentPlan[date]:
-                        additions[date].append(i)
-                for i in currentPlan[date]:
-                    if i not in newPlan[date]:
-                        removals[date].append(i)
+                for k in newPlan[date]:
+                    if k not in currentPlan[date]:
+                        additions[date].append(k)
+                for k in currentPlan[date]:
+                    if k not in newPlan[date]:
+                        removals[date].append(k)
         channel = bot.get_channel(lwConfig.logChannelID)
 
         rmEmbed = discord.Embed(title="Removed", color=discord.Color.red())
         addedEmbed = discord.Embed(title="Added", color=discord.Color.green())
         rmEmbed.description = "removed substitions [BETA]"
         addedEmbed.description = "added substitions [BETA]"
-        for date in removals.keys():
-            value = ""
-            if len(removals[date]) > 0:
-                for i in removals[date]:
-                    value += i + "\n"
-                rmEmbed.add_field(name=date,value=value,inline=False)
-
-        for date in additions.keys():
-            value = ""
-            if len(additions[date]) > 0:
-                for i in additions[date]:
-                    value += i + "\n"
-                addedEmbed.add_field(name=date,value=value,inline=False)
+        server = channel.guild
+        rmEmbed = substitutionHandler.format_plan(removals, server, rmEmbed)
+        addedEmbed = substitutionHandler.format_plan(additions, server, addedEmbed)
 
         if len(rmEmbed.fields) > 0: 
             await channel.send(embed=rmEmbed)

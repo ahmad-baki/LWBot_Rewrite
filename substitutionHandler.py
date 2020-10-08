@@ -141,3 +141,61 @@ async def getCurrentSubstitutionPlan():
     #         newPlan.pop(i)
     updateSubstitutionPlan(newPlan)
     return (currentPlan, newPlan)
+
+def format_plan(plan, guild, embed, courses=[]):
+    if courses == []:
+        courses = getMyCourseRoleNames(guild)
+        print(courses)
+    for date in list(plan.keys()):
+        substitutions = []
+        for i in range(len(plan[date])):
+            field = plan[date][i]
+            if field["altes_Fach"] in courses:
+                course = field["altes_Fach"]
+            elif field["neues_Fach"] in courses:
+                course = field["neues_Fach"]
+            else:
+                continue
+            if course in courses:
+                substitutions.append(field)
+
+        # get the max field length for all substitutions
+        length = [0, 0, 0, 0, 0, 0]
+        for i in range(len(substitutions)):
+            # j is the length index
+            j = 0
+            for k in list(substitutions[i].keys()):
+                if k == "altes_Fach":
+                    if substitutions[i]["altes_Fach"] in courses:
+                        substitutions[i][k] = substitutions[i]["altes_Fach"]
+                    elif substitutions[i]["neues_Fach"] in courses:
+                        substitutions[i][k] = substitutions[i]["neues_Fach"]
+                elif k == "neues_Fach" or k == "Klasse":
+                    continue
+
+                length[j] = max(length[j], len(substitutions[i][k]))
+                j += 1
+            
+            # sort substitutions by time of lesson
+            substitutions = sorted(
+                substitutions, key=lambda k: k['Stunde'].split()[0])
+
+            # stretch strings and apply them to the result string
+            result = ""
+            for i in range(len(substitutions)):
+                # j is the length index
+                j = 0
+                result += "``"
+                for k in list(substitutions[i].keys()):
+                    if k == "neues_Fach" or k == "Klasse":
+                        continue
+                    # stretch the strings if needed
+                    substitutions[i][k] = substitutions[i][k].ljust(length[j])
+                    j += 1
+                    result += substitutions[i][k] + ("" if k == (list(substitutions[i].keys())[
+                                                    len(substitutions[i].keys()) - 1]) else "  ")
+                result += f"``\n``{'-'*(sum(length) + 10)}``\n"
+
+            if result.strip() != "":
+                embed.add_field(name=date, value=result, inline=False)
+    return embed

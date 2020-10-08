@@ -118,12 +118,12 @@ async def test(ctx, *, arg):
     e.description = arg
     e.timestamp = datetime.datetime.utcnow()
     e.set_footer(text=ctx.author.name, icon_url=ctx.author.avatar_url)
-    # try:
-    #     raise Exception("test")
-    # except Exception as e:
-    #     # await ctx.send(embed=e)
-    #     await on_error(e)
-    await embed(ctx, arg)
+    try:
+        raise Exception("test")
+    except Exception as e:
+        # await ctx.send(embed=e)
+        await on_command_error(ctx, e)
+
 
 
 @bot.command()
@@ -534,7 +534,10 @@ async def updateSubstitutionPlan():
         if len(addedEmbed.fields) > 0: 
             await channel.send(embed=addedEmbed)
     except Exception as e:
-        pass
+        try:
+            await on_command_error(bot.get_channel(lwConfig.logChannelID), e)
+        except Exception:
+            pass
 
 
 @updateSubstitutionPlan.before_loop

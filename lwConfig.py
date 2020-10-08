@@ -1,14 +1,14 @@
 import json
-# path = ""
-# try:
-#     import os
-#     path = os.path.abspath(".")
-#     with open(path + '/lwConfig.json', 'r') as myfile:
-#         data = myfile.read()
-# except:
-path = '/home/pi/lwBot/LWBot_Rewrite'
-with open(path + '/lwConfig.json', 'r') as myfile:
-    data = myfile.read()
+path = ""
+try:
+    import os
+    path = os.path.abspath(".")
+    with open(path + '/lwConfig.json', 'r') as myfile:
+        data = myfile.read()
+except:
+    path = '/home/pi/lwBot/LWBot_Rewrite'
+    with open(path + '/lwConfig.json', 'r') as myfile:
+        data = myfile.read()
 
 
 config = json.loads(data)

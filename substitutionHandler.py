@@ -145,7 +145,6 @@ async def getCurrentSubstitutionPlan():
 def format_plan(plan, guild, embed, courses=[]):
     if courses == []:
         courses = getMyCourseRoleNames(guild)
-        print(courses)
     for date in list(plan.keys()):
         substitutions = []
         for i in range(len(plan[date])):

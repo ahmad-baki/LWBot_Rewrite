@@ -118,7 +118,12 @@ async def test(ctx, *, arg):
     e.description = arg
     e.timestamp = datetime.datetime.utcnow()
     e.set_footer(text=ctx.author.name, icon_url=ctx.author.avatar_url)
-    await ctx.send(embed=e)
+    # try:
+    #     raise Exception("test")
+    # except Exception as e:
+    #     # await ctx.send(embed=e)
+    #     await on_error(e)
+    await embed(ctx, arg)
 
 
 @bot.command()
@@ -488,45 +493,48 @@ async def checkGmoWebsite():
 @tasks.loop(seconds=300)
 async def updateSubstitutionPlan():
     currentPlan, newPlan = await substitutionHandler.getCurrentSubstitutionPlan()
-    additions = {}
-    removals = {}
-    for date in newPlan.keys():
-        additions[date] = []
-        removals[date] = []
-        if date not in currentPlan.keys():
-            additions[date] = newPlan[date]
-            # print(json.dumps(newPlan[date]))
-        else:
-            for i in newPlan[date]:
-                if i not in currentPlan[date]:
-                    additions[date].append(i)
-            for i in currentPlan[date]:
-                if i not in newPlan[date]:
-                    removals[date].append(i)
-    channel = bot.get_channel(lwConfig.logChannelID)
+    try:
+        additions = {}
+        removals = {}
+        for date in newPlan.keys():
+            additions[date] = []
+            removals[date] = []
+            if date not in currentPlan.keys():
+                additions[date] = newPlan[date]
+                # print(json.dumps(newPlan[date]))
+            else:
+                for i in newPlan[date]:
+                    if i not in currentPlan[date]:
+                        additions[date].append(i)
+                for i in currentPlan[date]:
+                    if i not in newPlan[date]:
+                        removals[date].append(i)
+        channel = bot.get_channel(lwConfig.logChannelID)
 
-    rmEmbed = discord.Embed(title="Removed", color=discord.Color.red())
-    addedEmbed = discord.Embed(title="Added", color=discord.Color.green())
-    rmEmbed.description = "removed substitions [BETA]"
-    addedEmbed.description = "added substitions [BETA]"
-    for date in removals.keys():
-        value = ""
-        if len(removals[date]) > 0:
-            for i in removals[date]:
-                value += i + "\n"
-            rmEmbed.add_field(name=date,value=value,inline=False)
+        rmEmbed = discord.Embed(title="Removed", color=discord.Color.red())
+        addedEmbed = discord.Embed(title="Added", color=discord.Color.green())
+        rmEmbed.description = "removed substitions [BETA]"
+        addedEmbed.description = "added substitions [BETA]"
+        for date in removals.keys():
+            value = ""
+            if len(removals[date]) > 0:
+                for i in removals[date]:
+                    value += i + "\n"
+                rmEmbed.add_field(name=date,value=value,inline=False)
 
-    for date in additions.keys():
-        value = ""
-        if len(additions[date]) > 0:
-            for i in additions[date]:
-                value += i + "\n"
-            addedEmbed.add_field(name=date,value=value,inline=False)
+        for date in additions.keys():
+            value = ""
+            if len(additions[date]) > 0:
+                for i in additions[date]:
+                    value += i + "\n"
+                addedEmbed.add_field(name=date,value=value,inline=False)
 
-    if len(rmEmbed.fields) > 0: 
-        await channel.send(embed=rmEmbed)
-    if len(addedEmbed.fields) > 0: 
-        await channel.send(embed=addedEmbed)
+        if len(rmEmbed.fields) > 0: 
+            await channel.send(embed=rmEmbed)
+        if len(addedEmbed.fields) > 0: 
+            await channel.send(embed=addedEmbed)
+    except Exception as e:
+        pass
 
 
 @updateSubstitutionPlan.before_loop

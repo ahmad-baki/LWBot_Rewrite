@@ -121,7 +121,6 @@ async def test(ctx, *, arg):
     await ctx.send(embed=e)
 
 
-
 @bot.command()
 async def emotes(ctx):
     e = discord.Embed(title="Emotes:")
@@ -189,7 +188,7 @@ async def stats(ctx):
         await ctx.message.channel.send("no items in the voting list.")
 
 
-@bot.command(aliases=["remindme", "remind"])
+@bot.command(aliases=["remindme", "remind", "reminder"])
 async def setreminder(ctx, *, arg):
     try:
         length = min(len(arg.split()), 2)
@@ -211,10 +210,12 @@ async def setreminder(ctx, *, arg):
     else:
         if len(ctx.message.mentions) > 0:
             for recipient in ctx.message.mentions:
-                reminderHandler.addReminder(ctx.author.id, recipient.id, time_str, m.content)
+                reminderHandler.addReminder(
+                    ctx.author.id, recipient.id, time_str, m.content)
                 await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "new reminder set for " + recipient.name + " at " + time_str, m.content))
         else:
-            reminderHandler.addReminder(ctx.author.id, ctx.author.id, time_str, m.content)
+            reminderHandler.addReminder(
+                ctx.author.id, ctx.author.id, time_str, m.content)
             await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "new reminder set for you at " + time_str, m.content))
         return
 
@@ -223,10 +224,12 @@ async def setreminder(ctx, *, arg):
 async def myreminders(ctx):
     reminder = reminderHandler.getReminder()
     if str(ctx.author.id) in list(reminder.keys()) and len(reminder[str(ctx.author.id)]) > 0:
-        e = discord.Embed(title="Your Reminders", color=ctx.author.color, timestamp=datetime.datetime.utcnow())
+        e = discord.Embed(title="Your Reminders", color=ctx.author.color,
+                          timestamp=datetime.datetime.utcnow())
         e.set_footer(text=ctx.author.name, icon_url=ctx.author.avatar_url)
         for singleReminder in reminder[str(ctx.author.id)]:
-            e.add_field(name=singleReminder[0], value=singleReminder[1], inline=False)
+            e.add_field(name=singleReminder[0],
+                        value=singleReminder[1], inline=False)
         await ctx.send(embed=e)
     else:
         await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "You have no reminders.", f"Type {bot.command_prefix}reminder [date] to create one."))
@@ -236,19 +239,22 @@ async def myreminders(ctx):
 async def removereminder(ctx):
     reminder = reminderHandler.getReminder()
     if str(ctx.author.id) in list(reminder.keys()) or len(reminder[str(ctx.author.id)]) == 0:
-        e = discord.Embed(title="Your Reminders", color=ctx.author.color, timestamp=datetime.datetime.utcnow())
+        e = discord.Embed(title="Your Reminders", color=ctx.author.color,
+                          timestamp=datetime.datetime.utcnow())
         e.set_footer(text=ctx.author.name, icon_url=ctx.author.avatar_url)
         reminderCount = len(reminder[str(ctx.author.id)])
         for i in range(reminderCount):
             singleReminder = reminder[str(ctx.author.id)][i]
-            e.add_field(name=f"[{i}] {singleReminder[0]}", value=singleReminder[1], inline=False)
+            e.add_field(name=f"[{i}] {singleReminder[0]}",
+                        value=singleReminder[1], inline=False)
         await ctx.send(embed=e)
         await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Please enter a index to remove", "Dont answer for 60 seconds to time out.", color=discord.Color.gold()))
         try:
             m = await bot.wait_for('message', check=lambda m: m.author == ctx.author, timeout=60)
             index = int(m.content)
             if 0 <= index < reminderCount:
-                reminderHandler.removeReminder(ctx.author.id, *reminder[str(ctx.author.id)][index])
+                reminderHandler.removeReminder(
+                    ctx.author.id, *reminder[str(ctx.author.id)][index])
                 await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Reminder removed.", f"Your reminder\n```{reminder[str(ctx.author.id)][index][1]}``` was removed."))
             else:
                 raise ValueError
@@ -466,11 +472,12 @@ async def updateSubstitutionPlan():
         addedEmbed.description = "added substitions [BETA]"
         server = channel.guild
         rmEmbed = substitutionHandler.format_plan(removals, server, rmEmbed)
-        addedEmbed = substitutionHandler.format_plan(additions, server, addedEmbed)
+        addedEmbed = substitutionHandler.format_plan(
+            additions, server, addedEmbed)
 
-        if len(rmEmbed.fields) > 0: 
+        if len(rmEmbed.fields) > 0:
             await channel.send(embed=rmEmbed)
-        if len(addedEmbed.fields) > 0: 
+        if len(addedEmbed.fields) > 0:
             await channel.send(embed=addedEmbed)
     except Exception as e:
         try:

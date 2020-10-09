@@ -13,20 +13,19 @@ def getReminder():
         return json.loads(myfile.read())
 
 
-def addReminder(author, time, message):
+def addReminder(author, recipient, time, message):
     reminder = getReminder()
-    authors = list(reminder.keys())
-    if not str(author) in authors:
-        reminder[str(author)] = []
-    reminder[str(author)].append((time, message))
+    recipients = list(reminder.keys())
+    if not str(recipient) in recipients:
+        reminder[str(recipient)] = []
+    reminder[str(recipient)].append([time, message, author])
     updateReminder(reminder)
 
 
-def removeReminder(authorID, time, message):
+def removeReminder(recipientID, time, message, author):
     reminder = getReminder()
-    authors = list(reminder.keys())
-    if str(authorID) in authors:
-        if [time, message] in reminder[str(authorID)]:
-            reminder[str(authorID)].pop(
-                reminder[str(authorID)].index([time, message]))
+    recipients = list(reminder.keys())
+    if str(recipientID) in recipients:
+        if [time, message, author] in reminder[str(recipientID)]:
+            reminder[str(recipientID)].pop(reminder[str(recipientID)].index([time, message, author]))
     updateReminder(reminder)

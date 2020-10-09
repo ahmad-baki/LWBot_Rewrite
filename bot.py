@@ -115,14 +115,10 @@ async def embed(ctx, *args):
 async def test(ctx, *, arg):
     e = discord.Embed(title="testing stuffu")
     e.color = discord.Color.blurple()
-    e.description = arg
+    e.description = str([m.name for m in ctx.message.mentions])
     e.timestamp = datetime.datetime.utcnow()
     e.set_footer(text=ctx.author.name, icon_url=ctx.author.avatar_url)
-    try:
-        raise Exception("test")
-    except Exception as e:
-        # await ctx.send(embed=e)
-        await on_command_error(ctx, e)
+    await ctx.send(embed=e)
 
 
 
@@ -193,10 +189,12 @@ async def stats(ctx):
         await ctx.message.channel.send("no items in the voting list.")
 
 
-@bot.command(aliases=["remindme"])
-async def reminder(ctx, *, arg):
+@bot.command(aliases=["remindme", "remind"])
+async def setreminder(ctx, *, arg):
     try:
-        time = datetime.datetime.strptime(arg, '%d.%m.%Y %H:%M')
+        length = min(len(arg.split()), 2)
+        time_str = ' '.join(arg.split()[:length])
+        time = datetime.datetime.strptime(time_str, '%d.%m.%Y %H:%M')
         if time < datetime.datetime.now():
             await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Reminder in the past?", "not allowed.", color=discord.Color.orange()))
             return
@@ -211,8 +209,13 @@ async def reminder(ctx, *, arg):
     except Exception:
         await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Some Error occured", "Your reminder could not be set.", color=discord.Color.red()))
     else:
-        reminderHandler.addReminder(ctx.author.id, arg, m.content)
-        await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "new reminder set for " + arg, m.content))
+        if len(ctx.message.mentions) > 0:
+            for recipient in ctx.message.mentions:
+                reminderHandler.addReminder(ctx.author.id, recipient.id, time_str, m.content)
+                await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "new reminder set for " + recipient.name + " at " + time_str, m.content))
+        else:
+            reminderHandler.addReminder(ctx.author.id, ctx.author.id, time_str, m.content)
+            await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "new reminder set for you at " + time_str, m.content))
         return
 
 
@@ -220,12 +223,10 @@ async def reminder(ctx, *, arg):
 async def myreminders(ctx):
     reminder = reminderHandler.getReminder()
     if str(ctx.author.id) in list(reminder.keys()) and len(reminder[str(ctx.author.id)]) > 0:
-        e = discord.Embed(title="Your Reminders", color=ctx.author.color,
-                          timestamp=datetime.datetime.utcnow())
+        e = discord.Embed(title="Your Reminders", color=ctx.author.color, timestamp=datetime.datetime.utcnow())
         e.set_footer(text=ctx.author.name, icon_url=ctx.author.avatar_url)
         for singleReminder in reminder[str(ctx.author.id)]:
-            e.add_field(name=singleReminder[0],
-                        value=singleReminder[1], inline=False)
+            e.add_field(name=singleReminder[0], value=singleReminder[1], inline=False)
         await ctx.send(embed=e)
     else:
         await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "You have no reminders.", f"Type {bot.command_prefix}reminder [date] to create one."))
@@ -235,22 +236,19 @@ async def myreminders(ctx):
 async def removereminder(ctx):
     reminder = reminderHandler.getReminder()
     if str(ctx.author.id) in list(reminder.keys()) or len(reminder[str(ctx.author.id)]) == 0:
-        e = discord.Embed(title="Your Reminders", color=ctx.author.color,
-                          timestamp=datetime.datetime.utcnow())
+        e = discord.Embed(title="Your Reminders", color=ctx.author.color, timestamp=datetime.datetime.utcnow())
         e.set_footer(text=ctx.author.name, icon_url=ctx.author.avatar_url)
         reminderCount = len(reminder[str(ctx.author.id)])
         for i in range(reminderCount):
             singleReminder = reminder[str(ctx.author.id)][i]
-            e.add_field(name=f"[{i}] {singleReminder[0]}",
-                        value=singleReminder[1], inline=False)
+            e.add_field(name=f"[{i}] {singleReminder[0]}", value=singleReminder[1], inline=False)
         await ctx.send(embed=e)
         await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Please enter a index to remove", "Dont answer for 60 seconds to time out.", color=discord.Color.gold()))
         try:
             m = await bot.wait_for('message', check=lambda m: m.author == ctx.author, timeout=60)
             index = int(m.content)
             if 0 <= index < reminderCount:
-                reminderHandler.removeReminder(
-                    ctx.author.id, *reminder[str(ctx.author.id)][index])
+                reminderHandler.removeReminder(ctx.author.id, *reminder[str(ctx.author.id)][index])
                 await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Reminder removed.", f"Your reminder\n```{reminder[str(ctx.author.id)][index][1]}``` was removed."))
             else:
                 raise ValueError
@@ -419,17 +417,19 @@ async def on_voice_state_update(member, before, after):
 async def checkReminder():
     r = reminderHandler.getReminder()
     now = datetime.datetime.now()
-    authors = list(r.keys())
-    for authorID in authors:
-        for reminder in r[authorID]:
+    recipients = list(r.keys())
+    for recipientID in recipients:
+        for reminder in r[recipientID]:
             time = datetime.datetime.strptime(reminder[0], '%d.%m.%Y %H:%M')
             if time <= now:
                 channel = bot.get_channel(lwConfig.botChannelID)
                 author = bot.get_guild(
-                    lwConfig.serverID).get_member(int(authorID))
-                color = author.color
-                await channel.send(content=author.mention, embed=lwHelperFunctions.simpleEmbed(author, "Reminder", reminder[1], color=color))
-                reminderHandler.removeReminder(authorID, *reminder)
+                    lwConfig.serverID).get_member(int(reminder[2]))
+                recipient = bot.get_guild(
+                    lwConfig.serverID).get_member(int(recipientID))
+                color = recipient.color
+                await channel.send(content=recipient.mention, embed=lwHelperFunctions.simpleEmbed(author, "Reminder", reminder[1], color=color))
+                reminderHandler.removeReminder(recipientID, *reminder)
 
 
 @tasks.loop(seconds=300)

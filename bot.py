@@ -435,7 +435,7 @@ async def checkReminder():
                     lwConfig.serverID).get_member(int(recipientID))
                 color = recipient.color
                 await channel.send(content=recipient.mention, embed=lwHelperFunctions.simpleEmbed(author, "Reminder", reminder[1], color=color))
-                reminderHandler.removeReminder(recipientID, *reminder)
+                # reminderHandler.removeReminder(recipientID, *reminder)
 
 
 @tasks.loop(seconds=300)

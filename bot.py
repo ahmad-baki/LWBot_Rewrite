@@ -419,7 +419,7 @@ async def on_voice_state_update(member, before, after):
             await member.move_to(before.channel)
 
 
-@tasks.loop(seconds=30)
+@tasks.loop(seconds=1200)    # change back to 30 later
 async def checkReminder():
     r = reminderHandler.getReminder()
     now = datetime.datetime.now()

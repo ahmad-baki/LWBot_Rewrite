@@ -419,7 +419,7 @@ async def on_voice_state_update(member, before, after):
             await member.move_to(before.channel)
 
 
-@tasks.loop(seconds=1200)    # change back to 30 later
+@tasks.loop(seconds=30)
 async def checkReminder():
     r = reminderHandler.getReminder()
     now = datetime.datetime.now()
@@ -435,7 +435,7 @@ async def checkReminder():
                     lwConfig.serverID).get_member(int(recipientID))
                 color = recipient.color
                 await channel.send(content=recipient.mention, embed=lwHelperFunctions.simpleEmbed(author, "Reminder", reminder[1], color=color))
-                # reminderHandler.removeReminder(recipientID, *reminder)
+                reminderHandler.removeReminder(recipientID, *reminder)
 
 
 @tasks.loop(seconds=300)

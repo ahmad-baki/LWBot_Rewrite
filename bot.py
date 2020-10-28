@@ -464,16 +464,19 @@ async def updateSubstitutionPlan():
                 for k in currentPlan[date]:
                     if k not in newPlan[date]:
                         removals[date].append(k)
-        channel = bot.get_channel(lwConfig.logChannelID)
+        channel = bot.get_channel(lwConfig.substitutionChannelID)
 
-        rmEmbed = discord.Embed(title="Removed", color=discord.Color.red())
-        addedEmbed = discord.Embed(title="Added", color=discord.Color.green())
-        rmEmbed.description = "removed substitions [BETA]"
-        addedEmbed.description = "added substitions [BETA]"
+        rmEmbed = discord.Embed(title="Entfernt", color=discord.Color.red())
+        addedEmbed = discord.Embed(title="Neu hinzugefügt", color=discord.Color.green())
+        rmEmbed.description = "gelöschte Vertretungen [BETA]"
+        addedEmbed.description = "geänderte Vertretungen [BETA]"
         server = channel.guild
+        rmEmbed.timestamp = datetime.datetime.utcnow()
+        addedEmbed.timestamp = datetime.datetime.utcnow()
         rmEmbed = substitutionHandler.format_plan(removals, server, rmEmbed)
         addedEmbed = substitutionHandler.format_plan(
             additions, server, addedEmbed)
+        
 
         if len(rmEmbed.fields) > 0:
             await channel.send(embed=rmEmbed)

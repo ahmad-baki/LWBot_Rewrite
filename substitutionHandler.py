@@ -134,11 +134,6 @@ async def getCurrentSubstitutionPlan():
     newPlan[date2] = table2
     newPlan[date3] = table3
     
-    # remove old substitution plans
-    # now = datetime.now()#.strftime("%d.%m.%Y")
-    # for i in list(newPlan.keys()):
-    #     if (now - datetime.strptime(i.split()[0], "%d.%m.%Y")).days >= 0:
-    #         newPlan.pop(i)
     updateSubstitutionPlan(newPlan)
     return (currentPlan, newPlan)
 

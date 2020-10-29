@@ -64,7 +64,6 @@ async def on_ready():
     channel = bot.get_channel(lwConfig.logChannelID)
     await channel.send(embed=e)
 
-
 @bot.listen()
 async def on_message(message):
     if message.author == bot.user:

@@ -115,7 +115,7 @@ async def embed(ctx, *args):
 async def test(ctx, *, arg):
     e = discord.Embed(title="testing stuffu")
     e.color = discord.Color.blurple()
-    e.description = str([m.name for m in ctx.message.mentions])
+    e.description = str([m.name for m in bot.get_all_members()])
     e.timestamp = datetime.datetime.utcnow()
     e.set_footer(text=ctx.author.name, icon_url=ctx.author.avatar_url)
     await ctx.send(embed=e)

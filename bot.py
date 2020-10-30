@@ -15,6 +15,7 @@ import datetime
 import operator
 import os
 import subprocess
+import validators
 
 import lwConfig
 import lwHelperFunctions
@@ -68,7 +69,7 @@ async def on_ready():
 async def on_message(message):
     if message.author == bot.user:
         return
-    if message.channel.id == lwConfig.memeChannelID and len(message.attachments) > 0:
+    if message.channel.id == lwConfig.memeChannelID and (len(message.attachments) > 0 or validators.url(message.content)):
         await message.add_reaction(lwHelperFunctions.getEmoji(bot, lwConfig.upvoteEmoji))
         await message.add_reaction(lwHelperFunctions.getEmoji(bot, lwConfig.downoteEmoji))
     if message.content.startswith("awoo"):
@@ -171,7 +172,8 @@ async def stats(ctx):
         e.title = f"Current top voted post with a score of {str(score)} {lwHelperFunctions.getEmoji(bot, lwConfig.upvoteEmoji)}"
 
         e.description = winnerMessage.content
-        e.set_image(url=winnerMessage.attachments[0].url)
+        if(len(winnerMessage.attachments) > 0):
+            e.set_image(url=winnerMessage.attachments[0].url)
         e.set_author(name=winnerMessage.author,
                      icon_url=winnerMessage.author.avatar_url)
         e.color = winnerMessage.guild.get_member(
@@ -181,8 +183,9 @@ async def stats(ctx):
         e.timestamp = datetime.datetime.utcnow()
         e.set_footer(text=ctx.author.name, icon_url=ctx.author.avatar_url)
         await ctx.message.channel.send(embed=e)
-        if(not lwHelperFunctions.is_url_image(e.image.url)):
-            await ctx.message.channel.send(winnerMessage.attachments[0].url)
+        if(len(winnerMessage.attachments) > 0):
+            if(not lwHelperFunctions.is_url_image(e.image.url)):
+                await ctx.message.channel.send(winnerMessage.attachments[0].url)
     else:
         await ctx.message.channel.send("no items in the voting list.")
 

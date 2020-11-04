@@ -16,6 +16,7 @@ import operator
 import os
 import subprocess
 import validators
+import ast
 
 import lwConfig
 import lwHelperFunctions
@@ -65,6 +66,7 @@ async def on_ready():
     channel = bot.get_channel(lwConfig.logChannelID)
     await channel.send(embed=e)
 
+
 @bot.listen()
 async def on_message(message):
     if message.author == bot.user:
@@ -76,34 +78,70 @@ async def on_message(message):
         await test(ctx=message, arg=message.content)
 
 
+# @bot.command(name="eval", aliases=["ev", "evaluate"])
+# async def _eval(ctx, *, arg):
+#     if await bot.is_owner(ctx.author):
+#         try:
+#         await eval(arg, globals(), locals())
+#         except Exception as e:
+#             if isinstance(e, TypeError):
+#                 pass
+#             else:
+#                 raise e
+#     else:
+#         awoo = lwHelperFunctions.getEmoji(bot, "AwOo")
+#         e = discord.Embed(title="You are not worthy ")
+#         e.set_image(url=awoo.url)
+#         e.color = discord.Color.blurple()
+#         e.timestamp = datetime.datetime.utcnow()
+#         e.set_footer(text=ctx.author.name, icon_url=ctx.author.avatar_url)
+#         await ctx.send(embed=e)
+
+
+# geklaut https://gist.github.com/nitros12/2c3c265813121492655bc95aa54da6b9
 @bot.command(name="eval", aliases=["ev", "evaluate"])
-async def _eval(ctx, *, arg):
-    if await bot.is_owner(ctx.author):
-        try:
-            await eval(arg, globals(), locals())
-                # "ctx": ctx,
-                # "bot": bot,
-                # "lwHelperFunctions": lwHelperFunctions,
-                # "discord": discord,
-                # "datetime": datetime,
-                # "reminderHandler": reminderHandler,
-                # "os": os,
-                # "subprocess": subprocess,
-                # "substitutionHandler": substitutionHandler
-            # })
-        except Exception as e:
-            if isinstance(e, TypeError):
-                pass
-            else:
-                raise e
-    else:
-        awoo = lwHelperFunctions.getEmoji(bot, "AwOo")
-        e = discord.Embed(title="You are not worthy ")
-        e.set_image(url=awoo.url)
-        e.color = discord.Color.blurple()
-        e.timestamp = datetime.datetime.utcnow()
-        e.set_footer(text=ctx.author.name, icon_url=ctx.author.avatar_url)
-        await ctx.send(embed=e)
+async def _eval(ctx, *, cmd):
+    def insert_returns(body):
+        # insert return stmt if the last expression is a expression statement
+        if isinstance(body[-1], ast.Expr):
+            body[-1] = ast.Return(body[-1].value)
+            ast.fix_missing_locations(body[-1])
+
+        # for if statements, we insert returns into the body and the orelse
+        if isinstance(body[-1], ast.If):
+            insert_returns(body[-1].body)
+            insert_returns(body[-1].orelse)
+
+        # for with blocks, again we insert returns into the body
+        if isinstance(body[-1], ast.With):
+            insert_returns(body[-1].body)
+    fn_name = "_eval_expr"
+
+    cmd = cmd.strip("` ")
+
+    # add a layer of indentation
+    cmd = "\n".join(f"    {i}" for i in cmd.splitlines())
+
+    # wrap in async def body
+    body = f"async def {fn_name}():\n{cmd}"
+
+    parsed = ast.parse(body)
+    body = parsed.body[0].body
+
+    insert_returns(body)
+
+    env = dict(globals(), **locals())
+    # env = {
+    #     'bot': ctx.bot,
+    #     'discord': discord,
+    #     'commands': commands,
+    #     'ctx': ctx,
+    #     '__import__': __import__
+    # }
+    exec(compile(parsed, filename="<ast>", mode="exec"), env)
+
+    result = (await eval(f"{fn_name}()", env))
+    await ctx.send(result)
 
 
 @bot.command()
@@ -116,7 +154,7 @@ async def test(ctx, *, arg):
     await bot.fetch_user(int(arg))
     e = discord.Embed(title="testing stuffu")
     e.color = discord.Color.blurple()
-    e.description = "ok"#str([m.name for m in bot.get_all_members()])
+    e.description = "ok"  # str([m.name for m in bot.get_all_members()])
     e.timestamp = datetime.datetime.utcnow()
     e.set_footer(text=ctx.author.name, icon_url=ctx.author.avatar_url)
     await ctx.send(embed=e)
@@ -470,7 +508,8 @@ async def updateSubstitutionPlan():
         channel = bot.get_channel(lwConfig.substitutionChannelID)
 
         rmEmbed = discord.Embed(title="Entfernt", color=discord.Color.red())
-        addedEmbed = discord.Embed(title="Neu hinzugefügt", color=discord.Color.green())
+        addedEmbed = discord.Embed(
+            title="Neu hinzugefügt", color=discord.Color.green())
         rmEmbed.description = "gelöschte Vertretungen [BETA]"
         addedEmbed.description = "geänderte Vertretungen [BETA]"
         server = channel.guild
@@ -479,7 +518,6 @@ async def updateSubstitutionPlan():
         rmEmbed = substitutionHandler.format_plan(removals, server, rmEmbed)
         addedEmbed = substitutionHandler.format_plan(
             additions, server, addedEmbed)
-        
 
         if len(rmEmbed.fields) > 0:
             await channel.send(embed=rmEmbed)

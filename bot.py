@@ -80,17 +80,17 @@ async def on_message(message):
 async def _eval(ctx, *, arg):
     if await bot.is_owner(ctx.author):
         try:
-            await eval(arg, {
-                "ctx": ctx,
-                "bot": bot,
-                "lwHelperFunctions": lwHelperFunctions,
-                "discord": discord,
-                "datetime": datetime,
-                "reminderHandler": reminderHandler,
-                "os": os,
-                "subprocess": subprocess,
-                "substitutionHandler": substitutionHandler
-            })
+            await eval(arg, globals(), locals())
+                # "ctx": ctx,
+                # "bot": bot,
+                # "lwHelperFunctions": lwHelperFunctions,
+                # "discord": discord,
+                # "datetime": datetime,
+                # "reminderHandler": reminderHandler,
+                # "os": os,
+                # "subprocess": subprocess,
+                # "substitutionHandler": substitutionHandler
+            # })
         except Exception as e:
             if isinstance(e, TypeError):
                 pass
@@ -113,9 +113,10 @@ async def embed(ctx, *args):
 
 @bot.command()
 async def test(ctx, *, arg):
+    await bot.fetch_user(int(arg))
     e = discord.Embed(title="testing stuffu")
     e.color = discord.Color.blurple()
-    e.description = str([m.name for m in bot.get_all_members()])
+    e.description = "ok"#str([m.name for m in bot.get_all_members()])
     e.timestamp = datetime.datetime.utcnow()
     e.set_footer(text=ctx.author.name, icon_url=ctx.author.avatar_url)
     await ctx.send(embed=e)

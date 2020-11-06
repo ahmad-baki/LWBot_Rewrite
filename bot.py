@@ -459,8 +459,8 @@ async def on_voice_state_update(member, before, after):
         if after.channel == afkChannel and before.channel.id in lwConfig.awakeChannelIDs:   #the "Stay awake" feature
             await member.move_to(before.channel)
 
-    if after.channel and member.guild.get_role(754044592097198091) in member.roles:         #the "banish" feature
-        await member.move_to(before.channel)
+    if after.channel and member.guild.get_role(754044592097198091) in member.roles and after.channel.id != 750052666830225498:  #the "banish" feature
+        await member.move_to(member.guild.get_channel(750052666830225498))
 
 
 @tasks.loop(seconds=30)

@@ -456,8 +456,11 @@ async def on_raw_reaction_remove(payload):
 async def on_voice_state_update(member, before, after):
     afkChannel = member.guild.afk_channel
     if after.channel and before.channel:  # if the member didn't just join or quit, but moved channels
-        if after.channel == afkChannel and before.channel.id in lwConfig.awakeChannelIDs:
+        if after.channel == afkChannel and before.channel.id in lwConfig.awakeChannelIDs:   #the "Stay awake" feature
             await member.move_to(before.channel)
+
+    if after.channel and member.guild.get_role(754044592097198091) in member.roles:         #the "banish" feature
+        await member.move_to(before.channel)
 
 
 @tasks.loop(seconds=30)

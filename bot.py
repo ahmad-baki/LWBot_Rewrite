@@ -252,11 +252,11 @@ async def setreminder(ctx, *, arg):
         if len(ctx.message.mentions) > 0:
             for recipient in ctx.message.mentions:
                 reminderHandler.addReminder(
-                    ctx.author.id, recipient.id, time_str, m.content + f"\ncreated [here]({ctx.message.jump_url})")
+                    ctx.author.id, recipient.id, time_str, m.content + f"\n_created [here]({ctx.message.jump_url})_")
                 await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "new reminder set for " + recipient.name + " at " + time_str, m.content))
         else:
             reminderHandler.addReminder(
-                ctx.author.id, ctx.author.id, time_str, m.content + f"\ncreated [here]({ctx.message.jump_url})")
+                ctx.author.id, ctx.author.id, time_str, m.content + f"\n_created [here]({ctx.message.jump_url})_")
             await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "new reminder set for you at " + time_str, m.content))
         return
 

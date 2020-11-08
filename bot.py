@@ -241,7 +241,7 @@ async def setreminder(ctx, *, arg):
         await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Please enter a message for the reminder", "Dont answer for 60 seconds to time out.", color=discord.Color.gold()))
         m = await bot.wait_for('message', check=lambda m: m.author == ctx.author, timeout=60)
     except ValueError:
-        await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Wrong date format.", "your Date should be in the format\n```reminder dd.mm.yyyy hh:mm\nExample: reminder 1.10.2020 6:34```", color=discord.Color.red()))
+        await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Wrong date format.", "your Date should be in the format\n```reminder (d)d.(m)m.yyyy (h)h:(m)m\nExample: reminder 1.10.2020 6:34```", color=discord.Color.red()))
         return
     except futures.TimeoutError:
         await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Timed out.", "Try again if you want to set a reminder.", color=discord.Color.red()))
@@ -511,16 +511,14 @@ async def updateSubstitutionPlan():
         channel = bot.get_channel(lwConfig.substitutionChannelID)
 
         rmEmbed = discord.Embed(title="Entfernt", color=discord.Color.red())
-        addedEmbed = discord.Embed(
-            title="Neu hinzugefügt", color=discord.Color.green())
+        addedEmbed = discord.Embed(title="Neu hinzugefügt", color=discord.Color.green())
         rmEmbed.description = "gelöschte Vertretungen [BETA]"
         addedEmbed.description = "geänderte Vertretungen [BETA]"
         server = channel.guild
         rmEmbed.timestamp = datetime.datetime.utcnow()
         addedEmbed.timestamp = datetime.datetime.utcnow()
         rmEmbed = substitutionHandler.format_plan(removals, server, rmEmbed)
-        addedEmbed = substitutionHandler.format_plan(
-            additions, server, addedEmbed)
+        addedEmbed = substitutionHandler.format_plan(additions, server, addedEmbed)
 
         if len(rmEmbed.fields) > 0:
             await channel.send(embed=rmEmbed)

@@ -218,7 +218,7 @@ async def stats(ctx):
         e.color = winnerMessage.guild.get_member(
             winnerMessage.author.id).colour
         date = winnerMessage.created_at
-        e.description += f"\n`Message created at:  {str(date).split('.')[0]}`"
+        e.description += f"\n[Message:]({winnerMessage.jump_url})"
         e.timestamp = datetime.datetime.utcnow()
         e.set_footer(text=ctx.author.name, icon_url=ctx.author.avatar_url)
         await ctx.message.channel.send(embed=e)

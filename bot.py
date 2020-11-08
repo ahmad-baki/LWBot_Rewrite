@@ -210,7 +210,7 @@ async def stats(ctx):
         e = discord.Embed()
         e.title = f"Current top voted post with a score of {str(score)} {lwHelperFunctions.getEmoji(bot, lwConfig.upvoteEmoji)}"
 
-        e.description = winnerMessage.content
+        e.description = f"[Message:]({winnerMessage.jump_url})"
         if(len(winnerMessage.attachments) > 0):
             e.set_image(url=winnerMessage.attachments[0].url)
         e.set_author(name=winnerMessage.author,
@@ -218,7 +218,7 @@ async def stats(ctx):
         e.color = winnerMessage.guild.get_member(
             winnerMessage.author.id).colour
         date = winnerMessage.created_at
-        e.description += f"\n[Message:]({winnerMessage.jump_url})"
+        e.description += "\n" + winnerMessage.content
         e.timestamp = datetime.datetime.utcnow()
         e.set_footer(text=ctx.author.name, icon_url=ctx.author.avatar_url)
         await ctx.message.channel.send(embed=e)

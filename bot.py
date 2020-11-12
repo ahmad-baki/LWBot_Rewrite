@@ -425,9 +425,29 @@ async def on_raw_reaction_add(payload):
             voteListHandler.changeVotingCounter(reaction.message, 1)
             # pin message when it has the specified amount of upvotes
             if reaction.count - 1 >= lwConfig.upvotesForPin and not reaction.message.pinned:
-                await reaction.message.pin(reason="good meme")
+                # await reaction.message.pin(reason="good meme")
+                await sendGoodMeme(reaction.message.id)
         elif reaction.emoji == downvote:
             voteListHandler.changeVotingCounter(reaction.message, -1)
+
+async def sendGoodMeme(msg):
+    channel = bot.get(lwConfig.goodMemesChannelID)
+    e = discord.Embed()
+    e.description = f"[Message:]({msg.jump_url})"
+    if(len(msg.attachments) > 0):
+        e.set_image(url=msg.attachments[0].url)
+    e.set_author(name=msg.author,
+                    icon_url=msg.author.avatar_url)
+    e.color = msg.guild.get_member(
+        msg.author.id).colour
+    e.description += "\n" + msg.content
+    e.timestamp = msg.created_at
+    e.set_footer(text=msg.author.name, icon_url=msg.author.avatar_url)
+    await channel.send(embed=e)
+    if(len(msg.attachments) > 0):
+        if(not lwHelperFunctions.is_url_image(e.image.url)):
+            await channel.send(msg.attachments[0].url)
+    
 
 
 @bot.listen()
@@ -459,8 +479,8 @@ async def on_voice_state_update(member, before, after):
         if after.channel == afkChannel and before.channel.id in lwConfig.awakeChannelIDs:   #the "Stay awake" feature
             await member.move_to(before.channel)
 
-    if after.channel and member.guild.get_role(754044592097198091) in member.roles and after.channel.id != 750052666830225498:  #the "banish" feature
-        await member.move_to(member.guild.get_channel(750052666830225498))
+    if after.channel and member.guild.get_role(lwConfig.banishedRoleID) in member.roles and after.channel.id != lwConfig.banishedChannelD:  #the "banish" feature
+        await member.move_to(member.guild.get_channel(lwConfig.banishedChannelD))
 
 
 @tasks.loop(seconds=30)

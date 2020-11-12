@@ -431,7 +431,7 @@ async def on_raw_reaction_add(payload):
             voteListHandler.changeVotingCounter(reaction.message, -1)
 
 async def sendGoodMeme(msg):
-    channel = bot.get(lwConfig.goodMemesChannelID)
+    channel = bot.get_channel(lwConfig.goodMemesChannelID)
     e = discord.Embed()
     e.description = f"[Message:]({msg.jump_url})"
     if(len(msg.attachments) > 0):

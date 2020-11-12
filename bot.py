@@ -426,7 +426,7 @@ async def on_raw_reaction_add(payload):
             # pin message when it has the specified amount of upvotes
             if reaction.count - 1 >= lwConfig.upvotesForPin and not reaction.message.pinned:
                 # await reaction.message.pin(reason="good meme")
-                await sendGoodMeme(reaction.message.id)
+                await sendGoodMeme(reaction.message)
         elif reaction.emoji == downvote:
             voteListHandler.changeVotingCounter(reaction.message, -1)
 

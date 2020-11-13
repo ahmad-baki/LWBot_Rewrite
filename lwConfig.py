@@ -3,11 +3,11 @@ path = ""
 try:
     import os
     path = os.path.abspath(".")
-    with open(path + '/lwConfig.json', 'r') as myfile:
+    with open(path + '/json/lwConfig.json', 'r') as myfile:
         data = myfile.read()
 except:
     path = '/home/pi/lwBot/LWBot_Rewrite'
-    with open(path + '/lwConfig.json', 'r') as myfile:
+    with open(path + '/json/lwConfig.json', 'r') as myfile:
         data = myfile.read()
 
 
@@ -33,6 +33,6 @@ courseRoleSeperatorID = config["course_role_sperator_role_id"]
 subPlanUsername = config["substitution_plan_username"]
 subPlanPassword = config["substitution_plan_password"]
 substitutionChannelID = config["substitution_channel_id"]
-goodMemesChannelID = 776355839178571786 # config["good_memes_channel_id"]
-banishedRoleID = 754044592097198091 # config["banished_role_id"]
-banishedChannelD = 750052666830225498 # config["banished_channel_id"] 
+goodMemesChannelID = config["good_memes_channel_id"]
+banishedRoleID = config["banished_role_id"]
+banishedChannelD = config["banished_channel_id"]

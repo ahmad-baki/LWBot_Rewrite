@@ -28,12 +28,12 @@ async def createCourseRole(ctx, name):
 
 
 def updateSubstitutionPlan(substitutionPlan):
-    with open(lwConfig.path + '/substitutionPlan.json', 'w') as myfile:
+    with open(lwConfig.path + '/json/substitutionPlan.json', 'w') as myfile:
         json.dump(substitutionPlan, myfile)
 
 
 def getSubstitutionPlan():
-    with open(lwConfig.path + '/substitutionPlan.json', 'r') as myfile:
+    with open(lwConfig.path + '/json/substitutionPlan.json', 'r') as myfile:
         return json.loads(myfile.read())
 
 async def get_plan_urls(username, password):

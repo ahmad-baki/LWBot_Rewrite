@@ -4,12 +4,12 @@ import datetime
 
 
 def updateVoteListFile(voteList):
-    with open(lwConfig.path + '/voteList.json', 'w') as myfile:
+    with open(lwConfig.path + '/json/voteList.json', 'w') as myfile:
         json.dump(voteList, myfile)
 
 
 def getVoteList():
-    with open(lwConfig.path + '/voteList.json', 'r') as myfile:
+    with open(lwConfig.path + '/json/voteList.json', 'r') as myfile:
         return json.loads(myfile.read())
 
 

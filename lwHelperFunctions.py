@@ -24,7 +24,7 @@ async def getGmoNews():
                         number = int(str(link.get('href')).replace('https://www.gymnasium-oberstadt.de/neuigkeiten/', "").split(".")[0])
                         if number > lwConfig.latestGmoNewsNumber:
                             lwConfig.config["latest_gmo_news_number"] = number
-                            with open(lwConfig.path + '/lwConfig.json', 'w') as myfile:
+                            with open(lwConfig.path + '/json/lwConfig.json', 'w') as myfile:
                                 myfile.write(json.dumps(lwConfig.config)) 
                             updateConfig()
                             return str(link.get('href'))

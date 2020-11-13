@@ -17,6 +17,7 @@ import os
 import subprocess
 import validators
 import ast
+import json
 
 import lwConfig
 import lwHelperFunctions
@@ -431,6 +432,17 @@ async def on_raw_reaction_add(payload):
             voteListHandler.changeVotingCounter(reaction.message, -1)
 
 async def sendGoodMeme(msg):
+    with open(lwConfig.path + '/json/goodMemes.json', 'r') as myfile:
+        memes = json.loads(myfile.read())
+
+    if msg.id in memes:
+        return
+
+    memes.append(msg.id)
+    with open(lwConfig.path + '/json/goodMemes.json', 'w') as myfile:
+        json.dump(memes, myfile)
+
+
     channel = bot.get_channel(lwConfig.goodMemesChannelID)
     e = discord.Embed()
     e.description = f"[Message:]({msg.jump_url})"

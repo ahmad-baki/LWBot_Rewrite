@@ -4,12 +4,12 @@ import datetime
 
 
 def updateReminder(reminder):
-    with open(lwConfig.path + '/reminder.json', 'w') as myfile:
+    with open(lwConfig.path + '/json/reminder.json', 'w') as myfile:
         json.dump(reminder, myfile)
 
 
 def getReminder():
-    with open(lwConfig.path + '/reminder.json', 'r') as myfile:
+    with open(lwConfig.path + '/json/reminder.json', 'r') as myfile:
         return json.loads(myfile.read())
 
 

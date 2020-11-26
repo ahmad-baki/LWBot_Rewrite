@@ -198,5 +198,6 @@ def format_plan(plan, guild, embed, courses=[]):
         if result.strip() != "":
             if(len(result) > 1020):
                 result = result[:1020] + "..."
+                date += " [zu viele Vertretungen]"
             embed.add_field(name=date, value=result, inline=False)
     return embed

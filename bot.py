@@ -552,7 +552,7 @@ async def updateSubstitutionPlan():
         rmEmbed = substitutionHandler.format_plan(removals, server, rmEmbed)
         addedEmbed = substitutionHandler.format_plan(additions, server, addedEmbed)
 
-        if len(rmEmbed.fields) > 0:
+        if len(rmEmbed.fields) > 0: 
             await channel.send(embed=rmEmbed)
         if len(addedEmbed.fields) > 0:
             await channel.send(embed=addedEmbed)

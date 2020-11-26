@@ -103,7 +103,12 @@ async def getCurrentSubstitutionPlan():
                     for line in table_even:
                         kurs = zeile_to_Dict(line.find_all("td", class_="list"))
                         rows.append(kurs)
-                    return (rows, soup.find("div", class_="mon_title").text)
+                    date = soup.find("div", class_="mon_title")
+                    if(date == None):
+                        date = "11.11.2011 kein Datum vorhanden [Fehler]"
+                    else:
+                        date = date.text
+                    return (rows, date)
 
 
     def zeile_to_Dict(zeile):
@@ -191,5 +196,7 @@ def format_plan(plan, guild, embed, courses=[]):
             result += f"``\n``{'-'*(sum(length) + 10)}``\n"
 
         if result.strip() != "":
+            if(len(result) > 1020):
+                result = result[:1020] + "..."
             embed.add_field(name=date, value=result, inline=False)
     return embed

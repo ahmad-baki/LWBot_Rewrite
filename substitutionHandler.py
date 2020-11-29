@@ -184,7 +184,7 @@ def format_plan(plan, guild, embed, courses=[]):
         for i in range(len(substitutions)):
             # j is the length index
             j = 0
-            result += "``"
+            result += "`"
             for k in list(substitutions[i].keys()):
                 if k == "neues_Fach" or k == "Klasse":
                     continue

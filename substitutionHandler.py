@@ -193,7 +193,7 @@ def format_plan(plan, guild, embed, courses=[]):
                 j += 1
                 result += substitutions[i][k] + ("" if k == (list(substitutions[i].keys())[
                                                 len(substitutions[i].keys()) - 1]) else "  ")
-            result += f"``\n``{'-'*(sum(length) + 10)}``\n"
+            result += f"`\n`{'-'*(sum(length) + 10)}`\n"
 
         if result.strip() != "":
             if(len(result) > 1020):

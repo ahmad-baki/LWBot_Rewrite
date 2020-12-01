@@ -12,7 +12,7 @@ def getMyCourseRoles(ctxAuthor):
     kurse = []
     # all course roles except the @everyone role
     for r in ctxAuthor.roles[1:len(ctxAuthor.roles)]:
-        if not "Kurse" in r.name:
+        if lwConfig.courseRoleSeperatorID != r.id:
             kurse.append(r)
         else:
             break

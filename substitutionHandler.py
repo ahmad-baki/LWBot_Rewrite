@@ -194,10 +194,15 @@ def format_plan(plan, guild, embed, courses=[]):
                 result += substitutions[i][k] + ("" if k == (list(substitutions[i].keys())[
                                                 len(substitutions[i].keys()) - 1]) else "  ")
             result += f"`\n`{'-'*(sum(length) + 10)}`\n"
+            if(len(result) > 1020):
+                result = result[:1020] + "...`"
+                # date += " [zu viele Vertretungen]"
+                embed.add_field(name=date, value=result, inline=False)
+                result = "`..." + result[1020:]
 
         if result.strip() != "":
-            if(len(result) > 1020):
-                result = result[:1020] + "..."
-                date += " [zu viele Vertretungen]"
+            # if(len(result) > 1020):
+            #     result = result[:1020] + "..."
+            #     date += " [zu viele Vertretungen]"
             embed.add_field(name=date, value=result, inline=False)
     return embed

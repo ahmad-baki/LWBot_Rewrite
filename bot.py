@@ -448,6 +448,13 @@ async def sendGoodMeme(msg):
     e.description = f"[Message:]({msg.jump_url})"
     if(len(msg.attachments) > 0):
         e.set_image(url=msg.attachments[0].url)
+        counter = 0
+        while e.image.width == 0 or counter == 100:
+            counter += 1
+            e.set_image(url=msg.attachments[0].url)
+        if counter == 100:
+            await on_command_error(bot.get_channel(lwConfig.logChannelID), Exception(str(msg.id) + " good meme was not sent correctly"))
+
     e.set_author(name=msg.author,
                     icon_url=msg.author.avatar_url)
     e.color = msg.guild.get_member(

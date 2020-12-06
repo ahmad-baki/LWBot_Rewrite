@@ -449,7 +449,7 @@ async def sendGoodMeme(msg):
     if(len(msg.attachments) > 0):
         e.set_image(url=msg.attachments[0].url)
         counter = 0
-        while e.image.width == 0 or counter == 100:
+        while e.image.width == 0 or counter == 100 and not lwHelperFunctions.is_url_image(e.image.url):
             counter += 1
             e.set_image(url=msg.attachments[0].url)
         if counter == 100:

@@ -453,7 +453,9 @@ async def sendGoodMeme(msg):
             counter += 1
             e.set_image(url=msg.attachments[0].url)
         if counter == 100:
-            await on_command_error(bot.get_channel(lwConfig.logChannelID), Exception(str(msg.id) + " good meme was not sent correctly"))
+            await on_command_error(bot.get_channel(lwConfig.logChannelID), Exception(f"{str(msg.id)}: good meme was not sent correctly."))
+        elif counter > 0:
+            await on_command_error(bot.get_channel(lwConfig.logChannelID), Exception(f"{str(msg.id)}: good meme was not sent correctly, took {counter} attempts."))
 
     e.set_author(name=msg.author,
                     icon_url=msg.author.avatar_url)

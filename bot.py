@@ -578,12 +578,17 @@ async def beforeSubstitutionPlan():
     channel = bot.get_channel(lwConfig.logChannelID)
     await channel.send(embed=lwHelperFunctions.simpleEmbed(bot.user, "Vertretungplan loop start", color=discord.Color.green()))
 
-
 @updateSubstitutionPlan.after_loop
 async def afterGmoNews():
     channel = bot.get_channel(lwConfig.logChannelID)
-    await channel.send(embed=lwHelperFunctions.simpleEmbed(bot.user, "Vertretungplan loop stopped. restarting now", color=discord.Color.orange()))
-    checkGmoWebsite.restart()
+    await channel.send(embed=lwHelperFunctions.simpleEmbed(bot.user, "Vertretungplan loop stopped.", color=discord.Color.orange()))
+    updateSubstitutionPlan.restart()
+
+@updateSubstitutionPlan.error
+async def subPlanError():
+    channel = bot.get_channel(lwConfig.logChannelID)
+    await channel.send(embed=lwHelperFunctions.simpleEmbed(bot.user, "substitution plan error", color=discord.Color.orange()))
+
 
 
 @checkGmoWebsite.before_loop
@@ -592,12 +597,17 @@ async def beforeGmoNews():
     channel = bot.get_channel(lwConfig.logChannelID)
     await channel.send(embed=lwHelperFunctions.simpleEmbed(bot.user, "gmoNewsCheck loop start", color=discord.Color.green()))
 
-
 @checkGmoWebsite.after_loop
 async def afterGmoNews():
     channel = bot.get_channel(lwConfig.logChannelID)
-    await channel.send(embed=lwHelperFunctions.simpleEmbed(bot.user, "gmoNewsCheck loop stopped. restarting now", color=discord.Color.orange()))
+    await channel.send(embed=lwHelperFunctions.simpleEmbed(bot.user, "gmoNewsCheck loop stopped.", color=discord.Color.orange()))
     checkGmoWebsite.restart()
+
+@checkGmoWebsite.error
+async def gmoNewsError():
+    channel = bot.get_channel(lwConfig.logChannelID)
+    await channel.send(embed=lwHelperFunctions.simpleEmbed(bot.user, "gmo news error", color=discord.Color.orange()))
+
 
 
 @checkReminder.before_loop
@@ -606,12 +616,20 @@ async def beforeReminderCheck():
     channel = bot.get_channel(lwConfig.logChannelID)
     await channel.send(embed=lwHelperFunctions.simpleEmbed(bot.user, "reminder loop start", color=discord.Color.green()))
 
-
 @checkReminder.after_loop
 async def afterReminderCheck():
     channel = bot.get_channel(lwConfig.logChannelID)
-    await channel.send(embed=lwHelperFunctions.simpleEmbed(bot.user, "reminder loop stopped. restarting now", color=discord.Color.orange()))
-    checkGmoWebsite.restart()
+    await channel.send(embed=lwHelperFunctions.simpleEmbed(bot.user, "reminder loop stopped.", color=discord.Color.orange()))
+    checkReminder.restart()
+
+@checkReminder.error
+async def reminderError():
+    channel = bot.get_channel(lwConfig.logChannelID)
+    await channel.send(embed=lwHelperFunctions.simpleEmbed(bot.user, "reminder error", color=discord.Color.orange()))
+
+
+
+
 
 updateSubstitutionPlan.start()
 checkGmoWebsite.start()

@@ -579,13 +579,13 @@ async def beforeSubstitutionPlan():
     await channel.send(embed=lwHelperFunctions.simpleEmbed(bot.user, "Vertretungplan loop start", color=discord.Color.green()))
 
 @updateSubstitutionPlan.after_loop
-async def afterGmoNews():
+async def afterSubstitutionPlan():
     channel = bot.get_channel(lwConfig.logChannelID)
     await channel.send(embed=lwHelperFunctions.simpleEmbed(bot.user, "Vertretungplan loop stopped.", color=discord.Color.orange()))
     updateSubstitutionPlan.restart()
 
 @updateSubstitutionPlan.error
-async def subPlanError():
+async def substitutionPlanError():
     channel = bot.get_channel(lwConfig.logChannelID)
     await channel.send(embed=lwHelperFunctions.simpleEmbed(bot.user, "substitution plan error", color=discord.Color.orange()))
 
@@ -623,7 +623,7 @@ async def afterReminderCheck():
     checkReminder.restart()
 
 @checkReminder.error
-async def reminderError():
+async def ReminderCheckError():
     channel = bot.get_channel(lwConfig.logChannelID)
     await channel.send(embed=lwHelperFunctions.simpleEmbed(bot.user, "reminder error", color=discord.Color.orange()))
 

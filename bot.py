@@ -25,9 +25,9 @@ import voteListHandler
 import reminderHandler
 import substitutionHandler
 
-bot = commands.Bot(command_prefix=lwConfig.prefix)
+intents = discord.Intents(messages=True, guilds=True)
+bot = commands.Bot(command_prefix=lwConfig.prefix, intents=intents)
 bot.owner_ids = lwConfig.ownerID
-
 
 @bot.event
 async def on_error(event, *args, **kwargs):

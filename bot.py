@@ -25,7 +25,9 @@ import voteListHandler
 import reminderHandler
 import substitutionHandler
 
-intents = discord.Intents(messages=True, guilds=True)
+intents = discord.Intents.all()
+intents.messages = True
+intents.presences = True
 bot = commands.Bot(command_prefix=lwConfig.prefix, intents=intents)
 bot.owner_ids = lwConfig.ownerID
 

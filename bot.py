@@ -587,9 +587,9 @@ async def afterSubstitutionPlan():
     updateSubstitutionPlan.restart()
 
 @updateSubstitutionPlan.error
-async def substitutionPlanError():
+async def substitutionPlanError(error):
     channel = bot.get_channel(lwConfig.logChannelID)
-    await channel.send(embed=lwHelperFunctions.simpleEmbed(bot.user, "substitution plan error", color=discord.Color.orange()))
+    await channel.send(embed=lwHelperFunctions.simpleEmbed(bot.user, "substitution plan error", error, color=discord.Color.orange()))
 
 
 
@@ -606,9 +606,9 @@ async def afterGmoNews():
     checkGmoWebsite.restart()
 
 @checkGmoWebsite.error
-async def gmoNewsError():
+async def gmoNewsError(error):
     channel = bot.get_channel(lwConfig.logChannelID)
-    await channel.send(embed=lwHelperFunctions.simpleEmbed(bot.user, "gmo news error", color=discord.Color.orange()))
+    await channel.send(embed=lwHelperFunctions.simpleEmbed(bot.user, "gmo news error", error, color=discord.Color.orange()))
 
 
 
@@ -625,9 +625,9 @@ async def afterReminderCheck():
     checkReminder.restart()
 
 @checkReminder.error
-async def ReminderCheckError():
+async def ReminderCheckError(error):
     channel = bot.get_channel(lwConfig.logChannelID)
-    await channel.send(embed=lwHelperFunctions.simpleEmbed(bot.user, "reminder error", color=discord.Color.orange()))
+    await channel.send(embed=lwHelperFunctions.simpleEmbed(bot.user, "reminder error", error, color=discord.Color.orange()))
 
 
 

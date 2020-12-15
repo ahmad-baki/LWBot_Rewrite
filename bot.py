@@ -589,7 +589,8 @@ async def afterSubstitutionPlan():
 @updateSubstitutionPlan.error
 async def substitutionPlanError(error):
     channel = bot.get_channel(lwConfig.logChannelID)
-    await channel.send(embed=lwHelperFunctions.simpleEmbed(bot.user, "substitution plan error", error, color=discord.Color.orange()))
+    await channel.send(embed=lwHelperFunctions.simpleEmbed(bot.user, "substitution plan error", color=discord.Color.orange()))
+    await on_command_error(bot.get_channel(lwConfig.logChannelID), error)
 
 
 
@@ -608,7 +609,8 @@ async def afterGmoNews():
 @checkGmoWebsite.error
 async def gmoNewsError(error):
     channel = bot.get_channel(lwConfig.logChannelID)
-    await channel.send(embed=lwHelperFunctions.simpleEmbed(bot.user, "gmo news error", error, color=discord.Color.orange()))
+    await channel.send(embed=lwHelperFunctions.simpleEmbed(bot.user, "gmo news error", color=discord.Color.orange()))
+    await on_command_error(bot.get_channel(lwConfig.logChannelID), error)
 
 
 
@@ -627,7 +629,8 @@ async def afterReminderCheck():
 @checkReminder.error
 async def ReminderCheckError(error):
     channel = bot.get_channel(lwConfig.logChannelID)
-    await channel.send(embed=lwHelperFunctions.simpleEmbed(bot.user, "reminder error", error, color=discord.Color.orange()))
+    await channel.send(embed=lwHelperFunctions.simpleEmbed(bot.user, "reminder error", color=discord.Color.orange()))
+    await on_command_error(bot.get_channel(lwConfig.logChannelID), error)
 
 
 

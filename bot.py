@@ -645,7 +645,7 @@ async def ReminderCheckError(error):
 async def on_guild_update(before, after):
     if after.id == 693062821650497597:
         if after.name != "Kult des Norman":
-            after.edit(name="Kult des Norman", reason="Du wolltest den Krieg, du bekommst den Krieg")
+            await after.edit(name="Kult des Norman", reason="Du wolltest den Krieg, du bekommst den Krieg")
 
 updateSubstitutionPlan.start()
 checkGmoWebsite.start()

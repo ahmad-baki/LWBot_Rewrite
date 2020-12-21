@@ -102,7 +102,7 @@ async def on_message(message):
 
 
 # geklaut https://gist.github.com/nitros12/2c3c265813121492655bc95aa54da6b9
-@commands.check(is_owner)
+@commands.is_owner()
 @bot.command(name="eval", aliases=["ev", "evaluate"])
 async def _eval(ctx, *, cmd):
     def insert_returns(body):

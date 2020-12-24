@@ -72,12 +72,11 @@ async def on_ready():
 
 @bot.listen()
 async def on_message(message):
-    if message.author.id == 332732784655204352:
-        return
     if message.author == bot.user:
         return
     if message.channel.id == lwConfig.memeChannelID and (len(message.attachments) > 0 or validators.url(message.content)):
-        await message.add_reaction(lwHelperFunctions.getEmoji(bot, lwConfig.upvoteEmoji))
+        if message.author.id != 332732784655204352:
+            await message.add_reaction(lwHelperFunctions.getEmoji(bot, lwConfig.upvoteEmoji))
         await message.add_reaction(lwHelperFunctions.getEmoji(bot, lwConfig.downoteEmoji))
     if message.content.startswith("awoo"):
         await test(ctx=message, arg=message.content)

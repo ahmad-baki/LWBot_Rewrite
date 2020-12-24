@@ -72,6 +72,8 @@ async def on_ready():
 
 @bot.listen()
 async def on_message(message):
+    if message.author.id == 332732784655204352:
+        return
     if message.author == bot.user:
         return
     if message.channel.id == lwConfig.memeChannelID and (len(message.attachments) > 0 or validators.url(message.content)):

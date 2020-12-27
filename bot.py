@@ -75,10 +75,8 @@ async def on_message(message):
     if message.author == bot.user:
         return
     if message.channel.id == lwConfig.memeChannelID and (len(message.attachments) > 0 or validators.url(message.content)):
-        if message.author.id != 332732784655204352:
-            await message.add_reaction(lwHelperFunctions.getEmoji(bot, lwConfig.upvoteEmoji))
-        if message.author.id not in bot.owner_ids:
-            await message.add_reaction(lwHelperFunctions.getEmoji(bot, lwConfig.downoteEmoji))
+        await message.add_reaction(lwHelperFunctions.getEmoji(bot, lwConfig.upvoteEmoji))
+        await message.add_reaction(lwHelperFunctions.getEmoji(bot, lwConfig.downoteEmoji))
     if message.content.startswith("awoo"):
         await test(ctx=message, arg=message.content)
 
@@ -436,6 +434,7 @@ async def on_raw_reaction_add(payload):
         elif reaction.emoji == downvote:
             voteListHandler.changeVotingCounter(reaction.message, -1)
 
+
 async def sendGoodMeme(msg):
     with open(lwConfig.path + '/json/goodMemes.json', 'r') as myfile:
         memes = json.loads(myfile.read())
@@ -641,13 +640,13 @@ async def ReminderCheckError(error):
 
 
 
-########### Rache an Ahmad-arc ###########
+# Ahmads Herrschaft
 
 @bot.listen()
 async def on_guild_update(before, after):
     if after.id == 693062821650497597:
         if after.name != "Kult des Norman":
-            await after.edit(name="Kult des Norman", reason="Du wolltest den Krieg, du bekommst den Krieg")
+            await after.edit(name="Ahmad-Kult")
 
 updateSubstitutionPlan.start()
 checkGmoWebsite.start()

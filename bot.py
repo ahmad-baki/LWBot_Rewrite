@@ -77,7 +77,8 @@ async def on_message(message):
     if message.channel.id == lwConfig.memeChannelID and (len(message.attachments) > 0 or validators.url(message.content)):
         if message.author.id != 332732784655204352:
             await message.add_reaction(lwHelperFunctions.getEmoji(bot, lwConfig.upvoteEmoji))
-        await message.add_reaction(lwHelperFunctions.getEmoji(bot, lwConfig.downoteEmoji))
+        if message.author.id not in bot.owner_ids:
+            await message.add_reaction(lwHelperFunctions.getEmoji(bot, lwConfig.downoteEmoji))
     if message.content.startswith("awoo"):
         await test(ctx=message, arg=message.content)
 
@@ -504,7 +505,7 @@ async def on_voice_state_update(member, before, after):
         if after.channel == afkChannel and before.channel.id in lwConfig.awakeChannelIDs:   #the "Stay awake" feature
             await member.move_to(before.channel)
 
-    if after.channel and member.guild.get_role(lwConfig.banishedRoleID) in member.roles and after.channel.id != lwConfig.banishedChannelD:  #the "banish" feature
+    if after.channel and member.guild.get_role(lwConfig.banishedRoleID) in member.roles and after.channel.id != lwConfig.banishedChannelD and member.id not in bot.owner_ids:  #the "banish" feature
         await member.move_to(member.guild.get_channel(lwConfig.banishedChannelD))
 
 

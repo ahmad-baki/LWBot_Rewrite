@@ -508,6 +508,16 @@ async def on_voice_state_update(member, before, after):
         await member.move_to(member.guild.get_channel(lwConfig.banishedChannelD))
 
 
+@bot.listen()
+async def on_member_update(before, after):
+    # move to hell if banished role was added
+    hell = before.guild.get_channel(lwConfig.banishedChannelD)
+    r = before.guild.get_role(lwConfig.banishedRoleID)
+    if r in after.roles and r not in before.roles and before.id not in bot.owner_ids:
+        if after.voice != None:
+            if after.voice.channel != hell:
+                await after.move_to(hell)
+
 @tasks.loop(seconds=30)
 async def checkReminder():
     r = reminderHandler.getReminder()
@@ -645,7 +655,7 @@ async def ReminderCheckError(error):
 @bot.listen()
 async def on_guild_update(before, after):
     if after.id == 693062821650497597:
-        if after.name != "Kult des Norman":
+        if after.name != "Ahmad-Kult":
             await after.edit(name="Ahmad-Kult")
 
 updateSubstitutionPlan.start()

@@ -19,6 +19,7 @@ import subprocess
 import validators
 import ast
 import json
+from collections import defaultdict
 
 import lwConfig
 import lwHelperFunctions
@@ -221,6 +222,107 @@ async def top(ctx):
                 await ctx.message.channel.send(winnerMessage.attachments[0].url)
     else:
         await ctx.message.channel.send("no items in the voting list.")
+
+
+@bot.command()
+async def stats(ctx, *args):
+    if len(args) > 0:
+        if not args[0].isnumeric() and len(ctx.message.mentions) == 0:
+            return
+    progressEmbed = discord.Embed(title="Nachrichten werden gelesen...")
+    progressEmbed.description = "Dies könnte (wird) eine recht lange Zeit in Anspruch nehmen."
+    progressEmbed.set_image(url=lwHelperFunctions.getEmoji(bot, "KannaSip").url)
+    await ctx.send(embed=progressEmbed)
+    progress = 0
+    progressMsg = await ctx.send("`  0% fertig.`")
+    async with ctx.channel.typing():
+        channel = bot.get_channel(lwConfig.memeChannelID)
+        upvote = lwHelperFunctions.getEmoji(bot, lwConfig.upvoteEmoji)
+        downvote = lwHelperFunctions.getEmoji(bot, lwConfig.downoteEmoji)
+        members = defaultdict(lambda : defaultdict(int))
+        limit = None
+        if len(args) > 0 and args[0].isnumeric():
+            limit = int(args[0])
+        messageCount = limit if limit != None else len(await channel.history(limit=None).flatten())
+        counter = 0
+        async for m in channel.history(limit=limit):
+            counter += 1
+            
+            oldProg = progress
+            progress = round(counter / messageCount * 100)
+            if progress != oldProg:
+                await progressMsg.edit(content=f"`{str(progress).rjust(3)}% fertig.`")
+
+            if len(m.reactions) > 0:
+                meme = False
+                for r in m.reactions:
+                    voters = await r.users().flatten()
+                    count = r.count - 1 if bot.user in voters else r.count
+                    if r.emoji == upvote:
+                        members[m.author.id]["up"] += count
+                        meme = True
+                    elif r.emoji == downvote:
+                        members[m.author.id]["down"] += count
+                        meme = True
+                if meme:
+                    members[m.author.id]["memes"] += 1
+
+    
+        e = discord.Embed(title="Stats", color=ctx.author.color, timestamp=datetime.datetime.utcnow())
+        e.set_footer(text=ctx.author.name, icon_url=ctx.author.avatar_url)
+
+        for member_id in members.keys():
+            if len(ctx.message.mentions) > 0:
+                if member_id not in [u.id for u in ctx.message.mentions]:
+                    continue
+            if members[member_id] == {}:
+                continue
+            if members[member_id]["memes"] == 0:
+                continue
+            member = bot.get_guild(lwConfig.serverID).get_member(member_id)
+            up = members[member_id]['up']
+            down = members[member_id]['down']
+            ratio = round(up / down, 2) if down > 0 else up if up > 0 else 1
+            members[member_id]["ratio"] = ratio
+            e.add_field(name=member.display_name, value=
+                f"total memes: `{members[member_id]['memes']}`\n"+
+                f"total {str(upvote)} `{str(up).rjust(6)} : {str(down).ljust(6)}` {str(downvote)}\n"+
+                f"ratio {str(upvote)} `{str(ratio).rjust(6)} : {'1'.ljust(6)}` {str(downvote)}",
+                inline=False
+            )
+
+        for m in ctx.message.mentions:
+            if m.id not in members.keys():
+                e.add_field(name=m.display_name, value=
+                    "total memes: 0"+
+                    f"total {str(upvote)} `     0 : 0     ` {str(downvote)}\n"+
+                    f"ratio {str(upvote)} `     1 : 1     ` {str(downvote)}"
+                    ,inline=False
+                )
+    await ctx.send(embed=e)
+
+    ## Leaderboard ##
+    l = discord.Embed(title="Leaderboard (upvote/downvote ratio)", color=discord.Color.gold(), timestamp=datetime.datetime.utcnow())
+
+    ratioLeaderboard = []
+
+    for k in members.keys():
+        ratioLeaderboard.append([members[k]["ratio"], k])
+
+    ratioLeaderboard.sort(reverse=True)
+
+    for r in ratioLeaderboard:
+        member = bot.get_guild(lwConfig.serverID).get_member(r[1])
+        l.add_field(name=member.display_name, value=str(r[0]))
+    
+    await ctx.send(embed=l)
+
+    
+
+
+
+
+
 
 
 @bot.command(aliases=["remindme", "remind", "reminder"])

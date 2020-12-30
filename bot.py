@@ -283,11 +283,12 @@ async def stats(ctx, *args):
             up = members[member_id]['up']
             down = members[member_id]['down']
             ratio = round(up / down, 2) if down > 0 else up if up > 0 else 1
+            dvratio = "1" if down > 0 else "0"
             members[member_id]["ratio"] = ratio
             e.add_field(name=member.display_name, value=
                 f"total memes: `{members[member_id]['memes']}`\n"+
                 f"total {str(upvote)} `{str(up).rjust(6)} : {str(down).ljust(6)}` {str(downvote)}\n"+
-                f"ratio {str(upvote)} `{str(ratio).rjust(6)} : {'1'.ljust(6)}` {str(downvote)}",
+                f"ratio {str(upvote)} `{str(ratio).rjust(6)} : {dvratio.ljust(6)}` {str(downvote)}",
                 inline=False
             )
 

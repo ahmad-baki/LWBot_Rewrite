@@ -6,6 +6,7 @@ from asyncio import futures
 import discord
 from discord.ext import commands
 from discord.ext import tasks
+from discord.errors import HTTPException
 from discord.ext.commands.errors import CommandNotFound, NotOwner
 from discord.ext.commands.errors import MissingRequiredArgument
 
@@ -145,7 +146,10 @@ async def _eval(ctx, *, cmd):
     exec(compile(parsed, filename="<ast>", mode="exec"), env)
 
     result = (await eval(f"{fn_name}()", env))
-    await ctx.send(result)
+    try:
+        await ctx.send(result)
+    except HTTPException:
+        pass
 
 
 @bot.command()
@@ -517,6 +521,7 @@ async def on_member_update(before, after):
         if after.voice != None:
             if after.voice.channel != hell:
                 await after.move_to(hell)
+
 
 @tasks.loop(seconds=30)
 async def checkReminder():

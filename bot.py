@@ -82,26 +82,6 @@ async def on_message(message):
         await test(ctx=message, arg=message.content)
 
 
-# @bot.command(name="eval", aliases=["ev", "evaluate"])
-# async def _eval(ctx, *, arg):
-#     if await bot.is_owner(ctx.author):
-#         try:
-#         await eval(arg, globals(), locals())
-#         except Exception as e:
-#             if isinstance(e, TypeError):
-#                 pass
-#             else:
-#                 raise e
-#     else:
-#         awoo = lwHelperFunctions.getEmoji(bot, "AwOo")
-#         e = discord.Embed(title="You are not worthy ")
-#         e.set_image(url=awoo.url)
-#         e.color = discord.Color.blurple()
-#         e.timestamp = datetime.datetime.utcnow()
-#         e.set_footer(text=ctx.author.name, icon_url=ctx.author.avatar_url)
-#         await ctx.send(embed=e)
-
-
 # geklaut https://gist.github.com/nitros12/2c3c265813121492655bc95aa54da6b9
 @commands.is_owner()
 @bot.command(name="eval", aliases=["ev", "evaluate"])
@@ -123,6 +103,10 @@ async def _eval(ctx, *, cmd):
     fn_name = "_eval_expr"
 
     cmd = cmd.strip("` ")
+
+    # removes discord syntax highlighting if it exists
+    if cmd.split("\n")[0] == "py":
+        cmd = "\n".join(cmd.split("\n")[1:])
 
     # add a layer of indentation
     cmd = "\n".join(f"    {i}" for i in cmd.splitlines())
@@ -146,8 +130,10 @@ async def _eval(ctx, *, cmd):
     exec(compile(parsed, filename="<ast>", mode="exec"), env)
 
     result = (await eval(f"{fn_name}()", env))
+    
     try:
-        await ctx.send(result)
+        if type(result) != discord.message.Message:
+            await ctx.send(result)
     except HTTPException:
         pass
 
@@ -203,7 +189,7 @@ async def entries(ctx):
 
 
 @bot.command()
-async def stats(ctx):
+async def top(ctx):
     async with ctx.message.channel.typing():
         voteListHandler.deleteOldMessages()
     voteList = voteListHandler.getVoteList()

@@ -282,13 +282,15 @@ async def stats(ctx, *args):
             member = bot.get_guild(lwConfig.serverID).get_member(member_id)
             up = members[member_id]['up']
             down = members[member_id]['down']
+            total = members[member_id]['memes']
             ratio = round(up / down, 2) if down > 0 else up if up > 0 else 1
             dvratio = "1" if down > 0 else "0"
             members[member_id]["ratio"] = ratio
             e.add_field(name=member.display_name, value=
                 f"total memes: `{members[member_id]['memes']}`\n"+
                 f"total {str(upvote)} `{str(up).rjust(6)} : {str(down).ljust(6)}` {str(downvote)}\n"+
-                f"ratio {str(upvote)} `{str(ratio).rjust(6)} : {dvratio.ljust(6)}` {str(downvote)}",
+                f"ratio {str(upvote)} `{str(ratio).rjust(6)} : {dvratio.ljust(6)}` {str(downvote)}\n"+
+                f"avg . {str(upvote)} `{str(round(up / total, 2)).rjust(6)} : {str(round(down / total, 2)).ljust(6)}` {str(downvote)}",
                 inline=False
             )
 
@@ -297,7 +299,8 @@ async def stats(ctx, *args):
                 e.add_field(name=m.display_name, value=
                     "total memes: 0"+
                     f"total {str(upvote)} `     0 : 0     ` {str(downvote)}\n"+
-                    f"ratio {str(upvote)} `     1 : 1     ` {str(downvote)}"
+                    f"ratio {str(upvote)} `     1 : 1     ` {str(downvote)}\n"+
+                    f"avg.  {str(upvote)} `     0 : 0     ` {str(downvote)}"
                     ,inline=False
                 )
     await ctx.send(embed=e)

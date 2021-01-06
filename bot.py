@@ -284,7 +284,7 @@ async def stats(ctx, *args):
             down = members[member_id]['down']
             total = members[member_id]['memes']
             ratio = round(up / down, 2) if down > 0 else up if up > 0 else 1
-            dvratio = "1" if down > 0 else "0"
+            dvratio = "1"# if down > 0 else "0"
             members[member_id]["ratio"] = ratio
             e.add_field(name=member.display_name, value=
                 f"total memes: `{members[member_id]['memes']}`\n"+

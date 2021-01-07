@@ -388,6 +388,10 @@ async def removereminder(ctx):
             singleReminder = reminder[str(ctx.author.id)][i]
             e.add_field(name=f"[{i}] {singleReminder[0]}",
                         value=singleReminder[1], inline=False)
+        if reminderCount == 0:
+            e.description = "You have no reminders."
+            await ctx.send(embed=e)
+            return
         await ctx.send(embed=e)
         await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Please enter a index to remove", "Dont answer for 60 seconds to time out.", color=discord.Color.gold()))
         try:
@@ -396,7 +400,7 @@ async def removereminder(ctx):
             if 0 <= index < reminderCount:
                 reminderHandler.removeReminder(
                     ctx.author.id, *reminder[str(ctx.author.id)][index])
-                await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Reminder removed.", f"Your reminder\n```{reminder[str(ctx.author.id)][index][1]}``` was removed."))
+                await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Reminder removed.", f"Your reminder\n```{''.join(reminder[str(ctx.author.id)][index][1].split("\n")[:-1]}``` was removed."))
             else:
                 raise ValueError
         except futures.TimeoutError:

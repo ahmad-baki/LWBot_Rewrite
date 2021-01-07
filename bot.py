@@ -560,7 +560,7 @@ async def sendGoodMeme(msg, force=False):
     e.set_footer(text=msg.author.name, icon_url=msg.author.avatar_url)
 
     if(len(msg.attachments) > 0):
-        if(lwHelperFunctions.is_url_image(e.image.url)):
+        if(lwHelperFunctions.is_url_image(msg.attachments[0].url)):
             e.set_image(url=msg.attachments[0].url)
             counter = 0
             while e.image.width == 0 or counter == 100:

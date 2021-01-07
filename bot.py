@@ -535,32 +535,22 @@ async def on_raw_reaction_add(payload):
             voteListHandler.changeVotingCounter(reaction.message, -1)
 
 
-async def sendGoodMeme(msg):
-    with open(lwConfig.path + '/json/goodMemes.json', 'r') as myfile:
-        memes = json.loads(myfile.read())
+async def sendGoodMeme(msg, force=False):
+    if not force:
+        with open(lwConfig.path + '/json/goodMemes.json', 'r') as myfile:
+            memes = json.loads(myfile.read())
 
-    if msg.id in memes:
-        return
+        if msg.id in memes:
+            return
 
-    memes.append(msg.id)
-    with open(lwConfig.path + '/json/goodMemes.json', 'w') as myfile:
-        json.dump(memes, myfile)
+        memes.append(msg.id)
+        with open(lwConfig.path + '/json/goodMemes.json', 'w') as myfile:
+            json.dump(memes, myfile)
 
 
     channel = bot.get_channel(lwConfig.goodMemesChannelID)
     e = discord.Embed()
     e.description = f"[Message:]({msg.jump_url})"
-    if(len(msg.attachments) > 0):
-        e.set_image(url=msg.attachments[0].url)
-        counter = 0
-        while e.image.width == 0 or counter == 100 and not lwHelperFunctions.is_url_image(e.image.url):
-            counter += 1
-            e.set_image(url=msg.attachments[0].url)
-        if counter == 100:
-            await on_command_error(bot.get_channel(lwConfig.logChannelID), Exception(f"{str(msg.id)}: good meme was not sent correctly."))
-        elif counter > 0:
-            await on_command_error(bot.get_channel(lwConfig.logChannelID), Exception(f"{str(msg.id)}: good meme was not sent correctly, took {counter} attempts."))
-
     e.set_author(name=msg.author,
                     icon_url=msg.author.avatar_url)
     e.color = msg.guild.get_member(
@@ -568,10 +558,23 @@ async def sendGoodMeme(msg):
     e.description += "\n" + msg.content
     e.timestamp = msg.created_at
     e.set_footer(text=msg.author.name, icon_url=msg.author.avatar_url)
-    await channel.send(embed=e)
+
     if(len(msg.attachments) > 0):
-        if(not lwHelperFunctions.is_url_image(e.image.url)):
-            await channel.send(msg.attachments[0].url)
+        if(lwHelperFunctions.is_url_image(e.image.url)):
+            e.set_image(url=msg.attachments[0].url)
+            counter = 0
+            while e.image.width == 0 or counter == 100:
+                counter += 1
+                e.set_image(url=msg.attachments[0].url)
+            if counter == 100:
+                await on_command_error(bot.get_channel(lwConfig.logChannelID), Exception(f"{str(msg.id)}: good meme was not sent correctly."))
+            elif counter > 0:
+                await on_command_error(bot.get_channel(lwConfig.logChannelID), Exception(f"{str(msg.id)}: good meme was not sent correctly, took {counter} attempts."))
+        
+            await channel.send(embed=e)
+        
+        else:
+            await channel.send(embed=e, file=await msg.attachments[0].to_file())
     
 
 

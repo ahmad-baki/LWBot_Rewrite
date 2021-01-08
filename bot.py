@@ -4,6 +4,7 @@ https://discord.com/api/oauth2/authorize?bot_id=760125323580276757&permissions=8
 
 from asyncio import futures
 import discord
+from discord.colour import Color
 from discord.ext import commands
 from discord.ext import tasks
 from discord.errors import HTTPException
@@ -779,6 +780,89 @@ class Schulneuigkeiten(commands.Cog):
         await on_command_error(bot.get_channel(lwConfig.logChannelID), error)
 
 
+class HelpCommand(commands.HelpCommand):
+
+    async def send_bot_help(self, mapping):
+        await self.send_pages()
+
+    async def send_cog_help(self, cog):
+        if len(cog.get_commands()) > 0:
+            await self.send_pages(cog)
+        else:
+            await self.context.send("This category has no commands.")
+
+    async def send_command_help(self, command):
+        e = discord.Embed(title=command.name, color=discord.Color.blurple())
+        cmdhelp = command.help if command.help != None else "to be added"
+        e.description = f"```{' | '.join(command.aliases)}```" + cmdhelp if len(command.aliases) > 0 else cmdhelp
+        e.set_footer(icon_url=self.context.author.avatar_url)
+        e.timestamp = datetime.datetime.utcnow()
+        await self.get_destination().send(embed=e)
+
+    def prepare_pages(self):
+        pages = []
+        for name in bot.cogs:
+            c = bot.cogs[name]
+            if len(c.get_commands()) > 0:
+                pages.append([name, c.description, c.get_commands()])
+        return pages
+
+
+    async def send_pages(self, page=""):
+        ctx = self.context
+        destination = self.get_destination()
+        e = discord.Embed(color=discord.Color.blurple(), description='')
+        right = "\u25B6"
+        left = "\u25C0"
+
+
+        pages = self.prepare_pages()
+        print(type(page))
+        if page == "":
+            page = 0
+        elif page in [bot.cogs[k] for k in bot.cogs.keys()]:
+            page = [i for i in range(len(pages)) if pages[i][0] == page.qualified_name][0]
+        
+        page_count = len(pages)
+
+
+        e.title = pages[page][0]
+        e.description = pages[page][1]
+
+        for cmd in pages[page][2]:
+            e.add_field(name=f"{cmd.name} <{' | '.join(cmd.aliases)}>" , value=cmd.short_doc if cmd.short_doc != '' else "to be added")
+        e.set_footer(text= f"{page + 1} / {page_count}", icon_url=ctx.author.avatar_url)
+
+
+        e.timestamp = datetime.datetime.utcnow()
+        msg = await destination.send(embed=e)
+        await msg.add_reaction(left)
+        await msg.add_reaction(right)
+        active = True
+        while active:
+            try:
+                reaction, user = await bot.wait_for('reaction_add', timeout=60.0, check=lambda _reaction, _user: _user == ctx.author and (_reaction.emoji == right or _reaction.emoji == left) and _reaction.message == msg)
+                await reaction.remove(user)
+                if reaction.emoji == left and page > 0:
+                    page -= 1
+                elif reaction.emoji == right and page < page_count - 1:
+                    page += 1
+                else:
+                    continue
+                e.clear_fields()
+                e.title = pages[page][0]
+                e.description = pages[page][1]
+                
+                for cmd in pages[page][2]:
+                    e.add_field(name=f"{cmd.name} <{' | '.join(cmd.aliases)}>" , value=cmd.short_doc if cmd.short_doc != '' else "to be added")
+                e.set_footer(text= f"{page + 1} / {page_count}", icon_url=ctx.author.avatar_url)
+                await msg.edit(embed=e)
+            except futures.TimeoutError:
+                active = False
+        e.color = discord.Color.orange()
+        await msg.edit(embed=e)
+
+
 
 
 # Ahmads Herrschaft
@@ -800,5 +884,7 @@ bot.add_cog(Memes(bot))
 bot.add_cog(Utility(bot))
 bot.add_cog(Schulneuigkeiten(bot))
 bot.add_cog(Ahmad(bot))
+
+bot.help_command = HelpCommand()
 
 bot.run(lwConfig.token)

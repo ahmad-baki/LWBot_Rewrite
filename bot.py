@@ -461,10 +461,10 @@ class Memes(commands.Cog):
         """Wertet die Bewertungen der Shitposts der einzelnen Nutzer aus
             Dies wird aufgrund von discord rate limits lange dauern.
             Für jeden Nutzer werden Anzahl Memes, Anzahl upvotes/downvotes, upvote/downvote-Verhältnis sowie durchschnittliche upvotes/downvotes aufgelistet.
-            Als optionale Parameter können zuerst Limit des Durchsuchens, dann auszuwertende Nutzer angegeben werden.
-            `stats 200 @Florik3ks @Zuruniik` gibt die Daten für @Florik3ks und @Zuruniik während der letzten 200 Nachrichten (nicht Beiträge!) aus.
-            Ohne angegebene Personen werden die Daten von allen Personen, die in den letzten x Nachrichten Beiträge gepostet haben, aufgeführt.
-            Ohne ein angegebenes Nachrichtenlimit werden alle Beiträge ausgewertet."""
+            \nAls optionale Parameter können zuerst Limit des Durchsuchens, dann auszuwertende Nutzer angegeben werden.
+            \n`stats 200 @Florik3ks @Zuruniik` gibt die Daten für @Florik3ks und @Zuruniik während der letzten 200 Nachrichten (nicht Beiträge!) aus.
+            \nOhne angegebene Personen werden die Daten von allen Personen, die Beiträge gepostet haben, aufgeführt.
+            \nOhne ein angegebenes Nachrichtenlimit werden alle Beiträge ausgewertet."""
         if len(args) > 0:
             if not args[0].isnumeric() and len(ctx.message.mentions) == 0:
                 return

@@ -74,7 +74,6 @@ async def on_ready():
     await channel.send(embed=e)
 
 
-
 class Debug(commands.Cog):
     """Commands zum debuggen"""
 
@@ -83,15 +82,8 @@ class Debug(commands.Cog):
 
     @commands.command()
     async def test(self, ctx, *, arg):
-        """Sendet ein Test-embed"""
-        await bot.fetch_user(int(arg))
-        e = discord.Embed(title="testing stuffu")
-        e.color = discord.Color.blurple()
-        e.description = "ok"  # str([m.name for m in bot.get_all_members()])
-        e.timestamp = datetime.datetime.utcnow()
-        e.set_footer(text=ctx.author.name, icon_url=ctx.author.avatar_url)
-        await ctx.send(embed=e)
-
+        """Test-command zum debuggen."""
+        return
 
     @commands.command()
     async def emotes(self, ctx):
@@ -127,83 +119,85 @@ class Reminder(commands.Cog):
             time_str = ' '.join(arg.split()[:length])
             time = datetime.datetime.strptime(time_str, '%d.%m.%Y %H:%M')
             if time < datetime.datetime.now():
-                await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Reminder in the past?", "not allowed.", color=discord.Color.orange()))
+                await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Erinnerungen in der Vergangenheit sind nicht erlaubt.", color=discord.Color.orange()))
                 return
-            await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Please enter a message for the reminder", "Dont answer for 60 seconds to time out.", color=discord.Color.gold()))
+            await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Bitte gib deine Erinnerungsnachricht ein.", "Dies ist nur in den nächsten 60s möglich.", color=discord.Color.gold()))
             m = await bot.wait_for('message', check=lambda m: m.author == ctx.author, timeout=60)
         except ValueError:
-            await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Wrong date format.", "your Date should be in the format\n```reminder (d)d.(m)m.yyyy (h)h:(m)m\nExample: reminder 1.10.2020 6:34```", color=discord.Color.red()))
+            await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Dein Datum ist so nicht zulässig.", "Das Format sollte so aussehen:\n```reminder (d)d.(m)m.yyyy (h)h:(m)m\nBeispiel: reminder 1.10.2020 6:34```", color=discord.Color.red()))
             return
         except futures.TimeoutError:
-            await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Timed out.", "Try again if you want to set a reminder.", color=discord.Color.red()))
+            await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Die Zeit ist abgelaufen.", "Bitte versuche es erneut, falls du eine Erinnerung erstellen möchtest.", color=discord.Color.red()))
             return
         except Exception:
-            await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Some Error occured", "Your reminder could not be set.", color=discord.Color.red()))
+            await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Ein Fehler ist aufgetreten", "Deine Erinnerung konnte nicht gespeichert werden.", color=discord.Color.red()))
         else:
             if len(ctx.message.mentions) > 0:
                 for recipient in ctx.message.mentions:
                     reminderHandler.addReminder(
-                        ctx.author.id, recipient.id, time_str, m.content + f"\n_created [here]({ctx.message.jump_url})_")
-                    await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "new reminder set for " + recipient.name + " at " + time_str, m.content))
+                        ctx.author.id, recipient.id, time_str, m.content + f"\n_[Hier]({ctx.message.jump_url}) erstellt_")
+                    await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Eine neue Erinnerung für " + recipient.name + ", " + time_str + " wurde erstellt.", m.content))
             else:
                 reminderHandler.addReminder(
-                    ctx.author.id, ctx.author.id, time_str, m.content + f"\n_created [here]({ctx.message.jump_url})_")
-                await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "new reminder set for you at " + time_str, m.content))
+                    ctx.author.id, ctx.author.id, time_str, m.content + f"\n_[Hier]({ctx.message.jump_url}) erstellt_")
+                await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Eine neue Erinnerung für dich, " + time_str + " wurde erstellt.", m.content))
             return
-
 
     @commands.command(aliases=["mr"])
     async def myreminders(self, ctx):
         """Listet alle Erinnerungen eines Nutzers auf"""
         reminder = reminderHandler.getReminder()
         if str(ctx.author.id) in list(reminder.keys()) and len(reminder[str(ctx.author.id)]) > 0:
-            e = discord.Embed(title="Your Reminders", color=ctx.author.color,
-                            timestamp=datetime.datetime.utcnow())
+            e = discord.Embed(title="Deine Erinnerungen", color=ctx.author.color,
+                              timestamp=datetime.datetime.utcnow())
             e.set_footer(text=ctx.author.name, icon_url=ctx.author.avatar_url)
             for singleReminder in reminder[str(ctx.author.id)]:
                 e.add_field(name=singleReminder[0],
                             value=singleReminder[1], inline=False)
             await ctx.send(embed=e)
         else:
-            await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "You have no reminders.", f"Type {bot.command_prefix}reminder [date] to create one."))
-
+            await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Du hast keine Erinnerungen.",
+                                                               f"Gebe {bot.command_prefix}reminder [Datum], um eine neue Erinnerung zu erstellen oder " +
+                                                               f"{bot.command_prefix}help reminder ein, um dir die korrekte Syntax des Commandes anzeigen zu lassen."))
 
     @commands.command(aliases=["rmr"])
     async def removereminder(self, ctx):
         """Erinnerung entfernen
             rufe `,removereminder` auf, und wähle dann den Index der zu entfernenden Erinnerung"""
         reminder = reminderHandler.getReminder()
-        if str(ctx.author.id) in list(reminder.keys()) or len(reminder[str(ctx.author.id)]) == 0:
-            e = discord.Embed(title="Your Reminders", color=ctx.author.color,
-                            timestamp=datetime.datetime.utcnow())
+        if str(ctx.author.id) in list(reminder.keys()) and len(reminder[str(ctx.author.id)]) > 0:
+            e = discord.Embed(title="Deine Erinnerungen", color=ctx.author.color,
+                              timestamp=datetime.datetime.utcnow())
             e.set_footer(text=ctx.author.name, icon_url=ctx.author.avatar_url)
             reminderCount = len(reminder[str(ctx.author.id)])
             for i in range(reminderCount):
                 singleReminder = reminder[str(ctx.author.id)][i]
                 e.add_field(name=f"[{i}] {singleReminder[0]}",
                             value=singleReminder[1], inline=False)
-            if reminderCount == 0:
-                e.description = "You have no reminders."
-                await ctx.send(embed=e)
-                return
+
             await ctx.send(embed=e)
-            await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Please enter a index to remove", "Dont answer for 60 seconds to time out.", color=discord.Color.gold()))
+            await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Gebe bitte den Index der Erinnerung ein, die du löschen möchtest.",
+                                                               "Dies ist nur in den nächsten 60s möglich.", color=discord.Color.gold()))
             try:
                 m = await bot.wait_for('message', check=lambda m: m.author == ctx.author, timeout=60)
                 index = int(m.content)
                 if 0 <= index < reminderCount:
                     reminderHandler.removeReminder(
                         ctx.author.id, *reminder[str(ctx.author.id)][index])
-                    await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Reminder removed.", f"Your reminder\n```{''.join(reminder[str(ctx.author.id)][index][1].splitlines()[:-1])}``` was removed."))
+                    await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Die Erinnerung wurde erfolgreich sgelöscht.",
+                                                                       f"Deine Erinnerung\n```{''.join(reminder[str(ctx.author.id)][index][1].splitlines()[:-1])}``` wurde gelöscht."))
                 else:
                     raise ValueError
             except futures.TimeoutError:
-                await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Timed out.", "Try again if you want to remove a reminder.", color=discord.Color.red()))
+                await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Die Zeit ist abgelaufen.",
+                                                                   "Bitte versuche es erneut, falls du eine Erinnerung löschen möchtest.", color=discord.Color.red()))
             except ValueError:
-                await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "ValueError", "Your message was not a number or the number is not in the indices.", color=discord.Color.red()))
+                await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Eingabefehler",
+                                                                   "Deine Eingabe war keine der zulässigen aufgeführten Indices.", color=discord.Color.red()))
         else:
-            await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "You have no reminders.", f"Type {bot.command_prefix}reminder [date] to create one."))
-
+            await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Du hast keine Erinnerungen.",
+                                                               f"Gebe {bot.command_prefix}reminder [Datum], um eine neue Erinnerung zu erstellen oder " +
+                                                               f"{bot.command_prefix}help reminder ein, um dir die korrekte Syntax des Commandes anzeigen zu lassen."))
 
     @tasks.loop(seconds=30)
     async def checkReminder(self):
@@ -212,7 +206,8 @@ class Reminder(commands.Cog):
         recipients = list(r.keys())
         for recipientID in recipients:
             for reminder in r[recipientID]:
-                time = datetime.datetime.strptime(reminder[0], '%d.%m.%Y %H:%M')
+                time = datetime.datetime.strptime(
+                    reminder[0], '%d.%m.%Y %H:%M')
                 if time <= now:
                     channel = bot.get_channel(lwConfig.botChannelID)
                     author = bot.get_guild(
@@ -220,9 +215,8 @@ class Reminder(commands.Cog):
                     recipient = bot.get_guild(
                         lwConfig.serverID).get_member(int(recipientID))
                     color = recipient.color
-                    await channel.send(content=recipient.mention, embed=lwHelperFunctions.simpleEmbed(author, "Reminder", reminder[1], color=color))
+                    await channel.send(content=recipient.mention, embed=lwHelperFunctions.simpleEmbed(author, "Erinnerung", reminder[1], color=color))
                     reminderHandler.removeReminder(recipientID, *reminder)
-
 
     @checkReminder.before_loop
     async def beforeReminderCheck(self):
@@ -263,8 +257,8 @@ class Stundenplan(commands.Cog):
             await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Deine Kurse: ", f"```{', '.join(kurse)}```"))
         # otherwise, inform the ctx.author that he does not have any course roles
         else:
-            await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Du hast keine Kurse ausgewählt. ", "Verwende den command addKurse [kurs1 kurs2 ...] um mehr hinzuzufügen.\nBeispiel: ```addKurse EN4 PH1```\ngibt dir die Kursrollen EN4 und PH1."))
-
+            await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Du hast keine Kurse ausgewählt. ",
+                                                               "Verwende den command addKurse [kurs1 kurs2 ...] um mehr hinzuzufügen.\nBeispiel: ```addKurse EN4 PH1```\ngibt dir die Kursrollen EN4 und PH1."))
 
     @commands.command(aliases=["ak"])
     async def addKurse(self, ctx, *, args):
@@ -288,7 +282,6 @@ class Stundenplan(commands.Cog):
         kurse = substitutionHandler.getMyCourseRoleNames(ctx.author)
         await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Deine Kurse: ", f"```{', '.join(kurse)}```"))
 
-
     @commands.command(aliases=["rk"])
     async def removeKurse(self, ctx, *, args):
         """Entfernt die gewünschten Kurse des Nutzers
@@ -310,9 +303,8 @@ class Stundenplan(commands.Cog):
             await ctx.author.remove_roles(role)
             # delete the role if no members have it now
             if len(role.members) == 0:
-                await role.delete(reason="not used anymore")
+                await role.delete(reason="Diese Kursrolle wird nicht mehr benutzt ist daher irrelevant.")
         await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, f"Die Rolle(n) {', '.join(args)} wurde erfolgreich entfernt."))
-
 
     @commands.command(aliases=["mp"])
     async def myplan(self, ctx):
@@ -323,7 +315,8 @@ class Stundenplan(commands.Cog):
         # if the ctx.author has at least no course role, tell him and return
         kurse = substitutionHandler.getMyCourseRoleNames(ctx.author)
         if len(kurse) == 0:
-            await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Du hast keine Kurse ausgewählt. ", "Verwende den command addKurse [kurs1 kurs2 ...] um mehr hinzuzufügen.\nBeispiel: ```addKurse EN4 PH1```\ngibt dir die Kursrollen EN4 und PH1."))
+            await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Du hast keine Kurse ausgewählt. ",
+                                                               "Verwende den command addKurse [kurs1 kurs2 ...] um mehr hinzuzufügen.\nBeispiel: ```addKurse EN4 PH1```\ngibt dir die Kursrollen EN4 und PH1."))
             return
         plan = substitutionHandler.getSubstitutionPlan()
         embed = discord.Embed(
@@ -335,8 +328,6 @@ class Stundenplan(commands.Cog):
 
         e = substitutionHandler.format_plan(plan, ctx.guild, embed, courses)
         await ctx.send(embed=e)
-
-
 
     @tasks.loop(seconds=300)
     async def updateSubstitutionPlan(self):
@@ -358,17 +349,21 @@ class Stundenplan(commands.Cog):
                             removals[date].append(k)
             channel = bot.get_channel(lwConfig.substitutionChannelID)
 
-            rmEmbed = discord.Embed(title="Entfernt", color=discord.Color.red())
-            addedEmbed = discord.Embed(title="Neu hinzugefügt", color=discord.Color.green())
-            rmEmbed.description = "gelöschte Vertretungen [BETA]"
-            addedEmbed.description = "geänderte Vertretungen [BETA]"
+            rmEmbed = discord.Embed(
+                title="Entfernt", color=discord.Color.red())
+            addedEmbed = discord.Embed(
+                title="Neu hinzugefügt", color=discord.Color.green())
+            rmEmbed.description = "gelöschte Vertretungen"
+            addedEmbed.description = "geänderte Vertretungen"
             server = channel.guild
             rmEmbed.timestamp = datetime.datetime.utcnow()
             addedEmbed.timestamp = datetime.datetime.utcnow()
-            rmEmbed = substitutionHandler.format_plan(removals, server, rmEmbed)
-            addedEmbed = substitutionHandler.format_plan(additions, server, addedEmbed)
+            rmEmbed = substitutionHandler.format_plan(
+                removals, server, rmEmbed)
+            addedEmbed = substitutionHandler.format_plan(
+                additions, server, addedEmbed)
 
-            if len(rmEmbed.fields) > 0: 
+            if len(rmEmbed.fields) > 0:
                 await channel.send(embed=rmEmbed)
             if len(addedEmbed.fields) > 0:
                 await channel.send(embed=addedEmbed)
@@ -377,7 +372,6 @@ class Stundenplan(commands.Cog):
                 await on_command_error(bot.get_channel(lwConfig.logChannelID), e)
             except Exception:
                 pass
-
 
     @updateSubstitutionPlan.before_loop
     async def beforeSubstitutionPlan(self):
@@ -405,29 +399,27 @@ class Memes(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
+    # @commands.command()
+    # async def entries(self, ctx):
+    #     """Zeigt alle Memes, deren Scores für die Bestenliste gespeichert werden"""
+    #     voteListHandler.deleteOldMessages()
+    #     voteList = voteListHandler.getVoteList()
+    #     e = discord.Embed()
+    #     e.color = discord.Color.purple()
+    #     e.timestamp = datetime.datetime.utcnow()
+    #     e.set_footer(text=ctx.author.name, icon_url=ctx.author.avatar_url)
+    #     e.set_author(name=bot.user, icon_url=bot.user.avatar_url)
+    #     if not len(voteList) > 0:
+    #         e.title = "Gerade eben sind keine Memes vorhanden."
+    #         await ctx.send(embed=e)
+    #         return
+    #     e.title = "Entries"
+    #     e.description = "All current entry messages in the votelist.\n\n```[ MessageID:\n Upvotes \u2606, created_at ]```"
+    #     for k in list(voteList.keys()):
+    #         e.add_field(
+    #             name=f"{str(k)}:", value=f"```{str(voteList[k][0])} \u2606, {str(voteList[k][1])}```", inline=False)
 
-    @commands.command()
-    async def entries(self, ctx):
-        """Zeigt alle Memes, deren Scores für die Bestenliste gespeichert werden"""
-        voteListHandler.deleteOldMessages()
-        voteList = voteListHandler.getVoteList()
-        e = discord.Embed()
-        e.color = discord.Color.purple()
-        e.timestamp = datetime.datetime.utcnow()
-        e.set_footer(text=ctx.author.name, icon_url=ctx.author.avatar_url)
-        e.set_author(name=bot.user, icon_url=bot.user.avatar_url)
-        if not len(voteList) > 0:
-            e.title = "No entries in the votelist."
-            await ctx.send(embed=e)
-            return
-        e.title = "Entries"
-        e.description = "All current entry messages in the votelist.\n\n```[ MessageID:\n Upvotes \u2606, created_at ]```"
-        for k in list(voteList.keys()):
-            e.add_field(
-                name=f"{str(k)}:", value=f"```{str(voteList[k][0])} \u2606, {str(voteList[k][1])}```", inline=False)
-
-        await ctx.send(embed=e)
-
+    #     await ctx.send(embed=e)
 
     @commands.command()
     async def top(self, ctx):
@@ -444,13 +436,13 @@ class Memes(commands.Cog):
             winnerMessage = await bot.get_channel(lwConfig.memeChannelID).fetch_message(sortedDict[0][0])
             score = voteList[sortedDict[0][0]][0]
             e = discord.Embed()
-            e.title = f"Current top voted post with a score of {str(score)} {lwHelperFunctions.getEmoji(bot, lwConfig.upvoteEmoji)}"
+            e.title = f"Der aktuell beliebteste Beitrag mit {str(score)} {lwHelperFunctions.getEmoji(bot, lwConfig.upvoteEmoji)}"
 
-            e.description = f"[Message:]({winnerMessage.jump_url})"
+            e.description = f"[Nachricht:]({winnerMessage.jump_url})"
             if(len(winnerMessage.attachments) > 0):
                 e.set_image(url=winnerMessage.attachments[0].url)
             e.set_author(name=winnerMessage.author,
-                        icon_url=winnerMessage.author.avatar_url)
+                         icon_url=winnerMessage.author.avatar_url)
             e.color = winnerMessage.guild.get_member(
                 winnerMessage.author.id).colour
             date = winnerMessage.created_at
@@ -462,21 +454,24 @@ class Memes(commands.Cog):
                 if(not lwHelperFunctions.is_url_image(e.image.url)):
                     await ctx.message.channel.send(winnerMessage.attachments[0].url)
         else:
-            await ctx.message.channel.send("no items in the voting list.")
-
+            await ctx.message.channel.send("Zurzeit sind keine Memes vorhanden.")
 
     @commands.command()
     async def stats(self, ctx, *args):
         """Wertet die Bewertungen der Shitposts der einzelnen Nutzer aus
             Dies wird aufgrund von discord rate limits lange dauern.
             Für jeden Nutzer werden Anzahl Memes, Anzahl upvotes/downvotes, upvote/downvote-Verhältnis sowie durchschnittliche upvotes/downvotes aufgelistet.
-            Als optionale Parameter können zuerst Limit des Durchsuchens, dann auszuwertende Nutzer angegeben werden."""
+            Als optionale Parameter können zuerst Limit des Durchsuchens, dann auszuwertende Nutzer angegeben werden.
+            `stats 200 @Florik3ks @Zuruniik` gibt die Daten für @Florik3ks und @Zuruniik während der letzten 200 Nachrichten (nicht Beiträge!) aus.
+            Ohne angegebene Personen werden die Daten von allen Personen, die in den letzten x Nachrichten Beiträge gepostet haben, aufgeführt.
+            Ohne ein angegebenes Nachrichtenlimit werden alle Beiträge ausgewertet."""
         if len(args) > 0:
             if not args[0].isnumeric() and len(ctx.message.mentions) == 0:
                 return
         progressEmbed = discord.Embed(title="Nachrichten werden gelesen...")
         progressEmbed.description = "Dies könnte (wird) eine recht lange Zeit in Anspruch nehmen."
-        progressEmbed.set_image(url=lwHelperFunctions.getEmoji(bot, "KannaSip").url)
+        progressEmbed.set_image(
+            url=lwHelperFunctions.getEmoji(bot, "KannaSip").url)
         await ctx.send(embed=progressEmbed)
         progress = 0
         progressMsg = await ctx.send("`  0% fertig.`")
@@ -484,7 +479,7 @@ class Memes(commands.Cog):
             channel = bot.get_channel(lwConfig.memeChannelID)
             upvote = lwHelperFunctions.getEmoji(bot, lwConfig.upvoteEmoji)
             downvote = lwHelperFunctions.getEmoji(bot, lwConfig.downoteEmoji)
-            members = defaultdict(lambda : defaultdict(int))
+            members = defaultdict(lambda: defaultdict(int))
             limit = None
             if len(args) > 0 and args[0].isnumeric():
                 limit = int(args[0])
@@ -492,7 +487,7 @@ class Memes(commands.Cog):
             counter = 0
             async for m in channel.history(limit=limit):
                 counter += 1
-                
+
                 oldProg = progress
                 progress = round(counter / messageCount * 100)
                 if progress != oldProg:
@@ -512,8 +507,8 @@ class Memes(commands.Cog):
                     if meme:
                         members[m.author.id]["memes"] += 1
 
-        
-            e = discord.Embed(title="Stats", color=ctx.author.color, timestamp=datetime.datetime.utcnow())
+            e = discord.Embed(title="Stats", color=ctx.author.color,
+                              timestamp=datetime.datetime.utcnow())
             e.set_footer(text=ctx.author.name, icon_url=ctx.author.avatar_url)
 
             for member_id in members.keys():
@@ -528,30 +523,29 @@ class Memes(commands.Cog):
                 up = members[member_id]['up']
                 down = members[member_id]['down']
                 total = members[member_id]['memes']
-                ratio = round(up / down, 2) if down > 0 else up if up > 0 else 1
-                dvratio = "1"# if down > 0 else "0"
+                ratio = round(
+                    up / down, 2) if down > 0 else up if up > 0 else 1
+                dvratio = "1"  # if down > 0 else "0"
                 members[member_id]["ratio"] = ratio
-                e.add_field(name=member.display_name, value=
-                    f"total memes: `{members[member_id]['memes']}`\n"+
-                    f"total {str(upvote)} `{str(up).rjust(6)} : {str(down).ljust(6)}` {str(downvote)}\n"+
-                    f"ratio {str(upvote)} `{str(ratio).rjust(6)} : {dvratio.ljust(6)}` {str(downvote)}\n"+
-                    f"avg . {str(upvote)} `{str(round(up / total, 2)).rjust(6)} : {str(round(down / total, 2)).ljust(6)}` {str(downvote)}",
-                    inline=False
-                )
+                e.add_field(name=member.display_name, value=f"total memes: `{members[member_id]['memes']}`\n" +
+                            f"`Gesamtanzahl` {str(upvote)} `{str(up).rjust(6)} : {str(down).ljust(6)}` {str(downvote)}\n" +
+                            f"`Verhältnis  ` {str(upvote)} `{str(ratio).rjust(6)} : {dvratio.ljust(6)}` {str(downvote)}\n" +
+                            f"`Durchschnitt` {str(upvote)} `{str(round(up / total, 2)).rjust(6)} : {str(round(down / total, 2)).ljust(6)}` {str(downvote)}",
+                            inline=False
+                            )
 
             for m in ctx.message.mentions:
                 if m.id not in members.keys():
-                    e.add_field(name=m.display_name, value=
-                        "total memes: 0\n"+
-                        f"total {str(upvote)} `     0 : 0     ` {str(downvote)}\n"+
-                        f"ratio {str(upvote)} `     1 : 1     ` {str(downvote)}\n"+
-                        f"avg.  {str(upvote)} `     0 : 0     ` {str(downvote)}"
-                        ,inline=False
-                    )
+                    e.add_field(name=m.display_name, value="total memes: `0`\n" +
+                                f"`Gesamtanzahl` {str(upvote)} `     0 : 0     ` {str(downvote)}\n" +
+                                f"`Verhältnis  ` {str(upvote)} `     1 : 1     ` {str(downvote)}\n" +
+                                f"`Durchschnitt` {str(upvote)} `     0 : 0     ` {str(downvote)}", inline=False
+                                )
         await ctx.send(embed=e)
 
         ## Leaderboard ##
-        l = discord.Embed(title="Leaderboard (upvote/downvote ratio)", color=discord.Color.gold(), timestamp=datetime.datetime.utcnow())
+        l = discord.Embed(title="Leaderboard (Up-/Downvote Verhältnis)",
+                          color=discord.Color.gold(), timestamp=datetime.datetime.utcnow())
 
         ratioLeaderboard = []
 
@@ -563,9 +557,8 @@ class Memes(commands.Cog):
         for r in ratioLeaderboard:
             member = bot.get_guild(lwConfig.serverID).get_member(r[1])
             l.add_field(name=member.display_name, value=str(r[0]))
-        
-        await ctx.send(embed=l)
 
+        await ctx.send(embed=l)
 
     @commands.Cog.listener()
     async def on_message(self, message):
@@ -574,7 +567,6 @@ class Memes(commands.Cog):
         if message.channel.id == lwConfig.memeChannelID and (len(message.attachments) > 0 or validators.url(message.content)):
             await message.add_reaction(lwHelperFunctions.getEmoji(bot, lwConfig.upvoteEmoji))
             await message.add_reaction(lwHelperFunctions.getEmoji(bot, lwConfig.downoteEmoji))
-
 
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload):
@@ -598,7 +590,7 @@ class Memes(commands.Cog):
             # in case the message author tries to up-/downvote their own post
             if reaction.message.author == user and (reaction.emoji == upvote or reaction.emoji == downvote):
                 await reaction.remove(user)
-                errormsg = await reaction.message.channel.send(f"{user.mention} you cannot up/downvote your own post.")
+                errormsg = await reaction.message.channel.send(f"{user.mention} Du darfst für deinen eigenen Beitrag nicht abstimmen.")
                 deleteEmoji = lwHelperFunctions.getEmoji(
                     bot, lwConfig.deleteEmojiName)
                 await errormsg.add_reaction(deleteEmoji)
@@ -615,10 +607,9 @@ class Memes(commands.Cog):
                 # pin message when it has the specified amount of upvotes
                 if reaction.count - 1 >= lwConfig.upvotesForPin:
                     # await reaction.message.pin(reason="good meme")
-                    await self.sendGoodMeme(reaction.message)
+                    await self.send_good_meme(reaction.message)
             elif reaction.emoji == downvote:
                 voteListHandler.changeVotingCounter(reaction.message, -1)
-
 
     @commands.Cog.listener()
     async def on_raw_reaction_remove(self, payload):
@@ -641,8 +632,7 @@ class Memes(commands.Cog):
             elif reaction.emoji == lwHelperFunctions.getEmoji(bot, lwConfig.downoteEmoji):
                 voteListHandler.changeVotingCounter(reaction.message, 1)
 
-
-    async def sendGoodMeme(self, msg, force=False):
+    async def send_good_meme(self, msg, force=False):
         if not force:
             with open(lwConfig.path + '/json/goodMemes.json', 'r') as myfile:
                 memes = json.loads(myfile.read())
@@ -654,12 +644,11 @@ class Memes(commands.Cog):
             with open(lwConfig.path + '/json/goodMemes.json', 'w') as myfile:
                 json.dump(memes, myfile)
 
-
         channel = bot.get_channel(lwConfig.goodMemesChannelID)
         e = discord.Embed()
         e.description = f"[Message:]({msg.jump_url})"
         e.set_author(name=msg.author,
-                        icon_url=msg.author.avatar_url)
+                     icon_url=msg.author.avatar_url)
         e.color = msg.guild.get_member(
             msg.author.id).colour
         e.description += "\n" + msg.content
@@ -677,9 +666,9 @@ class Memes(commands.Cog):
                     await on_command_error(bot.get_channel(lwConfig.logChannelID), Exception(f"{str(msg.id)}: good meme was not sent correctly."))
                 elif counter > 0:
                     await on_command_error(bot.get_channel(lwConfig.logChannelID), Exception(f"{str(msg.id)}: good meme was not sent correctly, took {counter} attempts."))
-            
+
                 await channel.send(embed=e)
-            
+
             else:
                 await channel.send(embed=e, file=await msg.attachments[0].to_file())
 
@@ -690,7 +679,6 @@ class Utility(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-
     @commands.command()
     async def embed(self, ctx, *args):
         """Ruft die Funktion simpleEmbed(*args) mit den übergebenen Argumenten auf.
@@ -700,12 +688,11 @@ class Utility(commands.Cog):
 
         await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, *args))
 
-
     # https://gist.github.com/nitros12/2c3c265813121492655bc95aa54da6b9 geklaut und überarbeitet
     @commands.is_owner()
     @commands.command(name="eval", aliases=["ev", "evaluate"])
     async def _eval(self, ctx, *, cmd):
-        """Führt Code aus und sendet das Ergebnis der letzten Zeile. (devs only)
+        """Führt Code aus und sendet das Ergebnis der letzten Zeile, falls vorhanden. (devs only)
             Beispiel: 
             ```,ev 
                 for i in range(4):
@@ -755,24 +742,23 @@ class Utility(commands.Cog):
         exec(compile(parsed, filename="<ast>", mode="exec"), env)
 
         result = (await eval(f"{fn_name}()", env))
-        
+
         try:
             if type(result) != discord.message.Message:
                 await ctx.send(result)
         except HTTPException:
             pass
 
-
     @commands.Cog.listener()
     async def on_voice_state_update(self, member, before, after):
         afkChannel = member.guild.afk_channel
         if after.channel and before.channel:  # if the member didn't just join or quit, but moved channels
-            if after.channel == afkChannel and before.channel.id in lwConfig.awakeChannelIDs:   #the "Stay awake" feature
+            if after.channel == afkChannel and before.channel.id in lwConfig.awakeChannelIDs:  # the "Stay awake" feature
                 await member.move_to(before.channel)
 
-        if after.channel and member.guild.get_role(lwConfig.banishedRoleID) in member.roles and after.channel.id != lwConfig.banishedChannelD and member.id not in bot.owner_ids:  #the "banish" feature
+        # the "banish" feature
+        if after.channel and member.guild.get_role(lwConfig.banishedRoleID) in member.roles and after.channel.id != lwConfig.banishedChannelD and member.id not in bot.owner_ids:
             await member.move_to(member.guild.get_channel(lwConfig.banishedChannelD))
-
 
     @commands.Cog.listener()
     async def on_member_update(self, before, after):
@@ -790,15 +776,12 @@ class Schulneuigkeiten(commands.Cog):
         self.bot = bot
         self.checkGmoWebsite.start()
 
-
     @tasks.loop(seconds=300)
     async def checkGmoWebsite(self):
         news = await lwHelperFunctions.getGmoNews()
         if news != None:
             channel = bot.get_channel(lwConfig.newsChannelID)
             await channel.send(channel.guild.get_role(lwConfig.gmoRoleID).mention + " " + news)
-
-
 
     @checkGmoWebsite.before_loop
     async def beforeGmoNews(self):
@@ -830,12 +813,13 @@ class HelpCommand(commands.HelpCommand):
         if len(cog.get_commands()) > 0:
             await self.send_pages(cog)
         else:
-            await self.context.send("This category has no commands.")
+            await self.context.send("Diese Kategorie beinhaltet keine Commands.")
 
     async def send_command_help(self, command):
         e = discord.Embed(title=command.name, color=discord.Color.blurple())
-        cmdhelp = command.help if command.help != None else "to be added"
-        e.description = f"```{' | '.join(command.aliases)}```" + cmdhelp if len(command.aliases) > 0 else cmdhelp
+        cmdhelp = command.help if command.help != None else " - "
+        e.description = f"```{' | '.join(command.aliases)}```" + \
+            cmdhelp if len(command.aliases) > 0 else cmdhelp
         e.set_footer(icon_url=self.context.author.avatar_url)
         e.timestamp = datetime.datetime.utcnow()
         await self.get_destination().send(embed=e)
@@ -848,7 +832,6 @@ class HelpCommand(commands.HelpCommand):
                 pages.append([name, c.description, c.get_commands()])
         return pages
 
-
     async def send_pages(self, page=""):
         ctx = self.context
         destination = self.get_destination()
@@ -856,24 +839,24 @@ class HelpCommand(commands.HelpCommand):
         right = "\u25B6"
         left = "\u25C0"
 
-
         pages = self.prepare_pages()
         print(type(page))
         if page == "":
             page = 0
         elif page in [bot.cogs[k] for k in bot.cogs.keys()]:
-            page = [i for i in range(len(pages)) if pages[i][0] == page.qualified_name][0]
-        
-        page_count = len(pages)
+            page = [i for i in range(len(pages))
+                    if pages[i][0] == page.qualified_name][0]
 
+        page_count = len(pages)
 
         e.title = pages[page][0]
         e.description = pages[page][1]
 
         for cmd in pages[page][2]:
-            e.add_field(name=f"{cmd.name} <{' | '.join(cmd.aliases)}>" , value=cmd.short_doc if cmd.short_doc != '' else "to be added")
-        e.set_footer(text= f"{page + 1} / {page_count}", icon_url=ctx.author.avatar_url)
-
+            e.add_field(name=f"{cmd.name} <{' | '.join(cmd.aliases)}>" if len(cmd.aliases) > 0 else cmd.name,
+                        value=cmd.short_doc if cmd.short_doc != '' else " - ")
+        e.set_footer(text=f"{page + 1} / {page_count}",
+                     icon_url=ctx.author.avatar_url)
 
         e.timestamp = datetime.datetime.utcnow()
         msg = await destination.send(embed=e)
@@ -893,17 +876,17 @@ class HelpCommand(commands.HelpCommand):
                 e.clear_fields()
                 e.title = pages[page][0]
                 e.description = pages[page][1]
-                
+
                 for cmd in pages[page][2]:
-                    e.add_field(name=f"{cmd.name} <{' | '.join(cmd.aliases)}>" , value=cmd.short_doc if cmd.short_doc != '' else "to be added")
-                e.set_footer(text= f"{page + 1} / {page_count}", icon_url=ctx.author.avatar_url)
+                    e.add_field(name=f"{cmd.name} <{' | '.join(cmd.aliases)}>" if len(cmd.aliases) > 0 else cmd.name,
+                                value=cmd.short_doc if cmd.short_doc != '' else " - ")
+                e.set_footer(text=f"{page + 1} / {page_count}",
+                             icon_url=ctx.author.avatar_url)
                 await msg.edit(embed=e)
             except futures.TimeoutError:
                 active = False
         e.color = discord.Color.orange()
         await msg.edit(embed=e)
-
-
 
 
 # Ahmads Herrschaft

@@ -76,11 +76,16 @@ async def on_ready():
 
 
 class Debug(commands.Cog):
+    """All commands in this category are for debugging purposes only."""
+
     def __init__(self, bot):
         self.bot = bot
 
     @commands.command()
     async def test(self, ctx, *, arg):
+        """short test
+            more test
+            looooooooooooooong teeeeeest"""
         await bot.fetch_user(int(arg))
         e = discord.Embed(title="testing stuffu")
         e.color = discord.Color.blurple()
@@ -650,7 +655,7 @@ class Memes(commands.Cog):
             
             else:
                 await channel.send(embed=e, file=await msg.attachments[0].to_file())
-        
+
 
 class Utility(commands.Cog):
     def __init__(self, bot):

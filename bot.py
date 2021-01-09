@@ -853,7 +853,7 @@ class HelpCommand(commands.HelpCommand):
         e.description = pages[page][1]
 
         for cmd in pages[page][2]:
-            e.add_field(name=f"{cmd.name} <{' | '.join(cmd.aliases)}>" if len(cmd.aliases) > 0 else cmd.name,
+            e.add_field(name=f"{cmd.name} \n<{' | '.join(cmd.aliases)}>" if len(cmd.aliases) > 0 else cmd.name,
                         value=cmd.short_doc if cmd.short_doc != '' else " - ")
         e.set_footer(text=f"{page + 1} / {page_count}",
                      icon_url=ctx.author.avatar_url)
@@ -878,7 +878,7 @@ class HelpCommand(commands.HelpCommand):
                 e.description = pages[page][1]
 
                 for cmd in pages[page][2]:
-                    e.add_field(name=f"{cmd.name} <{' | '.join(cmd.aliases)}>" if len(cmd.aliases) > 0 else cmd.name,
+                    e.add_field(name=f"{cmd.name} \n<{' | '.join(cmd.aliases)}>" if len(cmd.aliases) > 0 else cmd.name,
                                 value=cmd.short_doc if cmd.short_doc != '' else " - ")
                 e.set_footer(text=f"{page + 1} / {page_count}",
                              icon_url=ctx.author.avatar_url)

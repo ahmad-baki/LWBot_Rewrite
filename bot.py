@@ -646,7 +646,7 @@ class Memes(commands.Cog):
 
         channel = bot.get_channel(lwConfig.goodMemesChannelID)
         e = discord.Embed()
-        e.description = f"[Message:]({msg.jump_url})"
+        e.description = f"[Nachricht:]({msg.jump_url})"
         e.set_author(name=msg.author,
                      icon_url=msg.author.avatar_url)
         e.color = msg.guild.get_member(

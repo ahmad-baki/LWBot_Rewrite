@@ -76,7 +76,7 @@ async def on_ready():
 
 
 class Debug(commands.Cog):
-    """All commands in this category are for debugging purposes only."""
+    """Commands zum debuggen"""
 
     def __init__(self, bot):
         self.bot = bot
@@ -110,6 +110,8 @@ class Debug(commands.Cog):
 
 
 class Reminder(commands.Cog):
+    """Commands zum Bedienen der Erinnerungs-funktion"""
+
     def __init__(self, bot):
         self.bot = bot
         self.checkReminder.start()
@@ -243,6 +245,8 @@ class Reminder(commands.Cog):
 
 
 class Stundenplan(commands.Cog):
+    """Commands zum Nutzen des personalisierten Stundenplans"""
+
     def __init__(self, bot):
         self.bot = bot
         self.updateSubstitutionPlan.start()
@@ -396,6 +400,8 @@ class Stundenplan(commands.Cog):
 
 
 class Memes(commands.Cog):
+    """Commands zum Votingsystem im Shitpostkanal"""
+
     def __init__(self, bot):
         self.bot = bot
 
@@ -679,6 +685,8 @@ class Memes(commands.Cog):
 
 
 class Utility(commands.Cog):
+    """Andere nützliche Commands"""
+
     def __init__(self, bot):
         self.bot = bot
 
@@ -697,6 +705,12 @@ class Utility(commands.Cog):
     @commands.is_owner()
     @commands.command(name="eval", aliases=["ev", "evaluate"])
     async def _eval(self, ctx, *, cmd):
+        """Führt Code aus und sendet das Ergebnis der letzten Zeile. (devs only)
+            Beispiel: 
+            ```,ev 
+                for i in range(4):
+                    await ctx.send(ctx.author.mention)
+                "uwu"```"""
         def insert_returns(body):
             # insert return stmt if the last expression is a expression statement
             if isinstance(body[-1], ast.Expr):
@@ -807,6 +821,7 @@ class Schulneuigkeiten(commands.Cog):
 
 
 class HelpCommand(commands.HelpCommand):
+    """Zeigt eine hilfreiche Auflistung aller Commands"""
 
     async def send_bot_help(self, mapping):
         await self.send_pages()

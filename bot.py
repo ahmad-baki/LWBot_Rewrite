@@ -527,7 +527,7 @@ class Memes(commands.Cog):
                     up / down, 2) if down > 0 else up if up > 0 else 1
                 dvratio = "1"  # if down > 0 else "0"
                 members[member_id]["ratio"] = ratio
-                e.add_field(name=member.display_name, value=f"total memes: `{members[member_id]['memes']}`\n" +
+                e.add_field(name=member.display_name, value=f"Anzahl der Beiträge: `{members[member_id]['memes']}`\n" +
                             f"`Gesamtanzahl` {str(upvote)} `{str(up).rjust(6)} : {str(down).ljust(6)}` {str(downvote)}\n" +
                             f"`Verhältnis  ` {str(upvote)} `{str(ratio).rjust(6)} : {dvratio.ljust(6)}` {str(downvote)}\n" +
                             f"`Durchschnitt` {str(upvote)} `{str(round(up / total, 2)).rjust(6)} : {str(round(down / total, 2)).ljust(6)}` {str(downvote)}",
@@ -536,7 +536,7 @@ class Memes(commands.Cog):
 
             for m in ctx.message.mentions:
                 if m.id not in members.keys():
-                    e.add_field(name=m.display_name, value="total memes: `0`\n" +
+                    e.add_field(name=m.display_name, value="Anzahl der Beiträge: `0`\n" +
                                 f"`Gesamtanzahl` {str(upvote)} `     0 : 0     ` {str(downvote)}\n" +
                                 f"`Verhältnis  ` {str(upvote)} `     1 : 1     ` {str(downvote)}\n" +
                                 f"`Durchschnitt` {str(upvote)} `     0 : 0     ` {str(downvote)}", inline=False

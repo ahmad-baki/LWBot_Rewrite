@@ -97,6 +97,10 @@ class Debug(commands.Cog):
 
     @commands.command()
     async def emotes(self, ctx):
+        """displays all emotes available to Norman
+            use 
+            `lwHelperFunctions.getEmoji(bot, "emojiName")`
+            to get the emoji corresponding to its name (devs only)"""
         e = discord.Embed(title="Emotes:")
         emotes = [f"<:{e.name}:{e.id}>" for e in bot.emojis]
         e.description = ''.join(emotes)

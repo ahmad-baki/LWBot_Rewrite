@@ -268,7 +268,7 @@ class Stundenplan(commands.Cog):
 
     @commands.command(aliases=["ak"])
     async def addKurse(self, ctx, *, args):
-        """gibt dem Nutzer die gewünschten Kurse
+        """Gibt dem Nutzer die gewünschten Kurse
             beispiel: `,addkurse MA1 IN2 de2 mu1"""
         args = args.split(" ")
         # give the ctx.author the course seperator role if he does not have it already

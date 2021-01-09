@@ -83,9 +83,7 @@ class Debug(commands.Cog):
 
     @commands.command()
     async def test(self, ctx, *, arg):
-        """short test
-            more test
-            looooooooooooooong teeeeeest"""
+        """Sendet ein Test-embed"""
         await bot.fetch_user(int(arg))
         e = discord.Embed(title="testing stuffu")
         e.color = discord.Color.blurple()
@@ -97,10 +95,10 @@ class Debug(commands.Cog):
 
     @commands.command()
     async def emotes(self, ctx):
-        """displays all emotes available to Norman
-            use 
+        """Zeigt alle für Norman verfügbaren Emotes an
+            nutze
             `lwHelperFunctions.getEmoji(bot, "emojiName")`
-            to get the emoji corresponding to its name (devs only)"""
+            um einen Emoji anhand seines Namens zu erhalten (devs only)"""
         e = discord.Embed(title="Emotes:")
         emotes = [f"<:{e.name}:{e.id}>" for e in bot.emojis]
         e.description = ''.join(emotes)
@@ -118,6 +116,10 @@ class Reminder(commands.Cog):
 
     @commands.command(aliases=["remindme", "remind", "reminder"])
     async def setreminder(self, ctx, *, arg):
+        """Erstellt eine neue Erinnerung
+            nutze das Schema
+            `reminder (d)d.(m)m.yyyy (h)h:(m)m`
+            Beispiel: `reminder 1.10.2020 6:34`"""
         try:
             length = min(len(arg.split()), 2)
             time_str = ' '.join(arg.split()[:length])
@@ -150,6 +152,7 @@ class Reminder(commands.Cog):
 
     @commands.command(aliases=["mr"])
     async def myreminders(self, ctx):
+        """Listet alle Erinnerungen eines Nutzers auf"""
         reminder = reminderHandler.getReminder()
         if str(ctx.author.id) in list(reminder.keys()) and len(reminder[str(ctx.author.id)]) > 0:
             e = discord.Embed(title="Your Reminders", color=ctx.author.color,
@@ -165,6 +168,8 @@ class Reminder(commands.Cog):
 
     @commands.command(aliases=["rmr"])
     async def removereminder(self, ctx):
+        """Erinnerung entfernen
+            rufe `,removereminder` auf, und wähle dann den Index der zu entfernenden Erinnerung"""
         reminder = reminderHandler.getReminder()
         if str(ctx.author.id) in list(reminder.keys()) or len(reminder[str(ctx.author.id)]) == 0:
             e = discord.Embed(title="Your Reminders", color=ctx.author.color,
@@ -244,6 +249,7 @@ class Stundenplan(commands.Cog):
 
     @commands.command()
     async def kurse(self, ctx):
+        """Listet alle Kurse eines Nutzers auf"""
         # give the ctx.author the course seperator role if he does not have it already
         if not lwConfig.courseRoleSeperatorID in [c.id for c in ctx.author.roles]:
             await ctx.author.add_roles(ctx.guild.get_role(lwConfig.courseRoleSeperatorID))
@@ -258,6 +264,8 @@ class Stundenplan(commands.Cog):
 
     @commands.command(aliases=["ak"])
     async def addKurse(self, ctx, *, args):
+        """gibt dem Nutzer die gewünschten Kurse
+            beispiel: `,addkurse MA1 IN2 de2 mu1"""
         args = args.split(" ")
         # give the ctx.author the course seperator role if he does not have it already
         if not lwConfig.courseRoleSeperatorID in [c.id for c in ctx.author.roles]:
@@ -279,6 +287,8 @@ class Stundenplan(commands.Cog):
 
     @commands.command(aliases=["rk"])
     async def removeKurse(self, ctx, *, args):
+        """Entfernt die gewünschten Kurse des Nutzers
+            beispiel: `,removeKurse MA1 IN2 de2 mu1"""
         args = args.split(" ")
         # give the ctx.author the course seperator role if he does not have it already
         if not lwConfig.courseRoleSeperatorID in [c.id for c in ctx.author.roles]:
@@ -302,6 +312,7 @@ class Stundenplan(commands.Cog):
 
     @commands.command(aliases=["mp"])
     async def myplan(self, ctx):
+        """Zeigt den personalisierten Vertretungsplan des Nutzers an"""
         # give the ctx.author the course seperator role if he does not have it already
         if not lwConfig.courseRoleSeperatorID in [c.id for c in ctx.author.roles]:
             await ctx.author.add_roles(ctx.guild.get_role(lwConfig.courseRoleSeperatorID))
@@ -391,6 +402,7 @@ class Memes(commands.Cog):
 
     @commands.command()
     async def entries(self, ctx):
+        """Zeigt alle Memes, deren Scores für die Bestenliste gespeichert werden"""
         voteListHandler.deleteOldMessages()
         voteList = voteListHandler.getVoteList()
         e = discord.Embed()

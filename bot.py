@@ -425,6 +425,7 @@ class Memes(commands.Cog):
 
     @commands.command()
     async def top(self, ctx):
+        """Zeigt den Top-shitpost"""
         async with ctx.message.channel.typing():
             voteListHandler.deleteOldMessages()
         voteList = voteListHandler.getVoteList()
@@ -460,6 +461,10 @@ class Memes(commands.Cog):
 
     @commands.command()
     async def stats(self, ctx, *args):
+        """Wertet die Bewertungen der Shitposts der einzelnen Nutzer aus
+            Dies wird aufgrund von discord rate limits lange dauern.
+            Für jeden Nutzer werden Anzahl Memes, Anzahl upvotes/downvotes, upvote/downvote-Verhältnis sowie durchschnittliche upvotes/downvotes aufgelistet.
+            Als optionale Parameter können zuerst Limit des Durchsuchens, dann auszuwertende Nutzer angegeben werden."""
         if len(args) > 0:
             if not args[0].isnumeric() and len(ctx.message.mentions) == 0:
                 return
@@ -531,7 +536,7 @@ class Memes(commands.Cog):
             for m in ctx.message.mentions:
                 if m.id not in members.keys():
                     e.add_field(name=m.display_name, value=
-                        "total memes: 0"+
+                        "total memes: 0\n"+
                         f"total {str(upvote)} `     0 : 0     ` {str(downvote)}\n"+
                         f"ratio {str(upvote)} `     1 : 1     ` {str(downvote)}\n"+
                         f"avg.  {str(upvote)} `     0 : 0     ` {str(downvote)}"

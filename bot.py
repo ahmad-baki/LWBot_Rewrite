@@ -120,7 +120,7 @@ class Reminder(commands.Cog):
                 await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Erinnerungen in der Vergangenheit sind nicht erlaubt.", color=discord.Color.orange()))
                 return
             await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Bitte gib deine Erinnerungsnachricht ein.", "Dies ist nur in den nächsten 60s möglich.", color=discord.Color.gold()))
-            m = await bot.wait_for('message', check=lambda m: m.author == ctx.author, timeout=60)
+            m = await bot.wait_for('message', check=lambda m: m.author == ctx.author and m.channel == ctx.channel, timeout=60)
         except ValueError:
             await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Dein Datum ist so nicht zulässig.", "Das Format sollte so aussehen:\n```reminder (d)d.(m)m.yyyy (h)h:(m)m\nBeispiel: reminder 1.10.2020 6:34```", color=discord.Color.red()))
             return
@@ -177,7 +177,7 @@ class Reminder(commands.Cog):
             await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Gebe bitte den Index der Erinnerung ein, die du löschen möchtest.",
                                                                "Dies ist nur in den nächsten 60s möglich.", color=discord.Color.gold()))
             try:
-                m = await bot.wait_for('message', check=lambda m: m.author == ctx.author, timeout=60)
+                m = await bot.wait_for('message', check=lambda m: m.author == ctx.author and m.channel == ctx.channel, timeout=60)
                 index = int(m.content)
                 if 0 <= index < reminderCount:
                     reminderHandler.removeReminder(

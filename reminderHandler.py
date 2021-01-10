@@ -1,6 +1,5 @@
 import lwConfig
 import json
-import datetime
 
 
 def updateReminder(reminder):

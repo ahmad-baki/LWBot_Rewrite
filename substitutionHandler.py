@@ -2,9 +2,7 @@ import lwConfig
 import json
 from bs4 import BeautifulSoup
 import aiohttp
-import asyncio
 from datetime import datetime
-from jsondiff import diff, insert, delete
 import base64
 import gzip
 

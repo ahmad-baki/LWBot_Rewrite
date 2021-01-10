@@ -15,8 +15,6 @@ import traceback
 import asyncio
 import datetime
 import operator
-import os
-import subprocess
 import validators
 import ast
 import json

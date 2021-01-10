@@ -182,7 +182,7 @@ class Reminder(commands.Cog):
                 if 0 <= index < reminderCount:
                     reminderHandler.removeReminder(
                         ctx.author.id, *reminder[str(ctx.author.id)][index])
-                    await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Die Erinnerung wurde erfolgreich sgelöscht.",
+                    await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Die Erinnerung wurde erfolgreich gelöscht.",
                                                                        f"Deine Erinnerung\n```{''.join(reminder[str(ctx.author.id)][index][1].splitlines()[:-1])}``` wurde gelöscht."))
                 else:
                     raise ValueError

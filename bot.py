@@ -135,6 +135,11 @@ class Reminder(commands.Cog):
                     reminderHandler.addReminder(
                         ctx.author.id, recipient.id, time_str, m.content + f"\n_[Hier]({ctx.message.jump_url}) erstellt_")
                     await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Eine neue Erinnerung für " + recipient.name + ", " + time_str + " wurde erstellt.", m.content))
+            elif len(ctx.message.role_mentions) > 0:
+                for role in ctx.message.role_mentions:
+                    reminderHandler.addReminder(
+                        ctx.author.id, role.id, time_str, m.content + f"\n_[Hier]({ctx.message.jump_url}) erstellt_")
+                    await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Eine neue Erinnerung für " + role.name + ", " + time_str + " wurde erstellt.", m.content))
             else:
                 reminderHandler.addReminder(
                     ctx.author.id, ctx.author.id, time_str, m.content + f"\n_[Hier]({ctx.message.jump_url}) erstellt_")
@@ -212,6 +217,11 @@ class Reminder(commands.Cog):
                         lwConfig.serverID).get_member(int(reminder[2]))
                     recipient = bot.get_guild(
                         lwConfig.serverID).get_member(int(recipientID))
+                    if recipient == None:
+                        recipient = bot.get_guild(
+                            lwConfig.serverID).get_role(int(recipientID))
+                    if recipient == None:
+                        return
                     color = recipient.color
                     await channel.send(content=recipient.mention, embed=lwHelperFunctions.simpleEmbed(author, "Erinnerung", reminder[1], color=color))
                     reminderHandler.removeReminder(recipientID, *reminder)

@@ -139,7 +139,7 @@ class Reminder(commands.Cog):
                 for role in ctx.message.role_mentions:
                     reminderHandler.addReminder(
                         ctx.author.id, role.id, time_str, m.content + f"\n_[Hier]({ctx.message.jump_url}) erstellt_")
-                    await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Eine neue Erinnerung für " + role.name + ", " + time_str + " wurde erstellt.", m.content))
+                    await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Eine neue Erinnerung für @" + role.name + ", " + time_str + " wurde erstellt.", m.content))
             if len(ctx.message.mentions) == len(ctx.message.role_mentions) == 0:
                 reminderHandler.addReminder(
                     ctx.author.id, ctx.author.id, time_str, m.content + f"\n_[Hier]({ctx.message.jump_url}) erstellt_")

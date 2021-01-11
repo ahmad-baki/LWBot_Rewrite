@@ -823,6 +823,13 @@ class HelpCommand(commands.HelpCommand):
         else:
             await self.context.send("Diese Kategorie beinhaltet keine Commands.")
 
+    async def can_run_cmd(self, cmd):
+        try:
+            await cmd.can_run(self.context)
+        except:
+            return False
+        return True
+
     async def send_command_help(self, command):
         e = discord.Embed(title=command.name, color=discord.Color.blurple())
         cmdhelp = command.help if command.help != None else " - "
@@ -830,14 +837,20 @@ class HelpCommand(commands.HelpCommand):
             cmdhelp if len(command.aliases) > 0 else cmdhelp
         e.set_footer(icon_url=self.context.author.avatar_url)
         e.timestamp = datetime.datetime.utcnow()
+
+        if not await self.can_run_cmd(command):
+            e.color = discord.Color.red()
+            e.description += "\nDu hast keine Berechtigungen, diesen Command auszuführen."
         await self.get_destination().send(embed=e)
 
-    def prepare_pages(self):
+    async def prepare_pages(self):
+
         pages = []
         for name in bot.cogs:
             c = bot.cogs[name]
-            if len(c.get_commands()) > 0:
-                pages.append([name, c.description, c.get_commands()])
+            usable_commands = [cmd for cmd in c.get_commands() if await self.can_run_cmd(cmd)]
+            if len(usable_commands) > 0:
+                pages.append([name, c.description, usable_commands])
         return pages
 
     async def send_pages(self, page=""):
@@ -847,7 +860,7 @@ class HelpCommand(commands.HelpCommand):
         right = "\u25B6"
         left = "\u25C0"
 
-        pages = self.prepare_pages()
+        pages = await self.prepare_pages()
         print(type(page))
         if page == "":
             page = 0

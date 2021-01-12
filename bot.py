@@ -18,6 +18,7 @@ import operator
 import validators
 import ast
 import json
+import random
 from collections import defaultdict
 
 import lwConfig
@@ -811,6 +812,46 @@ class Schulneuigkeiten(commands.Cog):
         await on_command_error(bot.get_channel(lwConfig.logChannelID), error)
 
 
+class Wholesome(commands.Cog):
+    """Wholesome commands um deine Seele zu reinigen"""
+    def __init__(self, bot):
+        self.bot = bot
+
+    @commands.command()
+    async def hug(self, ctx, *args):
+        """umarme einen anderen Benutzer mit `hug @user`"""
+        if len(args) > 1 or len(ctx.message.mentions) == 0:
+            await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Du musst genau eine Person @pingen, um ihn zu umarmen", color=discord.Color.red()))
+        elif ctx.message.mentions[0] == ctx.author:
+            await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Du kannst dich nicht selbst umarmen :(", color=discord.Color.red()))
+        else:
+            e = discord.Embed(title=f"**{ctx.message.mentions[0].display_name}**, du wurdest von **{ctx.author.display_name}** umarmt", description="(^・ω・^ )")
+            e.timestamp = datetime.datetime.utcnow()
+            e.set_footer(icon_url=ctx.author.avatar_url)
+            e.color = ctx.author.color
+            e.set_footer(icon_url=ctx.author.avatar_url)
+            # hugs = self.get_hugs()
+            # e.set_image(url=random.choice(hugs))
+            url = f"https://cdn.nekos.life/hug/hug_{str(random.randint(0,100)).rjust(3,'0')}.gif"
+            e.set_image(url=url)
+            await ctx.send(embed=e)
+
+    # @commands.command(name="addHug")
+    # async def add_hug(self, ctx, *, arg):
+    #     if lwHelperFunctions.is_url_image(arg):
+    #         hugs = self.get_hugs()
+    #         with open(lwConfig.path + '/json/hugs.json', 'w') as file:
+    #             hugs.append(arg)
+    #             json.dump(hugs, file)
+    #     else:
+    #         await ctx.send("This is not a viable gif")
+
+    # def get_hugs(self):
+    #     with open(lwConfig.path + '/json/hugs.json', 'r') as file:
+    #         hugs = json.loads(file.read())
+    #         return hugs
+
+
 class HelpCommand(commands.HelpCommand):
     """Zeigt eine hilfreiche Auflistung aller Commands"""
 
@@ -861,7 +902,6 @@ class HelpCommand(commands.HelpCommand):
         left = "\u25C0"
 
         pages = await self.prepare_pages()
-        print(type(page))
         if page == "":
             page = 0
         elif page in [bot.cogs[k] for k in bot.cogs.keys()]:
@@ -928,7 +968,10 @@ bot.add_cog(Stundenplan(bot))
 bot.add_cog(Memes(bot))
 bot.add_cog(Utility(bot))
 bot.add_cog(Schulneuigkeiten(bot))
+bot.add_cog(Wholesome(bot))
+
 bot.add_cog(Ahmad(bot))
+
 
 bot.help_command = HelpCommand()
 

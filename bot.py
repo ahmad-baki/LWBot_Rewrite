@@ -845,22 +845,60 @@ class Wholesome(commands.Cog):
                     else:
                         await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Verbindungsfehler zur API", "(´; ω ;｀)", color=discord.Color.red()))
                         
+    @commands.command()
+    async def poke(self, ctx, *args):
+        """stupst einen anderen Benutzer mit `hug @user` an"""
+        if len(args) > 1 or len(ctx.message.mentions) == 0:
+            await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Du musst genau eine Person @pingen, um ihn anzustupsen", color=discord.Color.red()))
+        elif ctx.message.mentions[0] == ctx.author:
+            await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Du kannst dich nicht selbst anstupsen :v", color=discord.Color.red()))
+        else:
+            e = discord.Embed(title=f"**{ctx.message.mentions[0].display_name}**, du wurdest von **{ctx.author.display_name}** angestupst", description="(ฅ`･ω･´)っ=")
+            e.timestamp = datetime.datetime.utcnow()
+            e.color = ctx.author.color
+            e.set_footer(text=ctx.author.name, icon_url=ctx.author.avatar_url)
+            # hugs = self.get_hugs()
+            # e.set_image(url=random.choice(hugs))
 
-    # @commands.command(name="addHug")
-    # async def add_hug(self, ctx, *, arg):
-    #     if lwHelperFunctions.is_url_image(arg):
-    #         hugs = self.get_hugs()
-    #         with open(lwConfig.path + '/json/hugs.json', 'w') as file:
-    #             hugs.append(arg)
-    #             json.dump(hugs, file)
-    #     else:
-    #         await ctx.send("This is not a viable gif")
+            # Nekos.life API:
+            #url = f"https://cdn.nekos.life/hug/hug_{str(random.randint(0,89)).rjust(3,'0')}.gif"
+            async with aiohttp.ClientSession() as session:
+                async with session.get("https://purrbot.site/api/img/sfw/poke/gif") as response:
+                    rjson = await response.json()
+                    if rjson["error"] == False:
+                        url = rjson["link"]
+                        e.set_image(url=url)
+                        await ctx.send(embed=e)
+                    else:
+                        await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Verbindungsfehler zur API", "(´; ω ;｀)", color=discord.Color.red()))
 
-    # def get_hugs(self):
-    #     with open(lwConfig.path + '/json/hugs.json', 'r') as file:
-    #         hugs = json.loads(file.read())
-    #         return hugs
+    @commands.command()
+    async def pat(self, ctx, *args):
+        """patte einen anderen Benutzer mit `pat @user`!"""
+        if len(args) > 1 or len(ctx.message.mentions) == 0:
+            await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Du musst genau eine Person @pingen, um ihn zu patten", color=discord.Color.red()))
+        elif ctx.message.mentions[0] == ctx.author:
+            await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Du kannst dich nicht selbst patten :c", color=discord.Color.red()))
+        else:
+            e = discord.Embed(title=f"**{ctx.message.mentions[0].display_name}**, du wurdest von **{ctx.author.display_name}** patten", description="(=^･ω･^)y＝")
+            e.timestamp = datetime.datetime.utcnow()
+            e.color = ctx.author.color
+            e.set_footer(text=ctx.author.name, icon_url=ctx.author.avatar_url)
+            # hugs = self.get_hugs()
+            # e.set_image(url=random.choice(hugs))
 
+            # Nekos.life API:
+            #url = f"https://cdn.nekos.life/hug/hug_{str(random.randint(0,89)).rjust(3,'0')}.gif"
+            async with aiohttp.ClientSession() as session:
+                async with session.get("https://purrbot.site/api/img/sfw/pat/gif") as response:
+                    rjson = await response.json()
+                    if rjson["error"] == False:
+                        url = rjson["link"]
+                        e.set_image(url=url)
+                        await ctx.send(embed=e)
+                    else:
+                        await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Verbindungsfehler zur API", "(´; ω ;｀)", color=discord.Color.red()))
+                       
 
 class HelpCommand(commands.HelpCommand):
     """Zeigt eine hilfreiche Auflistung aller Commands"""

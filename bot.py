@@ -853,7 +853,7 @@ class Wholesome(commands.Cog):
         elif ctx.message.mentions[0] == ctx.author:
             await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Du kannst dich nicht selbst anstupsen :v", color=discord.Color.red()))
         else:
-            e = discord.Embed(title=f"**{ctx.message.mentions[0].display_name}**, du wurdest von **{ctx.author.display_name}** angestupst", description="(ฅ`･ω･´)っ=")
+            e = discord.Embed(title=f"**{ctx.message.mentions[0].display_name}**, du wurdest von **{ctx.author.display_name}** angestupst", description="ヾ(=｀ω´=)ノ”")
             e.timestamp = datetime.datetime.utcnow()
             e.color = ctx.author.color
             e.set_footer(text=ctx.author.name, icon_url=ctx.author.avatar_url)
@@ -880,7 +880,7 @@ class Wholesome(commands.Cog):
         elif ctx.message.mentions[0] == ctx.author:
             await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Du kannst dich nicht selbst patten :c", color=discord.Color.red()))
         else:
-            e = discord.Embed(title=f"**{ctx.message.mentions[0].display_name}**, du wurdest von **{ctx.author.display_name}** patten", description="(=^･ω･^)y＝")
+            e = discord.Embed(title=f"**{ctx.message.mentions[0].display_name}**, du wurdest von **{ctx.author.display_name}** patten", description="(ฅ`･ω･´)っ=")
             e.timestamp = datetime.datetime.utcnow()
             e.color = ctx.author.color
             e.set_footer(text=ctx.author.name, icon_url=ctx.author.avatar_url)

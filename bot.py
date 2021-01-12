@@ -19,6 +19,7 @@ import validators
 import ast
 import json
 import random
+import aiohttp
 from collections import defaultdict
 
 import lwConfig
@@ -831,9 +832,19 @@ class Wholesome(commands.Cog):
             e.set_footer(text=ctx.author.name, icon_url=ctx.author.avatar_url)
             # hugs = self.get_hugs()
             # e.set_image(url=random.choice(hugs))
-            url = f"https://cdn.nekos.life/hug/hug_{str(random.randint(0,89)).rjust(3,'0')}.gif"
-            e.set_image(url=url)
-            await ctx.send(embed=e)
+
+            # Nekos.life API:
+            #url = f"https://cdn.nekos.life/hug/hug_{str(random.randint(0,89)).rjust(3,'0')}.gif"
+            async with aiohttp.ClientSession() as session:
+                async with session.get("https://purrbot.site/api/img/sfw/hug/gif") as response:
+                    rjson = await response.json()
+                    if rjson["error"] == True:
+                        url = rjson["link"]
+                        e.set_image(url=url)
+                        await ctx.send(embed=e)
+                    else:
+                        await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Verbindungsfehler zur API", "(´; ω ;｀)", color=discord.Color.red()))
+                        
 
     # @commands.command(name="addHug")
     # async def add_hug(self, ctx, *, arg):

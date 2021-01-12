@@ -838,7 +838,7 @@ class Wholesome(commands.Cog):
             async with aiohttp.ClientSession() as session:
                 async with session.get("https://purrbot.site/api/img/sfw/hug/gif") as response:
                     rjson = await response.json()
-                    if rjson["error"] == True:
+                    if rjson["error"] == False:
                         url = rjson["link"]
                         e.set_image(url=url)
                         await ctx.send(embed=e)

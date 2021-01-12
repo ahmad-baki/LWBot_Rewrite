@@ -831,7 +831,7 @@ class Wholesome(commands.Cog):
             e.set_footer(text=ctx.author.name, icon_url=ctx.author.avatar_url)
             # hugs = self.get_hugs()
             # e.set_image(url=random.choice(hugs))
-            url = f"https://cdn.nekos.life/hug/hug_{str(random.randint(0,100)).rjust(3,'0')}.gif"
+            url = f"https://cdn.nekos.life/hug/hug_{str(random.randint(0,89)).rjust(3,'0')}.gif"
             e.set_image(url=url)
             await ctx.send(embed=e)
 

@@ -827,9 +827,8 @@ class Wholesome(commands.Cog):
         else:
             e = discord.Embed(title=f"**{ctx.message.mentions[0].display_name}**, du wurdest von **{ctx.author.display_name}** umarmt", description="(^・ω・^ )")
             e.timestamp = datetime.datetime.utcnow()
-            e.set_footer(icon_url=ctx.author.avatar_url)
             e.color = ctx.author.color
-            e.set_footer(icon_url=ctx.author.avatar_url)
+            e.set_footer(text=ctx.author.name, icon_url=ctx.author.avatar_url)
             # hugs = self.get_hugs()
             # e.set_image(url=random.choice(hugs))
             url = f"https://cdn.nekos.life/hug/hug_{str(random.randint(0,100)).rjust(3,'0')}.gif"

@@ -952,7 +952,10 @@ class Wholesome(commands.Cog):
         Syntaxbeispiel: `add hug hug_gif.gif`"""
 
         def is_gif(url):
-            r = requests.head(url)
+            try:
+                r = requests.head(url)
+            except:
+                return False
             if r.headers["content-type"] == "image/gif":
                 return True
             return False
@@ -980,9 +983,9 @@ class Wholesome(commands.Cog):
 
     def addInJson(self, name : str, add):
         try:
+            js = self.readJson(name)
             with open(lwConfig.path + f'/json/{name}.json', 'w') as myfile:
-                js = self.readJson(name).append
-                js.append()
+                js.append(add)
                 json.dump(js, myfile)
         except FileNotFoundError:
             file = open(lwConfig.path + f'/json/{name}.json', 'w')

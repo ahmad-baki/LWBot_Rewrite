@@ -8,7 +8,7 @@ from discord.colour import Color
 from discord.ext import commands
 from discord.ext import tasks
 from discord.errors import HTTPException
-from discord.ext.commands.errors import CommandNotFound, NotOwner
+from discord.ext.commands.errors import CheckFailure, CommandNotFound, NotOwner
 from discord.ext.commands.errors import MissingRequiredArgument
 
 import traceback
@@ -20,6 +20,7 @@ import ast
 import json
 import random
 import aiohttp
+import requests
 from collections import defaultdict
 
 import lwConfig
@@ -50,7 +51,7 @@ async def on_command_error(ctx, error):
     error = getattr(error, 'original', error)
     if isinstance(error, CommandNotFound) or isinstance(error, MissingRequiredArgument):
         return
-    if isinstance(error, NotOwner):
+    if isinstance(error, NotOwner) or isinstance(error, CheckFailure):
         await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Du hast keine Berechtigung diesen Command auszuführen.", color=discord.Color.red()))
         return
     embed = discord.Embed(title=repr(error))
@@ -73,6 +74,14 @@ async def on_ready():
     channel = bot.get_channel(lwConfig.logChannelID)
     await channel.send(embed=e)
 
+def is_bot_dev():
+    async def predicate(ctx):
+        if ctx.author.id in bot.owner_ids:
+            return True
+        elif 761237826758246412 in [r.id for r in bot.get_guild(lwConfig.serverID).get_member(ctx.author.id).roles] :
+            return True
+        return False
+    return commands.check(predicate)
 
 class Debug(commands.Cog):
     """Commands zum debuggen"""
@@ -101,7 +110,7 @@ class Debug(commands.Cog):
         #    await m.add_reaction(emotes[i])
 
 
-class Reminder(commands.Cog):
+class Erinnerungen(commands.Cog):
     """Commands zum Bedienen der Erinnerungs-funktion"""
 
     def __init__(self, bot):
@@ -697,6 +706,7 @@ class Utility(commands.Cog):
             Wenn ein Argument aus mehreren Worten bestehen soll, müssen diese in "Wort1 Wort2" stehen."""
 
         await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, *args))
+        await ctx.message.delete()
 
     # https://gist.github.com/nitros12/2c3c265813121492655bc95aa54da6b9 geklaut und überarbeitet
     @commands.is_owner()
@@ -830,20 +840,22 @@ class Wholesome(commands.Cog):
             e.timestamp = datetime.datetime.utcnow()
             e.color = ctx.author.color
             e.set_footer(text=ctx.author.name, icon_url=ctx.author.avatar_url)
-            # hugs = self.get_hugs()
-            # e.set_image(url=random.choice(hugs))
 
-            # Nekos.life API:
-            #url = f"https://cdn.nekos.life/hug/hug_{str(random.randint(0,89)).rjust(3,'0')}.gif"
-            async with aiohttp.ClientSession() as session:
-                async with session.get("https://purrbot.site/api/img/sfw/hug/gif") as response:
-                    rjson = await response.json()
-                    if rjson["error"] == False:
-                        url = rjson["link"]
-                        e.set_image(url=url)
-                        await ctx.send(embed=e)
-                    else:
-                        await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Verbindungsfehler zur API", "(´; ω ;｀)", color=discord.Color.red()))
+            gifs = self.readJson("hug")
+            r = random.randint(0,50 + len(gifs))
+            if r < len(gifs):
+                url = random.choice(gifs)
+            else:
+                async with aiohttp.ClientSession() as session:
+                    async with session.get("https://purrbot.site/api/img/sfw/hug/gif") as response:
+                        rjson = await response.json()
+                        if rjson["error"] == False:
+                            url = rjson["link"]
+                        else:
+                            await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Verbindungsfehler zur API", "(´; ω ;｀)", color=discord.Color.red()))
+                            return
+            e.set_image(url=url)
+            await ctx.send(embed=e)
                         
     @commands.command()
     async def poke(self, ctx, *args):
@@ -857,24 +869,26 @@ class Wholesome(commands.Cog):
             e.timestamp = datetime.datetime.utcnow()
             e.color = ctx.author.color
             e.set_footer(text=ctx.author.name, icon_url=ctx.author.avatar_url)
-            # hugs = self.get_hugs()
-            # e.set_image(url=random.choice(hugs))
 
-            # Nekos.life API:
-            #url = f"https://cdn.nekos.life/hug/hug_{str(random.randint(0,89)).rjust(3,'0')}.gif"
-            async with aiohttp.ClientSession() as session:
-                async with session.get("https://purrbot.site/api/img/sfw/poke/gif") as response:
-                    rjson = await response.json()
-                    if rjson["error"] == False:
-                        url = rjson["link"]
-                        e.set_image(url=url)
-                        await ctx.send(embed=e)
-                    else:
-                        await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Verbindungsfehler zur API", "(´; ω ;｀)", color=discord.Color.red()))
+            gifs = self.readJson("poke")
+            r = random.randint(0, 50 + len(gifs))
+            if r < len(gifs):
+                url = random.choice(gifs)
+            else:
+                async with aiohttp.ClientSession() as session:
+                    async with session.get("https://purrbot.site/api/img/sfw/poke/gif") as response:
+                        rjson = await response.json()
+                        if rjson["error"] == False:
+                            url = rjson["link"]
+                        else:
+                            await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Verbindungsfehler zur API", "(´; ω ;｀)", color=discord.Color.red()))
+                            return
+            e.set_image(url=url)
+            await ctx.send(embed=e)
 
     @commands.command()
     async def pat(self, ctx, *args):
-        """patte einen anderen Benutzer mit `pat @user`!"""
+        """patte einen anderen Benutzer mit `pat @user`"""
         if len(args) > 1 or len(ctx.message.mentions) == 0:
             await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Du musst genau eine Person @pingen, um ihn zu patten", color=discord.Color.red()))
         elif ctx.message.mentions[0] == ctx.author:
@@ -884,21 +898,97 @@ class Wholesome(commands.Cog):
             e.timestamp = datetime.datetime.utcnow()
             e.color = ctx.author.color
             e.set_footer(text=ctx.author.name, icon_url=ctx.author.avatar_url)
-            # hugs = self.get_hugs()
-            # e.set_image(url=random.choice(hugs))
 
-            # Nekos.life API:
-            #url = f"https://cdn.nekos.life/hug/hug_{str(random.randint(0,89)).rjust(3,'0')}.gif"
-            async with aiohttp.ClientSession() as session:
-                async with session.get("https://purrbot.site/api/img/sfw/pat/gif") as response:
-                    rjson = await response.json()
-                    if rjson["error"] == False:
-                        url = rjson["link"]
-                        e.set_image(url=url)
-                        await ctx.send(embed=e)
-                    else:
-                        await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Verbindungsfehler zur API", "(´; ω ;｀)", color=discord.Color.red()))
-                       
+            gifs = self.readJson("pat")
+            r = random.randint(0, 50 + len(gifs))
+            if r < len(gifs):
+                url = random.choice(gifs)
+            else:
+                async with aiohttp.ClientSession() as session:
+                    async with session.get("https://purrbot.site/api/img/sfw/pat/gif") as response:
+                        rjson = await response.json()
+                        if rjson["error"] == False:
+                            url = rjson["link"]
+                        else:
+                            await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Verbindungsfehler zur API", "(´; ω ;｀)", color=discord.Color.red()))
+                            return
+            e.set_image(url=url)
+            await ctx.send(embed=e)
+
+    @commands.command()
+    async def slap(self, ctx, *args):
+        """schlage einen anderen Benutzer mit `slap @user`"""
+        if len(args) > 1 or len(ctx.message.mentions) == 0:
+            await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Du musst genau eine Person @pingen, um ihn zu schlagen", color=discord.Color.red()))
+        elif ctx.message.mentions[0] == ctx.author:
+            await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Du kannst dich nicht selbst schlagen :)", color=discord.Color.red()))
+        else:
+            e = discord.Embed(title=f"**{ctx.message.mentions[0].display_name}**, du wurdest von **{ctx.author.display_name}** geschlagen", description="(ↀДↀ)⁼³₌₃")
+            e.timestamp = datetime.datetime.utcnow()
+            e.color = ctx.author.color
+            e.set_footer(text=ctx.author.name, icon_url=ctx.author.avatar_url)
+
+            gifs = self.readJson("slap")
+            r = random.randint(0, 50 + len(gifs))
+            if r < len(gifs):
+                url = random.choice(gifs)
+            else:
+                async with aiohttp.ClientSession() as session:
+                    async with session.get("https://purrbot.site/api/img/sfw/slap/gif") as response:
+                        rjson = await response.json()
+                        if rjson["error"] == False:
+                            url = rjson["link"]
+                        else:
+                            await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Verbindungsfehler zur API", "(´; ω ;｀)", color=discord.Color.red()))
+                            return
+            e.set_image(url=url)
+            await ctx.send(embed=e)
+
+    
+    @commands.command()       
+    @is_bot_dev()
+    async def add(self, ctx, *args):
+        """fügt ein GIF für die wholesome-Kategorie hinzu.
+        Syntaxbeispiel: `add hug hug_gif.gif`"""
+
+        def is_gif(url):
+            r = requests.head(url)
+            if r.headers["content-type"] == "image/gif":
+                return True
+            return False
+        if len(args) != 2:
+            await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Es müssen genau zwei Argumente übergeben werden", "Beispiel: `add hug hug_gif.gif`", color=discord.Color.red()))
+            return
+        category = args[0]
+        if category not in ["hug","pat","poke", "slap"]:
+            await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Die angegebene Kategorie ist nicht vorhanden", color=discord.Color.red()))
+            return
+        gif = args[1]
+        if not is_gif(gif):
+            await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Die angegebene URL ist kein gültiges GIF.", color=discord.Color.red()))
+            return
+        self.addInJson(category, str(gif))
+        await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Das GIF wurde erfolgreich zur Kategorie hinzugefügt."))
+
+
+    def readJson(self, name : str):
+        try:
+            with open(lwConfig.path + f'/json/{name}.json', 'r') as myfile:
+                return json.loads(myfile.read())
+        except FileNotFoundError:
+            return []
+
+    def addInJson(self, name : str, add):
+        try:
+            with open(lwConfig.path + f'/json/{name}.json', 'w') as myfile:
+                js = self.readJson(name).append
+                js.append()
+                json.dump(js, myfile)
+        except FileNotFoundError:
+            file = open(lwConfig.path + f'/json/{name}.json', 'w')
+            file.write("[]")
+            file.close()
+
 
 class HelpCommand(commands.HelpCommand):
     """Zeigt eine hilfreiche Auflistung aller Commands"""
@@ -1011,7 +1101,7 @@ class Ahmad(commands.Cog):
 
 
 bot.add_cog(Debug(bot))
-bot.add_cog(Reminder(bot))
+bot.add_cog(Erinnerungen(bot))
 bot.add_cog(Stundenplan(bot))
 bot.add_cog(Memes(bot))
 bot.add_cog(Utility(bot))

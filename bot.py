@@ -831,23 +831,42 @@ class Wholesome(commands.Cog):
     @commands.command()
     async def hug(self, ctx, *args):
         """umarme einen anderen Benutzer mit `hug @user`"""
+        await self.send(ctx, args, "hug", "umarmt", cat_ascii="(^・ω・^ )")
+
+    @commands.command()
+    async def poke(self, ctx, *args):
+        """stupst einen anderen Benutzer mit `hug @user` an"""
+        await self.send(ctx, args, "poke", "angestupst", cat_ascii="ヾ(=｀ω´=)ノ”")
+
+    @commands.command()
+    async def pat(self, ctx, *args):
+        """patte einen anderen Benutzer mit `pat @user`"""
+        await self.send(ctx, args, "pat", "gepattet", cat_ascii="(ฅ`･ω･´)っ=")
+
+    @commands.command()
+    async def slap(self, ctx, *args):
+        """schlage einen anderen Benutzer mit `slap @user`"""
+        await self.send(ctx, args, "slap", "geschlagen", cat_ascii="(ↀДↀ)⁼³₌₃")
+
+
+    async def send(self, ctx, args, command, verb, content_type="gif", cat_ascii="(^･o･^)ﾉ”"):
         if len(args) > 1 or len(ctx.message.mentions) == 0:
-            await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Du musst genau eine Person @pingen, um ihn zu umarmen", color=discord.Color.red()))
+            await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Du musst genau eine Person @pingen", color=discord.Color.red()))
         elif ctx.message.mentions[0] == ctx.author:
-            await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Du kannst dich nicht selbst umarmen :(", color=discord.Color.red()))
+            await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "No u", color=discord.Color.red()))
         else:
-            e = discord.Embed(title=f"**{ctx.message.mentions[0].display_name}**, du wurdest von **{ctx.author.display_name}** umarmt", description="(^・ω・^ )")
+            e = discord.Embed(title=f"**{ctx.message.mentions[0].display_name}**, du wurdest von **{ctx.author.display_name}** {verb}", description=cat_ascii)
             e.timestamp = datetime.datetime.utcnow()
             e.color = ctx.author.color
             e.set_footer(text=ctx.author.name, icon_url=ctx.author.avatar_url)
 
-            gifs = self.readJson("hug")
+            gifs = self.readJson(command)
             r = random.randint(0,50 + len(gifs))
             if r < len(gifs):
                 url = random.choice(gifs)
             else:
                 async with aiohttp.ClientSession() as session:
-                    async with session.get("https://purrbot.site/api/img/sfw/hug/gif") as response:
+                    async with session.get(f"https://purrbot.site/api/img/sfw/{command}/{content_type}") as response:
                         rjson = await response.json()
                         if rjson["error"] == False:
                             url = rjson["link"]
@@ -856,94 +875,6 @@ class Wholesome(commands.Cog):
                             return
             e.set_image(url=url)
             await ctx.send(embed=e)
-                        
-    @commands.command()
-    async def poke(self, ctx, *args):
-        """stupst einen anderen Benutzer mit `hug @user` an"""
-        if len(args) > 1 or len(ctx.message.mentions) == 0:
-            await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Du musst genau eine Person @pingen, um ihn anzustupsen", color=discord.Color.red()))
-        elif ctx.message.mentions[0] == ctx.author:
-            await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Du kannst dich nicht selbst anstupsen :v", color=discord.Color.red()))
-        else:
-            e = discord.Embed(title=f"**{ctx.message.mentions[0].display_name}**, du wurdest von **{ctx.author.display_name}** angestupst", description="ヾ(=｀ω´=)ノ”")
-            e.timestamp = datetime.datetime.utcnow()
-            e.color = ctx.author.color
-            e.set_footer(text=ctx.author.name, icon_url=ctx.author.avatar_url)
-
-            gifs = self.readJson("poke")
-            r = random.randint(0, 50 + len(gifs))
-            if r < len(gifs):
-                url = random.choice(gifs)
-            else:
-                async with aiohttp.ClientSession() as session:
-                    async with session.get("https://purrbot.site/api/img/sfw/poke/gif") as response:
-                        rjson = await response.json()
-                        if rjson["error"] == False:
-                            url = rjson["link"]
-                        else:
-                            await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Verbindungsfehler zur API", "(´; ω ;｀)", color=discord.Color.red()))
-                            return
-            e.set_image(url=url)
-            await ctx.send(embed=e)
-
-    @commands.command()
-    async def pat(self, ctx, *args):
-        """patte einen anderen Benutzer mit `pat @user`"""
-        if len(args) > 1 or len(ctx.message.mentions) == 0:
-            await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Du musst genau eine Person @pingen, um ihn zu patten", color=discord.Color.red()))
-        elif ctx.message.mentions[0] == ctx.author:
-            await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Du kannst dich nicht selbst patten :c", color=discord.Color.red()))
-        else:
-            e = discord.Embed(title=f"**{ctx.message.mentions[0].display_name}**, du wurdest von **{ctx.author.display_name}** gepattet", description="(ฅ`･ω･´)っ=")
-            e.timestamp = datetime.datetime.utcnow()
-            e.color = ctx.author.color
-            e.set_footer(text=ctx.author.name, icon_url=ctx.author.avatar_url)
-
-            gifs = self.readJson("pat")
-            r = random.randint(0, 50 + len(gifs))
-            if r < len(gifs):
-                url = random.choice(gifs)
-            else:
-                async with aiohttp.ClientSession() as session:
-                    async with session.get("https://purrbot.site/api/img/sfw/pat/gif") as response:
-                        rjson = await response.json()
-                        if rjson["error"] == False:
-                            url = rjson["link"]
-                        else:
-                            await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Verbindungsfehler zur API", "(´; ω ;｀)", color=discord.Color.red()))
-                            return
-            e.set_image(url=url)
-            await ctx.send(embed=e)
-
-    @commands.command()
-    async def slap(self, ctx, *args):
-        """schlage einen anderen Benutzer mit `slap @user`"""
-        if len(args) > 1 or len(ctx.message.mentions) == 0:
-            await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Du musst genau eine Person @pingen, um ihn zu schlagen", color=discord.Color.red()))
-        elif ctx.message.mentions[0] == ctx.author:
-            await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Du kannst dich nicht selbst schlagen :)", color=discord.Color.red()))
-        else:
-            e = discord.Embed(title=f"**{ctx.message.mentions[0].display_name}**, du wurdest von **{ctx.author.display_name}** geschlagen", description="(ↀДↀ)⁼³₌₃")
-            e.timestamp = datetime.datetime.utcnow()
-            e.color = ctx.author.color
-            e.set_footer(text=ctx.author.name, icon_url=ctx.author.avatar_url)
-
-            gifs = self.readJson("slap")
-            r = random.randint(0, 50 + len(gifs))
-            if r < len(gifs):
-                url = random.choice(gifs)
-            else:
-                async with aiohttp.ClientSession() as session:
-                    async with session.get("https://purrbot.site/api/img/sfw/slap/gif") as response:
-                        rjson = await response.json()
-                        if rjson["error"] == False:
-                            url = rjson["link"]
-                        else:
-                            await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Verbindungsfehler zur API", "(´; ω ;｀)", color=discord.Color.red()))
-                            return
-            e.set_image(url=url)
-            await ctx.send(embed=e)
-
     
     @commands.command()       
     @is_bot_dev()

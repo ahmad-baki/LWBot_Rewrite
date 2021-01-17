@@ -1007,7 +1007,7 @@ class HelpCommand(commands.HelpCommand):
 
     async def can_run_cmd(self, cmd):
         try:
-            await cmd.can_run(self.context)
+            return await cmd.can_run(self.context)
         except:
             return False
         return True
@@ -1045,6 +1045,8 @@ class HelpCommand(commands.HelpCommand):
         pages = await self.prepare_pages()
         if page == "":
             page = 0
+        elif page.isnumeric():
+            page = int(page) if int(page) < len(pages) else 0
         elif page in [bot.cogs[k] for k in bot.cogs.keys()]:
             page = [i for i in range(len(pages))
                     if pages[i][0] == page.qualified_name][0]

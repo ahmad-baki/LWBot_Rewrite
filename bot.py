@@ -834,20 +834,29 @@ class Wholesome(commands.Cog):
         await self.send(ctx, args, "hug", "umarmt", cat_ascii="(^・ω・^ )")
 
     @commands.command()
-    async def poke(self, ctx, *args):
-        """stupst einen anderen Benutzer mit `hug @user` an"""
-        await self.send(ctx, args, "poke", "angestupst", cat_ascii="ヾ(=｀ω´=)ノ”")
-
-    @commands.command()
     async def pat(self, ctx, *args):
         """patte einen anderen Benutzer mit `pat @user`"""
         await self.send(ctx, args, "pat", "gepattet", cat_ascii="(ฅ`･ω･´)っ=")
+
+    @commands.command()
+    async def cuddle(self, ctx, *args):
+        """knuddle einen anderen Benutzer mit `cuddle @user`"""
+        await self.send(ctx, args, "cuddle", "geknuddelt", cat_ascii="(=^･ω･^)y＝")
+
+    @commands.command()
+    async def poke(self, ctx, *args):
+        """stupst einen anderen Benutzer mit `hug @user` an"""
+        await self.send(ctx, args, "poke", "angestupst", cat_ascii="ヾ(=｀ω´=)ノ”")
 
     @commands.command()
     async def slap(self, ctx, *args):
         """schlage einen anderen Benutzer mit `slap @user`"""
         await self.send(ctx, args, "slap", "geschlagen", cat_ascii="(ↀДↀ)⁼³₌₃")
 
+    @commands.command()
+    async def bite(self, ctx, *args):
+        """beiße einen anderen Benutzer mit `bite @user`"""
+        await self.send(ctx, args, "bite", "gebissen", cat_ascii="(・∀・)")
 
     async def send(self, ctx, args, command, verb, content_type="gif", cat_ascii="(^･o･^)ﾉ”"):
         if len(args) > 1 or len(ctx.message.mentions) == 0:
@@ -861,7 +870,7 @@ class Wholesome(commands.Cog):
             e.set_footer(text=ctx.author.name, icon_url=ctx.author.avatar_url)
 
             gifs = self.readJson(command)
-            r = random.randint(0,50 + len(gifs))
+            r = random.randint(0, 25 + len(gifs))
             if r < len(gifs):
                 url = random.choice(gifs)
             else:

@@ -584,8 +584,22 @@ class Memes(commands.Cog):
         if message.author == bot.user:
             return
         if message.channel.id == lwConfig.memeChannelID and (len(message.attachments) > 0 or validators.url(message.content)):
-            await message.add_reaction(lwHelperFunctions.getEmoji(bot, lwConfig.upvoteEmoji))
-            await message.add_reaction(lwHelperFunctions.getEmoji(bot, lwConfig.downoteEmoji))
+            await self.addVotes(message)
+
+    async def addVotes(self, message):
+        up = lwHelperFunctions.getEmoji(bot, lwConfig.upvoteEmoji)
+        down = lwHelperFunctions.getEmoji(bot, lwConfig.downoteEmoji)
+        await message.add_reaction(up)
+        await message.add_reaction(down)
+        cross = "\N{CROSS MARK}"
+        await message.add_reaction(cross)
+        try:
+            reaction, user = await bot.wait_for('reaction_add', timeout=30.0, check=lambda _reaction, _user: _user == message.author and _reaction.emoji == cross and _reaction.message == message)
+            await message.clear_reaction(up)
+            await message.clear_reaction(down)
+        except asyncio.TimeoutError:
+            pass
+        await message.clear_reaction(cross)
 
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload):

@@ -852,9 +852,20 @@ class Wholesome(commands.Cog):
         await self.send(ctx, args, "pat", "gepattet", cat_ascii="(ฅ`･ω･´)っ=")
 
     @commands.command()
+    async def feed(self, ctx, *args):
+        """füttere einen anderen Benutzer mit `feed @user`"""
+        await self.send(ctx, args, "feed", "gefüttert", cat_ascii="~(=^‥^)_旦~")
+
+    @commands.command()
     async def cuddle(self, ctx, *args):
         """knuddle einen anderen Benutzer mit `cuddle @user`"""
         await self.send(ctx, args, "cuddle", "geknuddelt", cat_ascii="(=^･ω･^)y＝")
+
+    @commands.command()
+    async def kiss(self, ctx, *args):
+        """küsse einen anderen Benutzer mit `kiss @user`"""
+        await self.send(ctx, args, "kiss", "geküsst", cat_ascii="╭(╯ε╰)╮")
+
 
     @commands.command()
     async def poke(self, ctx, *args):
@@ -870,6 +881,9 @@ class Wholesome(commands.Cog):
     async def bite(self, ctx, *args):
         """beiße einen anderen Benutzer mit `bite @user`"""
         await self.send(ctx, args, "bite", "gebissen", cat_ascii="(・∀・)")
+
+
+
 
     async def send(self, ctx, args, command, verb, content_type="gif", cat_ascii="(^･o･^)ﾉ”"):
         if len(args) > 1 or len(ctx.message.mentions) == 0:

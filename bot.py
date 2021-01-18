@@ -23,8 +23,8 @@ import aiohttp
 import requests
 from collections import defaultdict
 
-import lwConfig
-import lwHelperFunctions
+import lwConfig as config
+from lwHelperFunctions import *
 import voteListHandler
 import reminderHandler
 import substitutionHandler
@@ -32,8 +32,8 @@ import substitutionHandler
 intents = discord.Intents.all()
 intents.messages = True
 intents.presences = True
-bot = commands.Bot(command_prefix=lwConfig.prefix, intents=intents)
-bot.owner_ids = lwConfig.ownerID
+bot = commands.Bot(command_prefix=config.PREFIX, intents=intents)
+bot.owner_ids = config.OWNER_IDS
 
 
 @bot.event
@@ -42,9 +42,8 @@ async def on_error(event, *args, **kwargs):
     embed.color = discord.Color.red()
     embed.description = f"```{traceback.format_exc()}```"
     embed.set_footer(text=kwargs)
-    channel = bot.get_channel(lwConfig.logChannelID)
+    channel = bot.get_channel(config.LOG_CHANNEL_ID)
     await channel.send(embed=embed)
-
 
 @bot.event
 async def on_command_error(ctx, error):
@@ -52,7 +51,7 @@ async def on_command_error(ctx, error):
     if isinstance(error, CommandNotFound) or isinstance(error, MissingRequiredArgument):
         return
     if isinstance(error, NotOwner) or isinstance(error, CheckFailure):
-        await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Du hast keine Berechtigung diesen Command auszuführen.", color=discord.Color.red()))
+        await ctx.send(embed=simpleEmbed(ctx.author, "Du hast keine Berechtigung diesen Command auszuführen.", color=discord.Color.red()))
         return
     embed = discord.Embed(title=repr(error))
     embed.color = discord.Color.red()
@@ -65,20 +64,20 @@ async def on_command_error(ctx, error):
 @bot.event
 async def on_ready():
     activity = discord.Activity(
-        type=discord.ActivityType.watching, name=lwConfig.statusMessage)
+        type=discord.ActivityType.watching, name=config.STATUS_MSG)
     await bot.change_presence(activity=activity, status=discord.enums.Status.dnd)
     e = discord.Embed(title="Bot started")
     e.color = discord.Color.blurple()
     e.timestamp = datetime.datetime.utcnow()
     e.set_footer(text=bot.user.name, icon_url=bot.user.avatar_url)
-    channel = bot.get_channel(lwConfig.logChannelID)
+    channel = bot.get_channel(config.LOG_CHANNEL_ID)
     await channel.send(embed=e)
 
 def is_bot_dev():
     async def predicate(ctx):
         if ctx.author.id in bot.owner_ids:
             return True
-        elif 761237826758246412 in [r.id for r in bot.get_guild(lwConfig.serverID).get_member(ctx.author.id).roles] :
+        elif 761237826758246412 in [r.id for r in bot.get_guild(config.SERVER_ID).get_member(ctx.author.id).roles] :
             return True
         return False
     return commands.check(predicate)
@@ -98,7 +97,7 @@ class Debug(commands.Cog):
     async def emotes(self, ctx):
         """Zeigt alle für Norman verfügbaren Emotes an
             nutze
-            `lwHelperFunctions.getEmoji(bot, "emojiName")`
+            `getEmoji(bot, "emojiName")`
             um einen Emoji anhand seines Namens zu erhalten (devs only)"""
         e = discord.Embed(title="Emotes:")
         emotes = [f"<:{e.name}:{e.id}>" for e in bot.emojis]
@@ -128,33 +127,33 @@ class Erinnerungen(commands.Cog):
             time_str = ' '.join(arg.split()[:length])
             time = datetime.datetime.strptime(time_str, '%d.%m.%Y %H:%M')
             if time < datetime.datetime.now():
-                await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Erinnerungen in der Vergangenheit sind nicht erlaubt.", color=discord.Color.orange()))
+                await ctx.send(embed=simpleEmbed(ctx.author, "Erinnerungen in der Vergangenheit sind nicht erlaubt.", color=discord.Color.orange()))
                 return
-            await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Bitte gib deine Erinnerungsnachricht ein.", "Dies ist nur in den nächsten 60s möglich.", color=discord.Color.gold()))
+            await ctx.send(embed=simpleEmbed(ctx.author, "Bitte gib deine Erinnerungsnachricht ein.", "Dies ist nur in den nächsten 60s möglich.", color=discord.Color.gold()))
             m = await bot.wait_for('message', check=lambda m: m.author == ctx.author and m.channel == ctx.channel, timeout=60)
         except ValueError:
-            await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Dein Datum ist so nicht zulässig.", "Das Format sollte so aussehen:\n```reminder (d)d.(m)m.yyyy (h)h:(m)m\nBeispiel: reminder 1.10.2020 6:34```", color=discord.Color.red()))
+            await ctx.send(embed=simpleEmbed(ctx.author, "Dein Datum ist so nicht zulässig.", "Das Format sollte so aussehen:\n```reminder (d)d.(m)m.yyyy (h)h:(m)m\nBeispiel: reminder 1.10.2020 6:34```", color=discord.Color.red()))
             return
         except futures.TimeoutError:
-            await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Die Zeit ist abgelaufen.", "Bitte versuche es erneut, falls du eine Erinnerung erstellen möchtest.", color=discord.Color.red()))
+            await ctx.send(embed=simpleEmbed(ctx.author, "Die Zeit ist abgelaufen.", "Bitte versuche es erneut, falls du eine Erinnerung erstellen möchtest.", color=discord.Color.red()))
             return
         except Exception:
-            await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Ein Fehler ist aufgetreten", "Deine Erinnerung konnte nicht gespeichert werden.", color=discord.Color.red()))
+            await ctx.send(embed=simpleEmbed(ctx.author, "Ein Fehler ist aufgetreten", "Deine Erinnerung konnte nicht gespeichert werden.", color=discord.Color.red()))
         else:
             if len(ctx.message.mentions) > 0:
                 for recipient in ctx.message.mentions:
                     reminderHandler.addReminder(
                         ctx.author.id, recipient.id, time_str, m.content + f"\n_[Hier]({ctx.message.jump_url}) erstellt_")
-                    await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Eine neue Erinnerung für " + recipient.name + ", " + time_str + " wurde erstellt.", m.content))
+                    await ctx.send(embed=simpleEmbed(ctx.author, "Eine neue Erinnerung für " + recipient.name + ", " + time_str + " wurde erstellt.", m.content))
             if len(ctx.message.role_mentions) > 0:
                 for role in ctx.message.role_mentions:
                     reminderHandler.addReminder(
                         ctx.author.id, role.id, time_str, m.content + f"\n_[Hier]({ctx.message.jump_url}) erstellt_")
-                    await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Eine neue Erinnerung für @" + role.name + ", " + time_str + " wurde erstellt.", m.content))
+                    await ctx.send(embed=simpleEmbed(ctx.author, "Eine neue Erinnerung für @" + role.name + ", " + time_str + " wurde erstellt.", m.content))
             if len(ctx.message.mentions) == len(ctx.message.role_mentions) == 0:
                 reminderHandler.addReminder(
                     ctx.author.id, ctx.author.id, time_str, m.content + f"\n_[Hier]({ctx.message.jump_url}) erstellt_")
-                await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Eine neue Erinnerung für dich, " + time_str + " wurde erstellt.", m.content))
+                await ctx.send(embed=simpleEmbed(ctx.author, "Eine neue Erinnerung für dich, " + time_str + " wurde erstellt.", m.content))
             return
 
     @commands.command(aliases=["mr"])
@@ -170,7 +169,7 @@ class Erinnerungen(commands.Cog):
                             value=singleReminder[1], inline=False)
             await ctx.send(embed=e)
         else:
-            await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Du hast keine Erinnerungen.",
+            await ctx.send(embed=simpleEmbed(ctx.author, "Du hast keine Erinnerungen.",
                                                                f"Gebe {bot.command_prefix}reminder [Datum], um eine neue Erinnerung zu erstellen oder " +
                                                                f"{bot.command_prefix}help reminder ein, um dir die korrekte Syntax des Commandes anzeigen zu lassen."))
 
@@ -190,7 +189,7 @@ class Erinnerungen(commands.Cog):
                             value=singleReminder[1], inline=False)
 
             await ctx.send(embed=e)
-            await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Gebe bitte den Index der Erinnerung ein, die du löschen möchtest.",
+            await ctx.send(embed=simpleEmbed(ctx.author, "Gebe bitte den Index der Erinnerung ein, die du löschen möchtest.",
                                                                "Dies ist nur in den nächsten 60s möglich.", color=discord.Color.gold()))
             try:
                 m = await bot.wait_for('message', check=lambda m: m.author == ctx.author and m.channel == ctx.channel, timeout=60)
@@ -198,18 +197,18 @@ class Erinnerungen(commands.Cog):
                 if 0 <= index < reminderCount:
                     reminderHandler.removeReminder(
                         ctx.author.id, *reminder[str(ctx.author.id)][index])
-                    await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Die Erinnerung wurde erfolgreich gelöscht.",
+                    await ctx.send(embed=simpleEmbed(ctx.author, "Die Erinnerung wurde erfolgreich gelöscht.",
                                                                        f"Deine Erinnerung\n```{''.join(reminder[str(ctx.author.id)][index][1].splitlines()[:-1])}``` wurde gelöscht."))
                 else:
                     raise ValueError
             except futures.TimeoutError:
-                await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Die Zeit ist abgelaufen.",
+                await ctx.send(embed=simpleEmbed(ctx.author, "Die Zeit ist abgelaufen.",
                                                                    "Bitte versuche es erneut, falls du eine Erinnerung löschen möchtest.", color=discord.Color.red()))
             except ValueError:
-                await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Eingabefehler",
+                await ctx.send(embed=simpleEmbed(ctx.author, "Eingabefehler",
                                                                    "Deine Eingabe war keine der zulässigen aufgeführten Indices.", color=discord.Color.red()))
         else:
-            await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Du hast keine Erinnerungen.",
+            await ctx.send(embed=simpleEmbed(ctx.author, "Du hast keine Erinnerungen.",
                                                                f"Gebe {bot.command_prefix}reminder [Datum], um eine neue Erinnerung zu erstellen oder " +
                                                                f"{bot.command_prefix}help reminder ein, um dir die korrekte Syntax des Commandes anzeigen zu lassen."))
 
@@ -223,38 +222,38 @@ class Erinnerungen(commands.Cog):
                 time = datetime.datetime.strptime(
                     reminder[0], '%d.%m.%Y %H:%M')
                 if time <= now:
-                    channel = bot.get_channel(lwConfig.botChannelID)
+                    channel = bot.get_channel(config.BOT_CHANNEL_ID)
                     author = bot.get_guild(
-                        lwConfig.serverID).get_member(int(reminder[2]))
+                        config.SERVER_ID).get_member(int(reminder[2]))
                     recipient = bot.get_guild(
-                        lwConfig.serverID).get_member(int(recipientID))
+                        config.SERVER_ID).get_member(int(recipientID))
                     if recipient == None:
                         recipient = bot.get_guild(
-                            lwConfig.serverID).get_role(int(recipientID))
+                            config.SERVER_ID).get_role(int(recipientID))
                     if recipient == None:
                         return
                     color = recipient.color
-                    await channel.send(content=recipient.mention, embed=lwHelperFunctions.simpleEmbed(author, "Erinnerung", reminder[1], color=color))
+                    await channel.send(content=recipient.mention, embed=simpleEmbed(author, "Erinnerung", reminder[1], color=color))
                     reminderHandler.removeReminder(recipientID, *reminder)
 
     @checkReminder.before_loop
     async def beforeReminderCheck(self):
         await bot.wait_until_ready()
-        channel = bot.get_channel(lwConfig.logChannelID)
-        await channel.send(embed=lwHelperFunctions.simpleEmbed(bot.user, "reminder loop start", color=discord.Color.green()))
+        channel = bot.get_channel(config.LOG_CHANNEL_ID)
+        await channel.send(embed=simpleEmbed(bot.user, "reminder loop start", color=discord.Color.green()))
 
     @checkReminder.after_loop
     async def afterReminderCheck(self):
-        channel = bot.get_channel(lwConfig.logChannelID)
-        await channel.send(embed=lwHelperFunctions.simpleEmbed(bot.user, "reminder loop stopped.", color=discord.Color.orange()))
+        channel = bot.get_channel(config.LOG_CHANNEL_ID)
+        await channel.send(embed=simpleEmbed(bot.user, "reminder loop stopped.", color=discord.Color.orange()))
         await asyncio.sleep(60)
         self.checkReminder.restart()
 
     @checkReminder.error
     async def ReminderCheckError(self, error):
-        channel = bot.get_channel(lwConfig.logChannelID)
-        await channel.send(embed=lwHelperFunctions.simpleEmbed(bot.user, "reminder error", color=discord.Color.orange()))
-        await on_command_error(bot.get_channel(lwConfig.logChannelID), error)
+        channel = bot.get_channel(config.LOG_CHANNEL_ID)
+        await channel.send(embed=simpleEmbed(bot.user, "reminder error", color=discord.Color.orange()))
+        await on_command_error(bot.get_channel(config.LOG_CHANNEL_ID), error)
 
 
 class Stundenplan(commands.Cog):
@@ -268,15 +267,15 @@ class Stundenplan(commands.Cog):
     async def kurse(self, ctx):
         """Listet alle Kurse eines Nutzers auf"""
         # give the ctx.author the course seperator role if he does not have it already
-        if not lwConfig.courseRoleSeperatorID in [c.id for c in ctx.author.roles]:
-            await ctx.author.add_roles(ctx.guild.get_role(lwConfig.courseRoleSeperatorID))
+        if not config.ROLE_SEPERATOR_ID in [c.id for c in ctx.author.roles]:
+            await ctx.author.add_roles(ctx.guild.get_role(config.ROLE_SEPERATOR_ID))
         # if the ctx.author has at least one course role, send it
         kurse = substitutionHandler.getMyCourseRoleNames(ctx.author)
         if len(kurse) > 0:
-            await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Deine Kurse: ", f"```{', '.join(kurse)}```"))
+            await ctx.send(embed=simpleEmbed(ctx.author, "Deine Kurse: ", f"```{', '.join(kurse)}```"))
         # otherwise, inform the ctx.author that he does not have any course roles
         else:
-            await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Du hast keine Kurse ausgewählt. ",
+            await ctx.send(embed=simpleEmbed(ctx.author, "Du hast keine Kurse ausgewählt. ",
                                                                "Verwende den command addKurse [kurs1 kurs2 ...] um mehr hinzuzufügen.\nBeispiel: ```addKurse EN4 PH1```\ngibt dir die Kursrollen EN4 und PH1."))
 
     @commands.command(aliases=["ak"])
@@ -285,8 +284,8 @@ class Stundenplan(commands.Cog):
             beispiel: `,addkurse MA1 IN2 de2 mu1"""
         args = args.split(" ")
         # give the ctx.author the course seperator role if he does not have it already
-        if not lwConfig.courseRoleSeperatorID in [c.id for c in ctx.author.roles]:
-            await ctx.author.add_roles(ctx.guild.get_role(lwConfig.courseRoleSeperatorID))
+        if not config.ROLE_SEPERATOR_ID in [c.id for c in ctx.author.roles]:
+            await ctx.author.add_roles(ctx.guild.get_role(config.ROLE_SEPERATOR_ID))
         # for all roles listed to add
         for arg in args:
             # if the role does not exist, create it
@@ -299,7 +298,7 @@ class Stundenplan(commands.Cog):
                 await ctx.author.add_roles(ctx.guild.get_role(roleID))
 
         kurse = substitutionHandler.getMyCourseRoleNames(ctx.author)
-        await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Deine Kurse: ", f"```{', '.join(kurse)}```"))
+        await ctx.send(embed=simpleEmbed(ctx.author, "Deine Kurse: ", f"```{', '.join(kurse)}```"))
 
     @commands.command(aliases=["rk"])
     async def removeKurse(self, ctx, *, args):
@@ -307,12 +306,12 @@ class Stundenplan(commands.Cog):
             beispiel: `,removeKurse MA1 IN2 de2 mu1"""
         args = args.split(" ")
         # give the ctx.author the course seperator role if he does not have it already
-        if not lwConfig.courseRoleSeperatorID in [c.id for c in ctx.author.roles]:
-            await ctx.author.add_roles(ctx.guild.get_role(lwConfig.courseRoleSeperatorID))
+        if not config.ROLE_SEPERATOR_ID in [c.id for c in ctx.author.roles]:
+            await ctx.author.add_roles(ctx.guild.get_role(config.ROLE_SEPERATOR_ID))
         for arg in args:
             # check if the ctx.author has the role that he wants to remove
             if arg not in substitutionHandler.getMyCourseRoleNames(ctx.author):
-                await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Du besitzt diese Kursrolle nicht.", color=discord.Color.red()))
+                await ctx.send(embed=simpleEmbed(ctx.author, "Du besitzt diese Kursrolle nicht.", color=discord.Color.red()))
                 return
             # get the role id by name
             roleID = [r.id for r in substitutionHandler.getMyCourseRoles(
@@ -323,18 +322,18 @@ class Stundenplan(commands.Cog):
             # delete the role if no members have it now
             if len(role.members) == 0:
                 await role.delete(reason="Diese Kursrolle wird nicht mehr benutzt ist daher irrelevant.")
-        await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, f"Die Rolle(n) {', '.join(args)} wurde erfolgreich entfernt."))
+        await ctx.send(embed=simpleEmbed(ctx.author, f"Die Rolle(n) {', '.join(args)} wurde erfolgreich entfernt."))
 
     @commands.command(aliases=["mp"])
     async def myplan(self, ctx):
         """Zeigt den personalisierten Vertretungsplan des Nutzers an"""
         # give the ctx.author the course seperator role if he does not have it already
-        if not lwConfig.courseRoleSeperatorID in [c.id for c in ctx.author.roles]:
-            await ctx.author.add_roles(ctx.guild.get_role(lwConfig.courseRoleSeperatorID))
+        if not config.ROLE_SEPERATOR_ID in [c.id for c in ctx.author.roles]:
+            await ctx.author.add_roles(ctx.guild.get_role(config.ROLE_SEPERATOR_ID))
         # if the ctx.author has at least no course role, tell him and return
         kurse = substitutionHandler.getMyCourseRoleNames(ctx.author)
         if len(kurse) == 0:
-            await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Du hast keine Kurse ausgewählt. ",
+            await ctx.send(embed=simpleEmbed(ctx.author, "Du hast keine Kurse ausgewählt. ",
                                                                "Verwende den command addKurse [kurs1 kurs2 ...] um mehr hinzuzufügen.\nBeispiel: ```addKurse EN4 PH1```\ngibt dir die Kursrollen EN4 und PH1."))
             return
         plan = substitutionHandler.getSubstitutionPlan()
@@ -366,7 +365,7 @@ class Stundenplan(commands.Cog):
                     for k in currentPlan[date]:
                         if k not in newPlan[date]:
                             removals[date].append(k)
-            channel = bot.get_channel(lwConfig.substitutionChannelID)
+            channel = bot.get_channel(config.PLAN_CHANNEL)
 
             rmEmbed = discord.Embed(
                 title="Entfernt", color=discord.Color.red())
@@ -388,28 +387,28 @@ class Stundenplan(commands.Cog):
                 await channel.send(embed=addedEmbed)
         except Exception as e:
             try:
-                await on_command_error(bot.get_channel(lwConfig.logChannelID), e)
+                await on_command_error(bot.get_channel(config.LOG_CHANNEL_ID), e)
             except Exception:
                 pass
 
     @updateSubstitutionPlan.before_loop
     async def beforeSubstitutionPlan(self):
         await bot.wait_until_ready()
-        channel = bot.get_channel(lwConfig.logChannelID)
-        await channel.send(embed=lwHelperFunctions.simpleEmbed(bot.user, "Vertretungplan loop start", color=discord.Color.green()))
+        channel = bot.get_channel(config.LOG_CHANNEL_ID)
+        await channel.send(embed=simpleEmbed(bot.user, "Vertretungplan loop start", color=discord.Color.green()))
 
     @updateSubstitutionPlan.after_loop
     async def afterSubstitutionPlan(self):
-        channel = bot.get_channel(lwConfig.logChannelID)
-        await channel.send(embed=lwHelperFunctions.simpleEmbed(bot.user, "Vertretungplan loop stopped.", color=discord.Color.orange()))
+        channel = bot.get_channel(config.LOG_CHANNEL_ID)
+        await channel.send(embed=simpleEmbed(bot.user, "Vertretungplan loop stopped.", color=discord.Color.orange()))
         await asyncio.sleep(60)
         self.updateSubstitutionPlan.restart()
 
     @updateSubstitutionPlan.error
     async def substitutionPlanError(self, error):
-        channel = bot.get_channel(lwConfig.logChannelID)
-        await channel.send(embed=lwHelperFunctions.simpleEmbed(bot.user, "substitution plan error", color=discord.Color.orange()))
-        await on_command_error(bot.get_channel(lwConfig.logChannelID), error)
+        channel = bot.get_channel(config.LOG_CHANNEL_ID)
+        await channel.send(embed=simpleEmbed(bot.user, "substitution plan error", color=discord.Color.orange()))
+        await on_command_error(bot.get_channel(config.LOG_CHANNEL_ID), error)
 
 
 class Memes(commands.Cog):
@@ -452,10 +451,10 @@ class Memes(commands.Cog):
                 vList[i] = voteList[i][0]
             sortedDict = sorted(
                 vList.items(), key=operator.itemgetter(1), reverse=True)
-            winnerMessage = await bot.get_channel(lwConfig.memeChannelID).fetch_message(sortedDict[0][0])
+            winnerMessage = await bot.get_channel(config.MEME_CHANNEL_ID).fetch_message(sortedDict[0][0])
             score = voteList[sortedDict[0][0]][0]
             e = discord.Embed()
-            e.title = f"Der aktuell beliebteste Beitrag mit {str(score)} {lwHelperFunctions.getEmoji(bot, lwConfig.upvoteEmoji)}"
+            e.title = f"Der aktuell beliebteste Beitrag mit {str(score)} {getEmoji(bot, config.UPVOTE)}"
 
             e.description = f"[Nachricht:]({winnerMessage.jump_url})"
             if(len(winnerMessage.attachments) > 0):
@@ -470,7 +469,7 @@ class Memes(commands.Cog):
             e.set_footer(text=ctx.author.name, icon_url=ctx.author.avatar_url)
             await ctx.message.channel.send(embed=e)
             if(len(winnerMessage.attachments) > 0):
-                if(not lwHelperFunctions.is_url_image(e.image.url)):
+                if(not is_url_image(e.image.url)):
                     await ctx.message.channel.send(winnerMessage.attachments[0].url)
         else:
             await ctx.message.channel.send("Zurzeit sind keine Memes vorhanden.")
@@ -490,14 +489,14 @@ class Memes(commands.Cog):
         progressEmbed = discord.Embed(title="Nachrichten werden gelesen...")
         progressEmbed.description = "Dies könnte (wird) eine recht lange Zeit in Anspruch nehmen."
         progressEmbed.set_image(
-            url=lwHelperFunctions.getEmoji(bot, "KannaSip").url)
+            url=getEmoji(bot, "KannaSip").url)
         await ctx.send(embed=progressEmbed)
         progress = 0
         progressMsg = await ctx.send("`  0% fertig.`")
         async with ctx.channel.typing():
-            channel = bot.get_channel(lwConfig.memeChannelID)
-            upvote = lwHelperFunctions.getEmoji(bot, lwConfig.upvoteEmoji)
-            downvote = lwHelperFunctions.getEmoji(bot, lwConfig.downoteEmoji)
+            channel = bot.get_channel(config.MEME_CHANNEL_ID)
+            upvote = getEmoji(bot, config.UPVOTE)
+            downvote = getEmoji(bot, config.DOWNVOTE)
             members = defaultdict(lambda: defaultdict(int))
             limit = None
             if len(args) > 0 and args[0].isnumeric():
@@ -538,7 +537,7 @@ class Memes(commands.Cog):
                     continue
                 if members[member_id]["memes"] == 0:
                     continue
-                member = bot.get_guild(lwConfig.serverID).get_member(member_id)
+                member = bot.get_guild(config.SERVER_ID).get_member(member_id)
                 up = members[member_id]['up']
                 down = members[member_id]['down']
                 total = members[member_id]['memes']
@@ -574,7 +573,7 @@ class Memes(commands.Cog):
         ratioLeaderboard.sort(reverse=True)
 
         for r in ratioLeaderboard:
-            member = bot.get_guild(lwConfig.serverID).get_member(r[1])
+            member = bot.get_guild(config.SERVER_ID).get_member(r[1])
             l.add_field(name=member.display_name, value=str(r[0]))
 
         await ctx.send(embed=l)
@@ -583,12 +582,12 @@ class Memes(commands.Cog):
     async def on_message(self, message):
         if message.author == bot.user:
             return
-        if message.channel.id == lwConfig.memeChannelID and (len(message.attachments) > 0 or validators.url(message.content)):
+        if message.channel.id == config.MEME_CHANNEL_ID and (len(message.attachments) > 0 or validators.url(message.content)):
             await self.addVotes(message)
 
     async def addVotes(self, message):
-        up = lwHelperFunctions.getEmoji(bot, lwConfig.upvoteEmoji)
-        down = lwHelperFunctions.getEmoji(bot, lwConfig.downoteEmoji)
+        up = getEmoji(bot, config.UPVOTE)
+        down = getEmoji(bot, config.DOWNVOTE)
         await message.add_reaction(up)
         await message.add_reaction(down)
         cross = "\N{CROSS MARK}"
@@ -604,7 +603,7 @@ class Memes(commands.Cog):
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload):
         # check if the channel of the reaction is the specified channel
-        if payload.channel_id != lwConfig.memeChannelID:
+        if payload.channel_id != config.MEME_CHANNEL_ID:
             return
         # get user, message and reaction
         user = bot.get_user(payload.user_id)
@@ -617,15 +616,15 @@ class Memes(commands.Cog):
             return
 
         # get up-/downvote emojis
-        upvote = lwHelperFunctions.getEmoji(bot, lwConfig.upvoteEmoji)
-        downvote = lwHelperFunctions.getEmoji(bot, lwConfig.downoteEmoji)
+        upvote = getEmoji(bot, config.UPVOTE)
+        downvote = getEmoji(bot, config.DOWNVOTE)
         if user != bot.user:
             # in case the message author tries to up-/downvote their own post
             if reaction.message.author == user and (reaction.emoji == upvote or reaction.emoji == downvote):
                 await reaction.remove(user)
                 errormsg = await reaction.message.channel.send(f"{user.mention} Du darfst für deinen eigenen Beitrag nicht abstimmen.")
-                deleteEmoji = lwHelperFunctions.getEmoji(
-                    bot, lwConfig.deleteEmojiName)
+                deleteEmoji = getEmoji(
+                    bot, config.UNDERSTOOD_EMOJI)
                 await errormsg.add_reaction(deleteEmoji)
                 try:
                     reaction, user = await bot.wait_for('reaction_add', timeout=30.0, check=lambda _reaction, _user: _user == user and _reaction.emoji.name == deleteEmoji.name)
@@ -638,7 +637,7 @@ class Memes(commands.Cog):
             if reaction.emoji == upvote:
                 voteListHandler.changeVotingCounter(reaction.message, 1)
                 # pin message when it has the specified amount of upvotes
-                if reaction.count - 1 >= lwConfig.upvotesForPin:
+                if reaction.count - 1 >= config.REQUIRED_UPVOTES_FOR_GOOD_MEME:
                     # await reaction.message.pin(reason="good meme")
                     await self.send_good_meme(reaction.message)
             elif reaction.emoji == downvote:
@@ -647,7 +646,7 @@ class Memes(commands.Cog):
     @commands.Cog.listener()
     async def on_raw_reaction_remove(self, payload):
         # check if the channel of the reaction is the specified channel
-        if payload.channel_id != lwConfig.memeChannelID:
+        if payload.channel_id != config.MEME_CHANNEL_ID:
             return
         # get user, message and reaction
         user = bot.get_user(payload.user_id)
@@ -660,24 +659,24 @@ class Memes(commands.Cog):
             return
         # change voting counter
         if user != bot.user and user != reaction.message.author:
-            if reaction.emoji == lwHelperFunctions.getEmoji(bot, lwConfig.upvoteEmoji):
+            if reaction.emoji == getEmoji(bot, config.UPVOTE):
                 voteListHandler.changeVotingCounter(reaction.message, -1)
-            elif reaction.emoji == lwHelperFunctions.getEmoji(bot, lwConfig.downoteEmoji):
+            elif reaction.emoji == getEmoji(bot, config.DOWNVOTE):
                 voteListHandler.changeVotingCounter(reaction.message, 1)
 
     async def send_good_meme(self, msg, force=False):
         if not force:
-            with open(lwConfig.path + '/json/goodMemes.json', 'r') as myfile:
+            with open(config.path + '/json/goodMemes.json', 'r') as myfile:
                 memes = json.loads(myfile.read())
 
             if msg.id in memes:
                 return
 
             memes.append(msg.id)
-            with open(lwConfig.path + '/json/goodMemes.json', 'w') as myfile:
+            with open(config.path + '/json/goodMemes.json', 'w') as myfile:
                 json.dump(memes, myfile)
 
-        channel = bot.get_channel(lwConfig.goodMemesChannelID)
+        channel = bot.get_channel(config.GOOD_MEMES_CHANNEL_ID)
         e = discord.Embed()
         e.description = f"[Nachricht:]({msg.jump_url})"
         e.set_author(name=msg.author,
@@ -689,16 +688,16 @@ class Memes(commands.Cog):
         e.set_footer(text=msg.author.name, icon_url=msg.author.avatar_url)
 
         if(len(msg.attachments) > 0):
-            if(lwHelperFunctions.is_url_image(msg.attachments[0].url)):
+            if(is_url_image(msg.attachments[0].url)):
                 e.set_image(url=msg.attachments[0].url)
                 counter = 0
                 while e.image.width == 0 or counter == 100:
                     counter += 1
                     e.set_image(url=msg.attachments[0].url)
                 if counter == 100:
-                    await on_command_error(bot.get_channel(lwConfig.logChannelID), Exception(f"{str(msg.id)}: good meme was not sent correctly."))
+                    await on_command_error(bot.get_channel(config.LOG_CHANNEL_ID), Exception(f"{str(msg.id)}: good meme was not sent correctly."))
                 elif counter > 0:
-                    await on_command_error(bot.get_channel(lwConfig.logChannelID), Exception(f"{str(msg.id)}: good meme was not sent correctly, took {counter} attempts."))
+                    await on_command_error(bot.get_channel(config.LOG_CHANNEL_ID), Exception(f"{str(msg.id)}: good meme was not sent correctly, took {counter} attempts."))
 
                 await channel.send(embed=e)
 
@@ -719,7 +718,7 @@ class Utility(commands.Cog):
             Zumindest der Titel muss übergeben werden, die anderen beiden sind optional.
             Wenn ein Argument aus mehreren Worten bestehen soll, müssen diese in "Wort1 Wort2" stehen."""
 
-        await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, *args))
+        await ctx.send(embed=simpleEmbed(ctx.author, *args))
         await ctx.message.delete()
 
     # https://gist.github.com/nitros12/2c3c265813121492655bc95aa54da6b9 geklaut und überarbeitet
@@ -787,18 +786,18 @@ class Utility(commands.Cog):
     async def on_voice_state_update(self, member, before, after):
         afkChannel = member.guild.afk_channel
         if after.channel and before.channel:  # if the member didn't just join or quit, but moved channels
-            if after.channel == afkChannel and before.channel.id in lwConfig.awakeChannelIDs:  # the "Stay awake" feature
+            if after.channel == afkChannel and before.channel.id in config.AWAKE_CHANNEL_IDS:  # the "Stay awake" feature
                 await member.move_to(before.channel)
 
         # the "banish" feature
-        if after.channel and member.guild.get_role(lwConfig.banishedRoleID) in member.roles and after.channel.id != lwConfig.banishedChannelD and member.id not in bot.owner_ids:
-            await member.move_to(member.guild.get_channel(lwConfig.banishedChannelD))
+        if after.channel and member.guild.get_role(config.BANISHED_ROLE_ID) in member.roles and after.channel.id != config.BANISHED_VC_ID and member.id not in bot.owner_ids:
+            await member.move_to(member.guild.get_channel(config.BANISHED_VC_ID))
 
     @commands.Cog.listener()
     async def on_member_update(self, before, after):
         # move to hell if banished role was added
-        hell = before.guild.get_channel(lwConfig.banishedChannelD)
-        r = before.guild.get_role(lwConfig.banishedRoleID)
+        hell = before.guild.get_channel(config.BANISHED_VC_ID)
+        r = before.guild.get_role(config.BANISHED_ROLE_ID)
         if r in after.roles and r not in before.roles and before.id not in bot.owner_ids:
             if after.voice != None:
                 if after.voice.channel != hell:
@@ -812,29 +811,29 @@ class Schulneuigkeiten(commands.Cog):
 
     @tasks.loop(seconds=300)
     async def checkGmoWebsite(self):
-        news = await lwHelperFunctions.getGmoNews()
+        news = await getGmoNews()
         if news != None:
-            channel = bot.get_channel(lwConfig.newsChannelID)
-            await channel.send(channel.guild.get_role(lwConfig.gmoRoleID).mention + " " + news)
+            channel = bot.get_channel(config.NEWS_CHANNEL_ID)
+            await channel.send(channel.guild.get_role(config.GMO_ROLE_ID).mention + " " + news)
 
     @checkGmoWebsite.before_loop
     async def beforeGmoNews(self):
         await bot.wait_until_ready()
-        channel = bot.get_channel(lwConfig.logChannelID)
-        await channel.send(embed=lwHelperFunctions.simpleEmbed(bot.user, "gmoNewsCheck loop start", color=discord.Color.green()))
+        channel = bot.get_channel(config.LOG_CHANNEL_ID)
+        await channel.send(embed=simpleEmbed(bot.user, "gmoNewsCheck loop start", color=discord.Color.green()))
 
     @checkGmoWebsite.after_loop
     async def afterGmoNews(self):
-        channel = bot.get_channel(lwConfig.logChannelID)
-        await channel.send(embed=lwHelperFunctions.simpleEmbed(bot.user, "gmoNewsCheck loop stopped.", color=discord.Color.orange()))
+        channel = bot.get_channel(config.LOG_CHANNEL_ID)
+        await channel.send(embed=simpleEmbed(bot.user, "gmoNewsCheck loop stopped.", color=discord.Color.orange()))
         await asyncio.sleep(60)
         self.checkGmoWebsite.restart()
 
     @checkGmoWebsite.error
     async def gmoNewsError(self, error):
-        channel = bot.get_channel(lwConfig.logChannelID)
-        await channel.send(embed=lwHelperFunctions.simpleEmbed(bot.user, "gmo news error", color=discord.Color.orange()))
-        await on_command_error(bot.get_channel(lwConfig.logChannelID), error)
+        channel = bot.get_channel(config.LOG_CHANNEL_ID)
+        await channel.send(embed=simpleEmbed(bot.user, "gmo news error", color=discord.Color.orange()))
+        await on_command_error(bot.get_channel(config.LOG_CHANNEL_ID), error)
 
 
 class Wholesome(commands.Cog):
@@ -874,9 +873,9 @@ class Wholesome(commands.Cog):
 
     async def send(self, ctx, args, command, verb, content_type="gif", cat_ascii="(^･o･^)ﾉ”"):
         if len(args) > 1 or len(ctx.message.mentions) == 0:
-            await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Du musst genau eine Person @pingen", color=discord.Color.red()))
+            await ctx.send(embed=simpleEmbed(ctx.author, "Du musst genau eine Person @pingen", color=discord.Color.red()))
         elif ctx.message.mentions[0] == ctx.author:
-            await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "No u", color=discord.Color.red()))
+            await ctx.send(embed=simpleEmbed(ctx.author, "No u", color=discord.Color.red()))
         else:
             e = discord.Embed(title=f"**{ctx.message.mentions[0].display_name}**, du wurdest von **{ctx.author.display_name}** {verb}", description=cat_ascii)
             e.timestamp = datetime.datetime.utcnow()
@@ -894,7 +893,7 @@ class Wholesome(commands.Cog):
                         if rjson["error"] == False:
                             url = rjson["link"]
                         else:
-                            await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Verbindungsfehler zur API", "(´; ω ;｀)", color=discord.Color.red()))
+                            await ctx.send(embed=simpleEmbed(ctx.author, "Verbindungsfehler zur API", "(´; ω ;｀)", color=discord.Color.red()))
                             return
             e.set_image(url=url)
             await ctx.send(embed=e)
@@ -914,23 +913,23 @@ class Wholesome(commands.Cog):
                 return True
             return False
         if len(args) != 2:
-            await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Es müssen genau zwei Argumente übergeben werden", "Beispiel: `add hug hug_gif.gif`", color=discord.Color.red()))
+            await ctx.send(embed=simpleEmbed(ctx.author, "Es müssen genau zwei Argumente übergeben werden", "Beispiel: `add hug hug_gif.gif`", color=discord.Color.red()))
             return
         category = args[0]
         if category not in ["hug","pat","poke", "slap"]:
-            await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Die angegebene Kategorie ist nicht vorhanden", color=discord.Color.red()))
+            await ctx.send(embed=simpleEmbed(ctx.author, "Die angegebene Kategorie ist nicht vorhanden", color=discord.Color.red()))
             return
         gif = args[1]
         if not is_gif(gif):
-            await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Die angegebene URL ist kein gültiges GIF.", color=discord.Color.red()))
+            await ctx.send(embed=simpleEmbed(ctx.author, "Die angegebene URL ist kein gültiges GIF.", color=discord.Color.red()))
             return
         self.addInJson(category, str(gif))
-        await ctx.send(embed=lwHelperFunctions.simpleEmbed(ctx.author, "Das GIF wurde erfolgreich zur Kategorie hinzugefügt."))
+        await ctx.send(embed=simpleEmbed(ctx.author, "Das GIF wurde erfolgreich zur Kategorie hinzugefügt."))
 
 
     def readJson(self, name : str):
         try:
-            with open(lwConfig.path + f'/json/{name}.json', 'r') as myfile:
+            with open(config.path + f'/json/{name}.json', 'r') as myfile:
                 return json.loads(myfile.read())
         except FileNotFoundError:
             return []
@@ -938,11 +937,11 @@ class Wholesome(commands.Cog):
     def addInJson(self, name : str, add):
         try:
             js = self.readJson(name)
-            with open(lwConfig.path + f'/json/{name}.json', 'w') as myfile:
+            with open(config.path + f'/json/{name}.json', 'w') as myfile:
                 js.append(add)
                 json.dump(js, myfile)
         except FileNotFoundError:
-            file = open(lwConfig.path + f'/json/{name}.json', 'w')
+            file = open(config.path + f'/json/{name}.json', 'w')
             file.write("[]")
             file.close()
 
@@ -1072,4 +1071,4 @@ bot.add_cog(Ahmad(bot))
 
 bot.help_command = HelpCommand()
 
-bot.run(lwConfig.token)
+bot.run(config.TOKEN)

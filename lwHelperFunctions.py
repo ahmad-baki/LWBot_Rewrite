@@ -22,7 +22,7 @@ async def getGmoNews():
                 for link in soup.findAll('a'):
                     if str(link.get('href')).startswith('https://www.gymnasium-oberstadt.de/neuigkeiten/'):
                         number = int(str(link.get('href')).replace('https://www.gymnasium-oberstadt.de/neuigkeiten/', "").split(".")[0])
-                        if number > lwConfig.latestGmoNewsNumber:
+                        if number > lwConfig.latest_news_number:
                             lwConfig.config["latest_gmo_news_number"] = number
                             with open(lwConfig.path + '/json/lwConfig.json', 'w') as myfile:
                                 myfile.write(json.dumps(lwConfig.config)) 

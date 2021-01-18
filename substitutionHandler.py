@@ -10,7 +10,7 @@ def getMyCourseRoles(ctxAuthor):
     kurse = []
     # all course roles except the @everyone role
     for r in ctxAuthor.roles[1:len(ctxAuthor.roles)]:
-        if lwConfig.courseRoleSeperatorID != r.id:
+        if lwConfig.ROLE_SEPERATOR_ID != r.id:
             kurse.append(r)
         else:
             break
@@ -123,7 +123,7 @@ async def getCurrentSubstitutionPlan():
 
     currentPlan = getSubstitutionPlan()
     try:
-        url1,url2,url3 = (await get_plan_urls(lwConfig.subPlanUsername, lwConfig.subPlanPassword))
+        url1,url2,url3 = (await get_plan_urls(lwConfig.PLAN_USERNAME, lwConfig.PLAN_PW))
     except ValueError:
         return (currentPlan, currentPlan)
     

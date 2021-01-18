@@ -33,7 +33,7 @@ def deleteOldMessages():
             days = (timeNow - datetime.datetime.strptime(voteList[messageID][1], '%Y-%m-%d %H:%M:%S.%f')).days
         except ValueError:
             days = (timeNow - datetime.datetime.strptime(voteList[messageID][1], '%Y-%m-%d %H:%M:%S')).days
-        if days > lwConfig.deleteAfter:
+        if days > lwConfig.DELETE_AFTER_DAYS:
             if messageID in keys:
                 voteList.pop(messageID)
 

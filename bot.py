@@ -1058,13 +1058,13 @@ class Ahmad(commands.Cog):
                 await after.edit(name="Ahmad-Kult")
 
 
-bot.add_cog(Debug(bot))
 bot.add_cog(Erinnerungen(bot))
 bot.add_cog(Stundenplan(bot))
+bot.add_cog(Wholesome(bot))
 bot.add_cog(Memes(bot))
 bot.add_cog(Utility(bot))
+bot.add_cog(Debug(bot))
 bot.add_cog(Schulneuigkeiten(bot))
-bot.add_cog(Wholesome(bot))
 
 bot.add_cog(Ahmad(bot))
 

@@ -1083,17 +1083,6 @@ class UserMessages(commands.Cog):
             if message.content in js[str(message.author.id)].keys():
                 await message.channel.send(random.choice(js[str(message.author.id)][message.content]))
 
-    
-    @commands.command(aliases=["mm"])
-    async def myMessages(self, ctx, *args):
-        """Lasse deine eingestellten Nachrichten aufzählen"""
-        e = discord.Embed(title="Deine Nachrichten", color=ctx.author.color)
-        if str(ctx.author.id) in self.data.keys():
-            for k in self.data[str(ctx.author.id)].keys():
-                e.add_field(name=str(k), value=str(self.data[str(ctx.author.id)][k]), inline=False)
-        else:
-            e.description = "Du hast keine eigenen Nachrichten eingestellt."
-        await ctx.send(embed=e)
 
     @commands.command(aliases=["am"])
     async def addMessage(self, ctx, *args):
@@ -1103,6 +1092,7 @@ class UserMessages(commands.Cog):
             await ctx.send(embed=simpleEmbed(ctx.author, "Du musst genau zwei Argumente angeben",
                         'Die Syntax ist: `addMessage "deine Nachricht, falls es mehr als ein Wort ist in Hochkommas" "Die Reaktionsnachricht des Bots"`',
                         color=discord.Color.red()))
+            return
         self.add_in_json(ctx.author, args[0], args[1])
         e = simpleEmbed(ctx.author, "Erfolgreich hinzugefügt!", color=ctx.author.color)
         e.description = f"`{args[1]}` wurde erfolgreich `{args[0]}` hinzugefügt."
@@ -1129,6 +1119,17 @@ class UserMessages(commands.Cog):
         else:
             await ctx.send(embed=simpleEmbed(ctx.author, "Du hast keine eigenen Nachrichten eingestellt.", color=discord.Color.red()))
 
+
+    @commands.command(aliases=["mm"])
+    async def myMessages(self, ctx, *args):
+        """Lasse deine eingestellten Nachrichten aufzählen"""
+        e = discord.Embed(title="Deine Nachrichten", color=ctx.author.color)
+        if str(ctx.author.id) in self.data.keys():
+            for k in self.data[str(ctx.author.id)].keys():
+                e.add_field(name=str(k), value=str(self.data[str(ctx.author.id)][k]), inline=False)
+        else:
+            e.description = "Du hast keine eigenen Nachrichten eingestellt."
+        await ctx.send(embed=e)
     
     def read_json(self):
         try:

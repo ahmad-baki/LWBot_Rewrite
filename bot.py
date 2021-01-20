@@ -1084,7 +1084,7 @@ class UserMessages(commands.Cog):
                 await message.channel.send(random.choice(js[str(message.author.id)][message.content]))
 
 
-    @commands.command(aliases=["am", "add"])
+    @commands.command(aliases=["am"])
     async def addMessage(self, ctx, *args):
         """Füge eine neue Reaktion auf eine bestimmte Nachricht von dir hinzu.
         Die Syntax ist: `addMessage "deine Nachricht, falls es mehr als ein Wort ist in Hochkommas" "Die Reaktionsnachricht des Bots"`"""

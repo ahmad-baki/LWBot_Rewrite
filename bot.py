@@ -598,8 +598,11 @@ class Memes(commands.Cog):
             await message.clear_reaction(down)
         except asyncio.TimeoutError:
             pass
-        await message.clear_reaction(cross)
-
+        try:
+            await message.clear_reaction(cross)
+        except discord.errors.NotFound:
+            pass
+        
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload):
         # check if the channel of the reaction is the specified channel
@@ -1101,7 +1104,8 @@ class UserMessages(commands.Cog):
 
     @commands.command(aliases=["rm"])
     async def removeMessage(self, ctx, *args):
-        """Lösche eine bereits existierende Reaktion auf eine bestimmte Nachricht von dir."""
+        """Lösche eine bereits existierende Reaktion auf eine bestimmte Nachricht von dir.
+        Die Syntax ist: `removeMessage "Nachricht, die gelöscht werden soll (in Hochkommas, falls mehr als ein Wort)"`"""
         if str(ctx.author.id) in self.data.keys():
             if len(args) != 1:
                 await ctx.send(embed=simpleEmbed(ctx.author, "Du musst genau ein Argument angeben",

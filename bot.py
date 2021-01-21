@@ -21,7 +21,9 @@ import json
 import random
 import aiohttp
 import requests
+import io
 from collections import defaultdict
+from PIL import Image
 
 import lwConfig as config
 from lwHelperFunctions import *
@@ -723,6 +725,57 @@ class Utility(commands.Cog):
 
         await ctx.send(embed=simpleEmbed(ctx.author, *args))
         await ctx.message.delete()
+
+    @commands.command()
+    async def pfpart(self, ctx):
+        """Zeigt dein Discord-Profilbild in ASCII-Art"""
+        bites = await ctx.author.avatar_url.read()
+        # im = Image.frombytes("RGB", (125, 125), bites, "raw")
+        im = Image.open(io.BytesIO(bites))
+        r = im.convert('1')
+        r.thumbnail((64, 64))
+        im = r
+        pix = r.load()
+
+        def add_dot_position(x, y):
+            # https://en.wikipedia.org/wiki/Braille_Patterns
+            pos = [["1", "8", ],
+                   ["2", "10", ],
+                   ["4", "20", ],
+                   ["40", "80"]]
+
+            nx = x % 2
+            ny = y % 4
+
+            if pix[x, y] == 255:
+                return pos[ny][nx]
+            return "0"
+
+        # returns the position in the array for a pixel at [x y]
+        def get_arr_position(x, y):
+            return x // 2, y // 4
+
+        dots = []
+        for y in range(im.height // 4):
+            dots.append(["2800" for _ in range(im.width // 2)])
+
+        for y in range((im.height // 4) * 4):
+            for x in range((im.width // 2) * 2):
+                nx, ny = get_arr_position(x, y)
+                value = hex(int(dots[ny][nx], 16) + int(add_dot_position(x, y), 16))
+                dots[ny][nx] = value
+
+        for y in range(len(dots)):
+            for x in range(len(dots[0])):
+                dots[y][x] = chr(int(dots[y][x], 16))
+
+        e = simpleEmbed(ctx.author, "Dein Icon")
+        e.description = "64x64\n```"
+        for line in dots:
+            e.description += ''.join(line) + "\n"
+        e.description += "```"
+        
+        await ctx.send(embed=e)
 
     # https://gist.github.com/nitros12/2c3c265813121492655bc95aa54da6b9 geklaut und überarbeitet
     @commands.is_owner()

@@ -1258,8 +1258,8 @@ class Music(commands.Cog):
     @is_bot_dev()
     @commands.command()
     async def playfile(self, ctx):
-        if (ctx.message.attachments) == 0:
-            await on_command_error(ctx, Exception("Dieser Nachricht liegt keine Datei bei."))
+        if len(ctx.message.attachments) == 0:
+            await on_command_error(ctx, CommandError("Dieser Nachricht liegt keine Datei bei."))
             return
         
         try:

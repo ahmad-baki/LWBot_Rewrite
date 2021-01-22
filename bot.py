@@ -1249,6 +1249,7 @@ class Music(commands.Cog):
         if not os.path.isfile(query):
             await on_command_error(ctx, FileNotFoundError(f"Die gewünschte Datei {query} existiert nicht."))
         source = discord.PCMVolumeTransformer(discord.FFmpegPCMAudio(query))
+        print(str(source))
         ctx.voice_client.play(source, after=lambda e: self.raise_error(e) if e else None)
 
         await ctx.send('Spielt {} ab.'.format(query))

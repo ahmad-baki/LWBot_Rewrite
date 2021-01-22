@@ -8,7 +8,7 @@ from discord.colour import Color
 from discord.ext import commands
 from discord.ext import tasks
 from discord.errors import HTTPException
-from discord.ext.commands.errors import CheckFailure, CommandNotFound, NotOwner
+from discord.ext.commands.errors import CheckFailure, CommandError, CommandNotFound, NotOwner
 from discord.ext.commands.errors import MissingRequiredArgument
 
 import traceback
@@ -1253,6 +1253,26 @@ class Music(commands.Cog):
         ctx.voice_client.play(source, after=lambda e: self.raise_error(e) if e else None)
 
         await ctx.send('Spielt {} ab.'.format(query))
+
+
+    @is_bot_dev()
+    @commands.command()
+    async def playfile(self, ctx):
+        if (ctx.message.attachments) == 0:
+            await on_command_error(ctx, CommandError("Dieser Nachricht liegt keine Datei bei."))
+            return
+        
+        try:
+            await ctx.author.voice.channel.connect()
+        except:
+            pass
+        msg = ctx.message
+        f = open("test/tmp.mp3", "wb") 
+        await msg.attachments[0].save(f)
+        source = discord.PCMVolumeTransformer(discord.FFmpegPCMAudio(f.name))
+        bot.voice_clients[0].play(source, after=lambda e: self.raise_error(e) if e else None)
+        await asyncio.sleep(1)
+        os.remove(f.name)
 
     # @is_bot_dev()
     # @commands.command()

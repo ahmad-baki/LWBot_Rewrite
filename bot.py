@@ -1259,7 +1259,7 @@ class Music(commands.Cog):
     @commands.command()
     async def playfile(self, ctx):
         if (ctx.message.attachments) == 0:
-            await on_command_error(ctx, CommandError("Dieser Nachricht liegt keine Datei bei."))
+            await on_command_error(ctx, Exception("Dieser Nachricht liegt keine Datei bei."))
             return
         
         try:

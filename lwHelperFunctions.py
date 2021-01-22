@@ -35,10 +35,13 @@ def updateConfig():
 
 def is_url_image(image_url):
     image_formats = ("image/png", "image/jpeg", "image/jpg", "image/gif", "image/webp")
-    r = requests.head(image_url)
-    if r.headers["content-type"] in image_formats:
-        return True
-    return False
+    try:
+        r = requests.head(image_url)
+        if r.headers["content-type"] in image_formats:
+            return True
+        return False
+    except:
+        return False
 
 def simpleEmbed(author, title, description = "", image_url="", color=discord.Color.blurple()):
     e = discord.Embed(title=title, description=description)

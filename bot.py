@@ -710,7 +710,11 @@ class Memes(commands.Cog):
 
             else:
                 await channel.send(embed=e, file=await msg.attachments[0].to_file())
-
+        else:
+            if(is_url_image(msg.content)):
+                e.description = e.description.splitlines()[0]
+                e.set_image(url=msg.content)
+            await channel.send(embed=e)
 
 class Utility(commands.Cog):
     """Andere nützliche Commands"""
@@ -1271,7 +1275,7 @@ class Music(commands.Cog):
         await msg.attachments[0].save(f)
         source = discord.PCMVolumeTransformer(discord.FFmpegPCMAudio(f.name))
         bot.voice_clients[0].play(source, after=lambda e: self.raise_error(e) if e else None)
-        await asyncio.sleep(1)
+        await asyncio.sleep(10)
         os.remove(f.name)
 
     # @is_bot_dev()

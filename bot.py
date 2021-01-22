@@ -1247,7 +1247,7 @@ class Music(commands.Cog):
         """Spielt eine Datei aus dem Dateisystem ab"""
 
         source = discord.PCMVolumeTransformer(discord.FFmpegPCMAudio(query))
-        ctx.voice_client.play(source, after=await on_command_error(ctx))
+        ctx.voice_client.play(source, after=lambda e: self.raise_error(e) if e else None)
 
         await ctx.send('Spielt {} ab.'.format(query))
 
@@ -1269,7 +1269,7 @@ class Music(commands.Cog):
 
         async with ctx.typing():
             player = await YTDLSource.from_url(url, loop=self.bot.loop, stream=True)
-            ctx.voice_client.play(player, after=await on_command_error(ctx))
+            ctx.voice_client.play(player, after=lambda e: self.raise_error(e) if e else None)
 
         await ctx.send('Spielt {} ab.'.format(player.title))
 
@@ -1301,6 +1301,9 @@ class Music(commands.Cog):
                 # raise commands.CommandError("Author not connected to a voice channel")
         elif ctx.voice_client.is_playing():
             ctx.voice_client.stop()
+
+    def raise_error(self, e):
+        raise e
 
 class YTDLSource(discord.PCMVolumeTransformer):
     def __init__(self, source, *, data, volume=0.5):

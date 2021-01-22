@@ -1247,7 +1247,7 @@ class Music(commands.Cog):
     async def play(self, ctx, *, query):
         """Spielt eine Datei aus dem Dateisystem ab"""
         if not os.path.isfile(query):
-            await on_command_error(ctx, FileNotFoundError())
+            await on_command_error(ctx, FileNotFoundError(f"Die gewünschte Datei {query} existiert nicht."))
         source = discord.PCMVolumeTransformer(discord.FFmpegPCMAudio(query))
         ctx.voice_client.play(source, after=lambda e: self.raise_error(e) if e else None)
 
@@ -1305,6 +1305,7 @@ class Music(commands.Cog):
             ctx.voice_client.stop()
 
     def raise_error(self, e):
+        print(e)
         raise e
 
 class YTDLSource(discord.PCMVolumeTransformer):

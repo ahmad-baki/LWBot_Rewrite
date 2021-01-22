@@ -1233,15 +1233,9 @@ class Music(commands.Cog):
 
     @is_bot_dev()
     @commands.command()
-    async def join(self, ctx, *channel: discord.VoiceChannel):
-        """Verbindet sich mit deinem voice-channel"""
+    async def join(self, ctx, *, channel: discord.VoiceChannel):
+        """Verbindet sich mit einem angegebenen voice-channel"""
 
-        if channel == None:
-            if ctx.author.voice:
-                channel = ctx.author.voice.channel
-            else:
-                await ctx.send("Du bist zu keinem voicechannel verbunden.")
-                return
         if ctx.voice_client is not None:
             return await ctx.voice_client.move_to(channel)
 

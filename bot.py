@@ -23,6 +23,7 @@ import aiohttp
 import requests
 import io
 import youtube_dl
+import os
 from collections import defaultdict
 from PIL import Image
 
@@ -1245,7 +1246,8 @@ class Music(commands.Cog):
     @commands.command()
     async def play(self, ctx, *, query):
         """Spielt eine Datei aus dem Dateisystem ab"""
-
+        if not os.path.isfile(query):
+            await on_command_error(ctx, FileNotFoundError())
         source = discord.PCMVolumeTransformer(discord.FFmpegPCMAudio(query))
         ctx.voice_client.play(source, after=lambda e: self.raise_error(e) if e else None)
 

@@ -1233,9 +1233,15 @@ class Music(commands.Cog):
 
     @is_bot_dev()
     @commands.command()
-    async def join(self, ctx, *, channel: discord.VoiceChannel):
+    async def join(self, ctx, *channel: discord.VoiceChannel):
         """Verbindet sich mit deinem voice-channel"""
 
+        if channel == None:
+            if ctx.author.voice:
+                channel = ctx.author.voice.channel
+            else:
+                await ctx.send("Du bist zu keinem voicechannel verbunden.")
+                return
         if ctx.voice_client is not None:
             return await ctx.voice_client.move_to(channel)
 
@@ -1247,7 +1253,7 @@ class Music(commands.Cog):
         """Spielt eine Datei aus dem Dateisystem ab"""
 
         source = discord.PCMVolumeTransformer(discord.FFmpegPCMAudio(query))
-        ctx.voice_client.play(source, after=lambda e: print('Player error: %s' % e) if e else None)
+        ctx.voice_client.play(source, after=lambda e: on_command_error(ctx, e) if e else None)
 
         await ctx.send('Spielt {} ab.'.format(query))
 
@@ -1269,7 +1275,7 @@ class Music(commands.Cog):
 
         async with ctx.typing():
             player = await YTDLSource.from_url(url, loop=self.bot.loop, stream=True)
-            ctx.voice_client.play(player, after=lambda e: print('Player error: %s' % e) if e else None)
+            ctx.voice_client.play(player, lambda e: on_command_error(ctx, e) if e else None)
 
         await ctx.send('Spielt {} ab.'.format(player.title))
 

@@ -1,5 +1,5 @@
 import discord
-import lwConfig
+import config
 from bs4 import BeautifulSoup
 import aiohttp
 import importlib
@@ -7,13 +7,15 @@ import json
 import requests
 import datetime
 
+# from bot import *
+
 def getEmoji(bot, emojiName):
     emoji = discord.utils.get(bot.emojis, name=emojiName)
     if emoji:
         return emoji
     return None
 
-async def getGmoNews():
+async def get_news():
     url = "https://www.gymnasium-oberstadt.de/"
     async with aiohttp.ClientSession() as session:
         async with session.get(url) as r:
@@ -22,16 +24,16 @@ async def getGmoNews():
                 for link in soup.findAll('a'):
                     if str(link.get('href')).startswith('https://www.gymnasium-oberstadt.de/neuigkeiten/'):
                         number = int(str(link.get('href')).replace('https://www.gymnasium-oberstadt.de/neuigkeiten/', "").split(".")[0])
-                        if number > lwConfig.latest_news_number:
-                            lwConfig.config["latest_gmo_news_number"] = number
-                            with open(lwConfig.path + '/json/lwConfig.json', 'w') as myfile:
-                                myfile.write(json.dumps(lwConfig.config)) 
-                            updateConfig()
+                        if number > config.latest_news_number:
+                            config.config["latest_gmo_news_number"] = number
+                            with open(config.path + '/json/config.json', 'w') as myfile:
+                                myfile.write(json.dumps(config.config)) 
+                            update_config()
                             return str(link.get('href'))
     return None
 
-def updateConfig():
-    importlib.reload(lwConfig)
+def update_config():
+    importlib.reload(config)
 
 def is_url_image(image_url):
     image_formats = ("image/png", "image/jpeg", "image/jpg", "image/gif", "image/webp")
@@ -43,7 +45,7 @@ def is_url_image(image_url):
     except:
         return False
 
-def simpleEmbed(author, title, description = "", image_url="", color=discord.Color.blurple()):
+def simple_embed(author, title, description = "", image_url="", color=discord.Color.blurple()):
     e = discord.Embed(title=title, description=description)
     if image_url != "":
         e.set_image(url=image_url)
@@ -51,3 +53,4 @@ def simpleEmbed(author, title, description = "", image_url="", color=discord.Col
     e.timestamp = datetime.datetime.utcnow()
     e.set_footer(text=author.name, icon_url=author.avatar_url) 
     return e
+

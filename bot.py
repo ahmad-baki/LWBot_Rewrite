@@ -497,6 +497,8 @@ class Memes(commands.Cog):
         await ctx.send(embed=progressEmbed)
         progress = 0
         progressMsg = await ctx.send("`  0% fertig.`")
+        last_edited = []
+        start_time = datetime.datetime.utcnow()
         async with ctx.channel.typing():
             channel = bot.get_channel(config.MEME_CHANNEL_ID)
             upvote = getEmoji(bot, config.UPVOTE)
@@ -513,7 +515,15 @@ class Memes(commands.Cog):
                 oldProg = progress
                 progress = round(counter / messageCount * 100)
                 if progress != oldProg:
-                    await progressMsg.edit(content=f"`{str(progress).rjust(3)}% fertig.`")
+                    time_now = datetime.datetime.utcnow()
+                    if len(last_edited) >= 5:
+                        if (time_now - last_edited[0]).seconds >= 5:
+                            await progressMsg.edit(content=f"`{str(progress).rjust(3)}% fertig.`")
+                            last_edited.pop(0)
+                            last_edited.append(time_now)
+                    else:
+                        await progressMsg.edit(content=f"`{str(progress).rjust(3)}% fertig.`")
+                        last_edited.append(time_now)
 
                 if len(m.reactions) > 0:
                     meme = False
@@ -528,6 +538,11 @@ class Memes(commands.Cog):
                             meme = True
                     if meme:
                         members[m.author.id]["memes"] += 1
+            
+            end_time = str(datetime.datetime.utcnow() - start_time)
+            # round milliseconds
+            end_time = end_time.split(".")[0] + "." + str(round(int(end_time.split(".")[1]), 2)) 
+            await progressMsg.edit(content=f"`Bearbeitung in {end_time} abgeschlossen.`")
 
             e = discord.Embed(title="Stats", color=ctx.author.color,
                               timestamp=datetime.datetime.utcnow())

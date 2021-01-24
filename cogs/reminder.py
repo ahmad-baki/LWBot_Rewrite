@@ -124,7 +124,7 @@ class Erinnerungen(commands.Cog):
                 time = datetime.datetime.strptime(
                     reminder[0], '%d.%m.%Y %H:%M')
                 if time <= now:
-                    channel = self.bot.get_channel(config.self.bot_CHANNEL_ID)
+                    channel = self.bot.get_channel(config.bot_CHANNEL_ID)
                     author = self.bot.get_guild(
                         config.SERVER_ID).get_member(int(reminder[2]))
                     recipient = self.bot.get_guild(

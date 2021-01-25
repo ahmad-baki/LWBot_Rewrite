@@ -30,6 +30,7 @@ async def get_news():
                             with open(config.path + '/json/config.json', 'w') as myfile:
                                 myfile.write(json.dumps(config.config)) 
                             update_config()
+                            config.reload_config()
                             return str(link.get('href'))
     return None
 

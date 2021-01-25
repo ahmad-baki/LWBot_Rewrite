@@ -36,6 +36,3 @@ PLAN_CHANNEL = config["substitution_channel_id"]
 GOOD_MEMES_CHANNEL_ID = config["good_memes_channel_id"]
 BANISHED_ROLE_ID = config["banished_role_id"]
 BANISHED_VC_ID = config["banished_channel_id"]
-
-def reload():
-    

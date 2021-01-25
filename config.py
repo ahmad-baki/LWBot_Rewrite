@@ -12,6 +12,8 @@ except:
 
 
 def reload_config():
+    with open(path + '/json/lwConfig.json', 'r') as myfile:
+        data = myfile.read()
     config = json.loads(data)
     OWNER_IDS = config["owner_id"]
     REQUIRED_UPVOTES_FOR_GOOD_MEME = config["upvotes_for_pin"]
@@ -37,5 +39,6 @@ def reload_config():
     GOOD_MEMES_CHANNEL_ID = config["good_memes_channel_id"]
     BANISHED_ROLE_ID = config["banished_role_id"]
     BANISHED_VC_ID = config["banished_channel_id"]
-
+    globals().update(locals())
+    
 reload_config()

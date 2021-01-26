@@ -132,6 +132,7 @@ class Utility(commands.Cog):
         insert_returns(body)
 
         env = dict(globals(), **locals())
+        env["bot"] = self.bot
 
         exec(compile(parsed, filename="<ast>", mode="exec"), env)
 

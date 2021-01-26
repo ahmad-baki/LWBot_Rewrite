@@ -406,6 +406,24 @@ def format_plan(plan, guild, embed, courses=[]):
     return embed
 
 
+async def get_news():
+    url = "https://www.gymnasium-oberstadt.de/"
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url) as r:
+            if r.status == 200:
+                soup = BeautifulSoup(await r.text(), "html.parser")
+                for link in soup.findAll('a'):
+                    if str(link.get('href')).startswith('https://www.gymnasium-oberstadt.de/neuigkeiten/'):
+                        number = int(str(link.get('href')).replace('https://www.gymnasium-oberstadt.de/neuigkeiten/', "").split(".")[0])
+                        if number > config.latest_news_number:
+                            config.config["latest_gmo_news_number"] = number
+                            config.latest_news_number = number
+                            with open(config.path + '/json/config.json', 'w') as myfile:
+                                myfile.write(json.dumps(config.config)) 
+                            update_config()
+                            return str(link.get('href'))
+    return None
+
 def setup(bot):
     bot.add_cog(Schule(bot))
     bot.add_cog(Schulneuigkeiten(bot))

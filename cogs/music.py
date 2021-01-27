@@ -120,6 +120,7 @@ class Music(commands.Cog):
         """Trennt die Verbindung zum voicechannel"""
         await ctx.voice_client.disconnect()
 
+    @yt.before_invoke
     @play.before_invoke
     @stream.before_invoke
     async def ensure_voice(self, ctx):

@@ -152,7 +152,7 @@ class Utility(commands.Cog):
                 await member.move_to(before.channel)
 
         # the "banish" feature
-        if after.channel and member.guild.get_role(config.BANISHED_ROLE_ID) in member.roles and after.channel.id != config.BANISHED_VC_ID and member.id not in bot.owner_ids:
+        if after.channel and member.guild.get_role(config.BANISHED_ROLE_ID) in member.roles and after.channel.id != config.BANISHED_VC_ID and member.id not in self.bot.owner_ids:
             await member.move_to(member.guild.get_channel(config.BANISHED_VC_ID))
 
     @commands.Cog.listener()
@@ -160,7 +160,7 @@ class Utility(commands.Cog):
         # move to hell if banished role was added
         hell = before.guild.get_channel(config.BANISHED_VC_ID)
         r = before.guild.get_role(config.BANISHED_ROLE_ID)
-        if r in after.roles and r not in before.roles and before.id not in bot.owner_ids:
+        if r in after.roles and r not in before.roles and before.id not in self.bot.owner_ids:
             if after.voice != None:
                 if after.voice.channel != hell:
                     await after.move_to(hell)

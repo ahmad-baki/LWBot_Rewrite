@@ -20,7 +20,6 @@ intents.presences = True
 bot = commands.Bot(command_prefix=config.PREFIX, intents=intents)
 bot.owner_ids = config.OWNER_IDS
 
-wortspielAllowedUserIds = [327461111173742592, 760125323580276757]
 
 
 @bot.event
@@ -185,7 +184,7 @@ class Ahmad(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(author, message):
-        if message.channel.id == 804652343428644874 and not message.author.id in wortspielAllowedUserIds:
+        if message.channel.id == 804652343428644874 and not message.author.id in config.wortspielAllowedUserIds:
             await message.delete()
 
 

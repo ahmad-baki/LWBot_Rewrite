@@ -181,6 +181,11 @@ class Ahmad(commands.Cog):
             if after.name != "Ahmad-Kult":
                 await after.edit(name="Ahmad-Kult")
 
+    @commands.Cog.listener()
+    async def on_message(message):
+        if message.channel.id == 804652343428644874 and message.author.id != 327461111173742592:
+            await message.delete()
+
 
 bot.load_extension("cogs.debug")
 bot.load_extension("cogs.memes")

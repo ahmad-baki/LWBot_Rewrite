@@ -182,8 +182,8 @@ class Ahmad(commands.Cog):
                 await after.edit(name="Ahmad-Kult")
 
     @commands.Cog.listener()
-    async def on_message(message, x):
-        if message.channel.id == 804652343428644874 and message.author.id != 327461111173742592:
+    async def on_message(author, message):
+        if message.channel.id == 804652343428644874 and author.id != 327461111173742592:
             await message.delete()
 
 

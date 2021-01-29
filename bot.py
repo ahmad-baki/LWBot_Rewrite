@@ -21,6 +21,7 @@ bot = commands.Bot(command_prefix=config.PREFIX, intents=intents)
 bot.owner_ids = config.OWNER_IDS
 
 
+
 @bot.event
 async def on_error(event, *args, **kwargs):
     embed = discord.Embed(title=f'new Error in event {event}()')
@@ -182,6 +183,11 @@ class Ahmad(commands.Cog):
         if after.id == 693062821650497597:
             if after.name != "Ahmad-Kult":
                 await after.edit(name="Ahmad-Kult")
+
+    @commands.Cog.listener()
+    async def on_message(author, message):
+        if message.channel.id == 804652343428644874 and not message.author.id in config.wortspielAllowedUserIds:
+            await message.delete()
 
 
 bot.load_extension("cogs.debug")

@@ -35,6 +35,8 @@ async def on_command_error(ctx, error):
     error = getattr(error, 'original', error)
     if isinstance(error, CommandNotFound) or isinstance(error, MissingRequiredArgument):
         return
+    if type(error).__name__ == "EventError" or type(error).__name__ == "EventNotRunning" or type(error).__name__ == "NoParticipant":
+        return
     if isinstance(error, NotOwner) or isinstance(error, CheckFailure):
         await ctx.send(embed=simple_embed(ctx.author, "Du hast keine Berechtigung diesen Command auszuführen.", color=discord.Color.red()))
         return
@@ -190,7 +192,7 @@ bot.load_extension("cogs.school")
 bot.load_extension("cogs.user_messages")
 bot.load_extension("cogs.utility")
 bot.load_extension("cogs.wholesome")
-
+bot.load_extension("cogs.event")
 
 bot.add_cog(Ahmad(bot))
 

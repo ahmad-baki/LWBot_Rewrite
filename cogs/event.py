@@ -90,6 +90,8 @@ class Event(commands.Cog):
                         e.description += "\nDu bist ziemlich vorhersehbar :)"
                     await message.channel.send(embed=e)
 
+                    for p in self.config["remaining"]:
+                        self.data[str(p)]["placement"] = len(self.config["remaining"])
 
 
             save_data("event", self.data)

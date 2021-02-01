@@ -288,7 +288,7 @@ Eine Person "gewinnt", wenn sie die letzte Person ist, die noch mindestens ein <
                 user = self.bot.get_user(p)
                 author = self.bot.get_user(self.data[str(p)]["word_author"])
                 author_visible = (self.data[str(p)]["word1_found"] and self.data[str(p)]["word2_found"] and self.data[str(p)]["phrase_found"])
-                v =  f"`Author:` `{author.name if author_visible else ' '}`\n"
+                v =  f"`Author:` `{author.name if author_visible else ' '}`\n\n"
                 v += f"`Wort 1:` `{self.data[str(p)]['word1'] if self.data[str(p)]['word1_found'] else ' '}`\n"
                 v += f"`Wort 2:` `{self.data[str(p)]['word2'] if self.data[str(p)]['word2_found'] else ' '}`\n"
                 v += f"`Phrase:` `{self.data[str(p)]['phrase'] if self.data[str(p)]['phrase_found'] else ' '}`\n"

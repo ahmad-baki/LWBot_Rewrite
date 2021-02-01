@@ -64,6 +64,7 @@ class Event(commands.Cog):
         if message.author == self.bot.user:
             return
         if get_data("event_config")["words_complete"]:
+            changed = False
             if message.author.id in self.config["remaining"]:
                 user = message.author.id
                 if not self.data[str(user)]["word1_found"]:
@@ -71,17 +72,20 @@ class Event(commands.Cog):
                     if w1.lower() in message.content.lower():
                         self.data[str(user)]["word1_found"] = True
                         await message.channel.send(embed=simple_embed(message.author, "Verbotenes Wort!", f"`{w1}` war eines deiner verbotenen Worte!", color=discord.Color.dark_purple()))
+                        changed = True
                 if not self.data[str(user)]["word2_found"]:
                     w2 = self.data[str(user)]["word2"]
                     if w2.lower() in message.content.lower():
                         self.data[str(user)]["word2_found"] = True
                         await message.channel.send(embed=simple_embed(message.author, "Verbotenes Wort!", f"`{w2}` war eines deiner verbotenen Worte!", color=discord.Color.dark_purple()))
+                        changed = True
                 if not self.data[str(user)]["phrase_found"]:
                     ph = self.data[str(user)]["phrase"]
                     if ph.lower() in message.content.lower():
                         self.data[str(user)]["phrase_found"] = True
                         await message.channel.send(embed=simple_embed(message.author, "Verbotenes Wort!", f"`{ph}` war deine verbotene Phrase!", color=discord.Color.dark_purple()))
-                
+                        changed = True
+
                 if (self.data[str(user)]["word1_found"] and self.data[str(user)]["word2_found"] and self.data[str(user)]["phrase_found"]):
                     self.data[str(user)]["placement"] = len(self.config["remaining"])
                     self.config["remaining"].remove(user)
@@ -92,16 +96,17 @@ class Event(commands.Cog):
 
                     for p in self.config["remaining"]:
                         self.data[str(p)]["placement"] = len(self.config["remaining"])
+                    changed = True
 
-
-            save_data("event", self.data)
-            save_data("event_config", self.config)
-            await self.update_event_message()
-            if len(self.config["remaining"]) == 0:
-                self.config["is_running"] = False
-                self.config["words_complete"] = False
-            save_data("event_config", self.config)
-            self.update_data()
+            if changed:
+                save_data("event", self.data)
+                save_data("event_config", self.config)
+                await self.update_event_message()
+                if len(self.config["remaining"]) == 0:
+                    self.config["is_running"] = False
+                    self.config["words_complete"] = False
+                save_data("event_config", self.config)
+                self.update_data()
             
 
 

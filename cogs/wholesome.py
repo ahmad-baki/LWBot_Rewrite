@@ -5,6 +5,7 @@ import datetime
 import json
 import random
 import aiohttp
+from discord.ext.commands.errors import MemberNotFound
 import requests
 
 import config
@@ -15,76 +16,77 @@ class Wholesome(commands.Cog):
     """Wholesome commands um deine Seele zu reinigen"""
     def __init__(self, bot):
         self.bot = bot
-        self.cmds = ["hug", "pat", "feed", "cuddle", "kiss", "poke", "slap", "bite"]
+        self.cmds = [c.name for c in self.get_commands()]
+        self.cmds.remove("add")
+
 
     @commands.command()
-    async def hug(self, ctx, *args):
+    async def hug(self, ctx, *, arg : discord.Member):
         """umarme einen anderen Benutzer mit `hug @user`"""
-        await self.send(ctx, args, "hug", "umarmt", cat_ascii="(^・ω・^ )")
+        await self.send(ctx, arg, "hug", "umarmt", cat_ascii="(^・ω・^ )")
 
     @commands.command()
-    async def pat(self, ctx, *args):
+    async def pat(self, ctx, *, arg : discord.Member):
         """patte einen anderen Benutzer mit `pat @user`"""
-        await self.send(ctx, args, "pat", "gepattet", cat_ascii="(ฅ`･ω･´)っ=")
+        await self.send(ctx, arg, "pat", "gepattet", cat_ascii="(ฅ`･ω･´)っ=")
 
     @commands.command()
-    async def feed(self, ctx, *args):
+    async def feed(self, ctx, *, arg : discord.Member):
         """füttere einen anderen Benutzer mit `feed @user`"""
-        await self.send(ctx, args, "feed", "gefüttert", cat_ascii="~(=^‥^)_旦~")
+        await self.send(ctx, arg, "feed", "gefüttert", cat_ascii="~(=^‥^)_旦~")
 
     @commands.command()
-    async def cuddle(self, ctx, *args):
+    async def cuddle(self, ctx, *, arg : discord.Member):
         """knuddle einen anderen Benutzer mit `cuddle @user`"""
-        await self.send(ctx, args, "cuddle", "geknuddelt", cat_ascii="(=^･ω･^)y＝")
+        await self.send(ctx, arg, "cuddle", "geknuddelt", cat_ascii="(=^･ω･^)y＝")
 
     @commands.command()
-    async def kiss(self, ctx, *args):
+    async def kiss(self, ctx, *, arg : discord.Member):
         """küsse einen anderen Benutzer mit `kiss @user`"""
-        await self.send(ctx, args, "kiss", "geküsst", cat_ascii="╭(╯ε╰)╮")
+        await self.send(ctx, arg, "kiss", "geküsst", cat_ascii="╭(╯ε╰)╮")
 
 
     @commands.command()
-    async def poke(self, ctx, *args):
+    async def poke(self, ctx, *, arg : discord.Member):
         """stupst einen anderen Benutzer mit `hug @user` an"""
-        await self.send(ctx, args, "poke", "angestupst", cat_ascii="ヾ(=｀ω´=)ノ”")
+        await self.send(ctx, arg, "poke", "angestupst", cat_ascii="ヾ(=｀ω´=)ノ”")
 
     @commands.command()
-    async def slap(self, ctx, *args):
+    async def slap(self, ctx, *, arg : discord.Member):
         """schlage einen anderen Benutzer mit `slap @user`"""
-        await self.send(ctx, args, "slap", "geschlagen", cat_ascii="(ↀДↀ)⁼³₌₃")
+        await self.send(ctx, arg, "slap", "geschlagen", cat_ascii="(ↀДↀ)⁼³₌₃")
 
     @commands.command()
-    async def bite(self, ctx, *args):
+    async def bite(self, ctx, *, arg : discord.Member):
         """beiße einen anderen Benutzer mit `bite @user`"""
-        await self.send(ctx, args, "bite", "gebissen", cat_ascii="(・∀・)")
+        await self.send(ctx, arg, "bite", "gebissen", cat_ascii="(・∀・)")
 
 
-    async def send(self, ctx, args, command, verb, content_type="gif", cat_ascii="(^･o･^)ﾉ”"):
-        if len(args) > 1 or len(ctx.message.mentions) == 0:
-            await ctx.send(embed=simple_embed(ctx.author, "Du musst genau eine Person @pingen", color=discord.Color.red()))
-        elif ctx.message.mentions[0] == ctx.author:
+    async def send(self, ctx, arg, command, verb, content_type="gif", cat_ascii="(^･o･^)ﾉ”"):
+        if arg == ctx.author:
             await ctx.send(embed=simple_embed(ctx.author, "No u", color=discord.Color.red()))
-        else:
-            e = discord.Embed(title=f"**{ctx.message.mentions[0].display_name}**, du wurdest von **{ctx.author.display_name}** {verb}", description=cat_ascii)
-            e.timestamp = datetime.datetime.utcnow()
-            e.color = ctx.author.color
-            e.set_footer(text=ctx.author.name, icon_url=ctx.author.avatar_url)
+            return
+        
+        e = discord.Embed(title=f"**{arg.display_name}**, du wurdest von **{ctx.author.display_name}** {verb}", description=cat_ascii)
+        e.timestamp = datetime.datetime.utcnow()
+        e.color = ctx.author.color
+        e.set_footer(text=ctx.author.name, icon_url=ctx.author.avatar_url)
 
-            gifs = self.readJson(command)
-            r = random.randint(0, 25 + len(gifs))
-            if r < len(gifs):
-                url = random.choice(gifs)
-            else:
-                async with aiohttp.ClientSession() as session:
-                    async with session.get(f"https://purrbot.site/api/img/sfw/{command}/{content_type}") as response:
-                        rjson = await response.json()
-                        if rjson["error"] == False:
-                            url = rjson["link"]
-                        else:
-                            await ctx.send(embed=simple_embed(ctx.author, "Verbindungsfehler zur API", "(´; ω ;｀)", color=discord.Color.red()))
-                            return
-            e.set_image(url=url)
-            await ctx.send(embed=e)
+        gifs = self.readJson(command)
+        r = random.randint(0, 25 + len(gifs))
+        if r < len(gifs):
+            url = random.choice(gifs)
+        else:
+            async with aiohttp.ClientSession() as session:
+                async with session.get(f"https://purrbot.site/api/img/sfw/{command}/{content_type}") as response:
+                    rjson = await response.json()
+                    if rjson["error"] == False:
+                        url = rjson["link"]
+                    else:
+                        await ctx.send(embed=simple_embed(ctx.author, "Verbindungsfehler zur API", "(´; ω ;｀)", color=discord.Color.red()))
+                        return
+        e.set_image(url=url)
+        await ctx.send(embed=e)
     
     @commands.command()       
     @is_bot_dev()
@@ -132,6 +134,24 @@ class Wholesome(commands.Cog):
             file = open(config.path + f'/json/{name}.json', 'w')
             file.write("[]")
             file.close()
+
+
+    @hug.error
+    @pat.error
+    @feed.error
+    @cuddle.error
+    @kiss.error
+    @poke.error
+    @slap.error
+    @bite.error
+    async def on_command_error(self, ctx, error):
+        embed = discord.Embed(title=type(error).__name__)
+        embed.description = str(error)
+        if isinstance(error, MemberNotFound):
+            embed.description = f"{error.argument}\n\nist kein gültiger Benutzer."
+
+        embed.color = discord.Color.red()
+        await ctx.send(embed=embed)
 
 def setup(bot):
     bot.add_cog(Wholesome(bot))

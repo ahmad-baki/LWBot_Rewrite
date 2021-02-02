@@ -11,9 +11,9 @@ class Debug(commands.Cog):
         self.bot = bot
 
     @commands.command()
-    async def test(self, ctx, *, arg):
+    async def test(self, ctx, *, arg : discord.Member):
         """Test-command zum debuggen."""
-        return
+        await ctx.send(arg.name)
 
     @commands.command()
     async def emotes(self, ctx):
@@ -29,6 +29,7 @@ class Debug(commands.Cog):
         m = await ctx.send(embed=e)
         # for i in range(min(20, len(emotes))):
         #    await m.add_reaction(emotes[i])
+
 
 
 def setup(bot):

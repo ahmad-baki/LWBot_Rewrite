@@ -311,7 +311,7 @@ class Memes(commands.Cog):
             if(is_url_image(msg.attachments[0].url)):
                 e.set_image(url=msg.attachments[0].url)
                 counter = 0
-                while e.image.width == 0 or counter == 100:
+                while e.image.width == 0 and counter < 100:
                     counter += 1
                     e.set_image(url=msg.attachments[0].url)
                 if counter == 100:

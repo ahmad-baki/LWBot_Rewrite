@@ -21,7 +21,11 @@ class Schule(commands.Cog):
         self.bot = bot
         self.update_substitution_plan.start()
 
-
+    async def cog_check(self, ctx):
+        if ctx.guild.id == config.SERVER_ID:
+            return True
+        return False
+        
     @commands.command()
     async def kurse(self, ctx):
         """Listet alle Kurse eines Nutzers auf"""

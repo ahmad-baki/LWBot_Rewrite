@@ -1,5 +1,5 @@
 '''
-https://discord.com/api/oauth2/authorize?bot_id=760125323580276757&permissions=8&scope=bot
+https://discord.com/api/oauth2/authorize?client_id=760125323580276757&permissions=8&scope=bot
 '''
 
 from asyncio import futures
@@ -191,14 +191,15 @@ class Ahmad(commands.Cog):
             await message.delete()
 
 
-bot.load_extension("cogs.debug")
-bot.load_extension("cogs.memes")
-bot.load_extension("cogs.music")
 bot.load_extension("cogs.reminder")
-bot.load_extension("cogs.school")
 bot.load_extension("cogs.user_messages")
-bot.load_extension("cogs.utility")
 bot.load_extension("cogs.wholesome")
+bot.load_extension("cogs.utility")
+bot.load_extension("cogs.memes")
+bot.load_extension("cogs.school")
+bot.load_extension("cogs.moodle")
+bot.load_extension("cogs.debug")
+bot.load_extension("cogs.music")
 bot.load_extension("cogs.event")
 
 bot.add_cog(Ahmad(bot))

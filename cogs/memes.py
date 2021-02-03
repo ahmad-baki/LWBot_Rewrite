@@ -13,6 +13,11 @@ import config
 from helper_functions import *
 from bot import on_command_error
 
+def is_private_server():
+    async def predicate(ctx):
+        return ctx.guild and ctx.guild.id == config.SERVER_ID
+    return commands.check(predicate)
+
 class Memes(commands.Cog):
     """Commands zum Votingsystem im Shitpostkanal"""
 
@@ -41,6 +46,7 @@ class Memes(commands.Cog):
 
     #     await ctx.send(embed=e)
 
+    @is_private_server()
     @commands.command()
     async def top(self, ctx):
         """Zeigt den Top-shitpost"""
@@ -76,6 +82,7 @@ class Memes(commands.Cog):
         else:
             await ctx.message.channel.send("Zurzeit sind keine Memes vorhanden.")
 
+    @is_private_server()
     @commands.command()
     async def stats(self, ctx, *args):
         """Wertet die Bewertungen der Shitposts der einzelnen Nutzer aus

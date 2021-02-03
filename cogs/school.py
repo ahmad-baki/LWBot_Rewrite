@@ -182,8 +182,13 @@ class Schulneuigkeiten(commands.Cog):
     async def check_website(self):
         news = await get_news()
         if news != None:
-            channel = self.bot.get_channel(config.NEWS_CHANNEL_ID)
-            await channel.send(channel.guild.get_role(config.GMO_ROLE_ID).mention + " " + news)
+            channels = [self.bot.get_channel(cid) for cid in config.NEWS_CHANNEL_ID]
+            for channel in channels:
+                role_id = config.GMO_ROLE_ID
+                if role_id in [r.id for r in channel.guild.roles]:
+                    await channel.send(channel.guild.get_role(role_id).mention + " " + news)
+                else:
+                    await channel.send(news)
 
     @check_website.before_loop
     async def before_news(self):

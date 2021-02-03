@@ -182,14 +182,14 @@ class Moodle(commands.Cog):
         await pages.send(ctx, message)
 
 
-    # @aufgaben.error
-    # async def on_command_error(self, ctx, error):
-    #     embed = discord.Embed(title=type(error).__name__)
-    #     if isinstance(error, CommandNotFound) or isinstance(error, MissingRequiredArgument):
-    #         return
-    #     embed.description = str(error)
-    #     embed.color = discord.Color.red()
-    #     await ctx.send(embed=embed)
+    @aufgaben.error
+    async def on_command_error(self, ctx, error):
+        embed = discord.Embed(title=type(error).__name__)
+        if isinstance(error, CommandNotFound) or isinstance(error, MissingRequiredArgument):
+            return
+        embed.description = str(error)
+        embed.color = discord.Color.red()
+        await ctx.send(embed=embed)
 
 
 def setup(bot):

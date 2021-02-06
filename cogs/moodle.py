@@ -167,13 +167,13 @@ class Moodle(commands.Cog):
             fields.append(["Zuletzt bearbeitet am", datetime.datetime.fromtimestamp(assignment.timemodified).strftime("%d.%m.%Y %H:%MUhr").replace(" 0", " ")])
             files = []
             for i in assignment.introfiles:
-                files.append(f'[{i["filename"]}]({i["fileurl"]})')
+                files.append(f'[{i["filename"]}]({i["fileurl"].replace("/webservice", "")})')
             if len(files) > 0:
                 fields.append(["Dateien", '\n'.join(files)])
             
             attachments = []
             for i in assignment.introattachments:
-                attachments.append(f'[{i["filename"]}]({i["fileurl"]})')
+                attachments.append(f'[{i["filename"]}]({i["fileurl"].replace("/webservice", "")})')
             if len(attachments) > 0:
                 fields.append(["Anhänge", '\n'.join(attachments)])
 

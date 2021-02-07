@@ -8,10 +8,6 @@ from discord.ext import tasks
 import config
 from bot import on_command_error
 
-with open("config.json", "r") as file:
-    config = json.loads(file.read())
-
-
 class Anzeige():
     def __init__(self, price=None, time=None, id=None, location=None, title=None, description=None, url=None):
         self.price = price
@@ -77,7 +73,7 @@ class Scraper(commands.Cog):
 
     @tasks.loop(seconds=300)
     async def scraper(self):
-        ads = get_ads()
+        ads = get_ads(self.config)
         with open(config.path + '/json/user_config.json', 'r') as myfile:
             data = json.loads(myfile.read())
         

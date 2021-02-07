@@ -1,4 +1,5 @@
 import json
+from os import scandir
 import requests
 from bs4 import BeautifulSoup
 import discord
@@ -7,6 +8,7 @@ from discord.ext import tasks
 
 import config
 from bot import on_command_error
+
 
 class Anzeige():
     def __init__(self, price=None, time=None, id=None, location=None, title=None, description=None, url=None):
@@ -23,8 +25,7 @@ def get_ads(config):
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.125 Safari/537.36 Edg/84.0.522.59'
     }
-    r = requests.get(
-        url=f'{config["url"]}r{config["radius"]}', headers=headers)
+    r = requests.get(url=f'{config["url"]}r{config["radius"]}', headers=headers)
     soup = BeautifulSoup(r.text, features="html5lib")
     results = soup.find("div", id="srchrslt-content")
     ads = []
@@ -46,9 +47,10 @@ def get_ads(config):
         ad.title = title.contents[0]
         ad.url = config["base_url"] + title["href"]
         ads.append(ad)
+    return ads
 
 
-def ad_to_embed(ad : Anzeige):
+def ad_to_embed(ad: Anzeige):
     e = discord.Embed(title=ad.title)
     e.description = ad.description
     e.url = ad.url
@@ -57,7 +59,6 @@ def ad_to_embed(ad : Anzeige):
     e.set_footer(text=ad.time)
     e.color = discord.Color.dark_red()
     return e
-
 
 
 class Scraper(commands.Cog):
@@ -76,7 +77,7 @@ class Scraper(commands.Cog):
         ads = get_ads(self.config)
         with open(config.path + '/json/user_config.json', 'r') as myfile:
             data = json.loads(myfile.read())
-        
+
         if str(self.id) not in data.keys():
             data[str(self.id)] = {}
             data[str(self.id)]["ids"] = []
@@ -86,9 +87,14 @@ class Scraper(commands.Cog):
                 data[str(self.id)]["ids"].append(ad.id)
                 channel = self.bot.get_channel(config.LOG_CHANNEL_ID)
                 await channel.send(embed=ad_to_embed(ad), content=self.bot.get_user(self.id).mention)
-        
+
         with open(config.path + '/json/user_config.json', 'w') as myfile:
             json.dump(data, myfile)
-            
+
+    @scraper.before_loop
+    async def beforeReminderCheck(self):
+        await self.bot.wait_until_ready()
+
+
 def setup(bot):
     bot.add_cog(Scraper(bot))

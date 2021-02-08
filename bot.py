@@ -33,7 +33,9 @@ async def on_error(event, *args, **kwargs):
 
 @bot.event
 async def on_command_error(ctx, error):
-    if hasattr(ctx.command, 'on_error'):
+    if isinstance(ctx, discord.TextChannel):
+        pass
+    elif hasattr(ctx.command, 'on_error'):
         return
     
     error = getattr(error, 'original', error)

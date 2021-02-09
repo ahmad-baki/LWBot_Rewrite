@@ -4,6 +4,7 @@ from bs4 import BeautifulSoup
 import discord
 from discord.ext import commands
 from discord.ext import tasks
+import asyncio
 
 import config
 from helper_functions import *
@@ -46,37 +47,42 @@ class Scraper(commands.Cog):
             self.scraper.start()
 
         
-    def get_ads(self, config):
+    async def get_ads(self, config):
         headers = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.125 Safari/537.36 Edg/84.0.522.59'
         }
-        r = requests.get(url=f'{config["url"]}r{config["radius"]}', headers=headers)
-        soup = BeautifulSoup(r.text, features="html5lib")
-        results = soup.find("div", id="srchrslt-content")
         ads = []
-        for i in results.find_all("article"):
-            ad = Anzeige()
-            ad.id = i["data-adid"]
-            details = i.find("div", {"class": "aditem-details"})
-            ad.price = details.find("strong").text
-            radius = details.contents[8].split()[-2:]
-            if float(radius[0]) > config["radius"]:
-                continue
-            ad.location = f"{details.contents[4].split()[-1]} {details.contents[6].split()[-1]} ({' '.join(radius)})"
-            ad.description = i.find(
-                "div", {"class": "aditem-main"}).contents[3].contents[0]
-            ad.time = ' '.join(
-                i.find("div", {"class": "aditem-addon"}).contents[0].split())
+        try:
+            r = requests.get(url=f'{config["url"]}r{config["radius"]}', headers=headers)
+            soup = BeautifulSoup(r.text, features="html5lib")
+            results = soup.find("div", id="srchrslt-content")
+            for i in results.find_all("article"):
+                ad = Anzeige()
+                ad.id = i["data-adid"]
+                details = i.find("div", {"class": "aditem-details"})
+                ad.price = details.find("strong").text
+                radius = details.contents[8].split()[-2:]
+                if float(radius[0]) > config["radius"]:
+                    continue
+                ad.location = f"{details.contents[4].split()[-1]} {details.contents[6].split()[-1]} ({' '.join(radius)})"
+                ad.description = i.find(
+                    "div", {"class": "aditem-main"}).contents[3].contents[0]
+                ad.time = ' '.join(
+                    i.find("div", {"class": "aditem-addon"}).contents[0].split())
 
-            title = i.find("a", {"class": "ellipsis"})
-            ad.title = title.contents[0]
-            ad.url = config["base_url"] + title["href"]
-            ads.append(ad)
+                title = i.find("a", {"class": "ellipsis"})
+                ad.title = title.contents[0]
+                ad.url = config["base_url"] + title["href"]
+                ads.append(ad)
+        except Exception as e:
+            channel = self.bot.get_channel(config.LOG_CHANNEL_ID)
+            await channel.send(embed=simple_embed(self.bot.user, "scraper error", color=discord.Color.orange()))
+            await on_command_error(self.bot.get_channel(config.LOG_CHANNEL_ID), e)
         return ads
     
     @tasks.loop(seconds=300)
     async def scraper(self):
-        ads = self.get_ads(self.config)
+        ads = await self.get_ads(self.config)
         with open(config.path + '/json/user_config.json', 'r') as myfile:
             data = json.loads(myfile.read())
 
@@ -96,6 +102,15 @@ class Scraper(commands.Cog):
     @scraper.before_loop
     async def beforeReminderCheck(self):
         await self.bot.wait_until_ready()
+        channel = self.bot.get_channel(config.LOG_CHANNEL_ID)
+        await channel.send(embed=simple_embed(self.bot.user, "scraper start", color=discord.Color.green()))
+
+    @scraper.after_loop
+    async def afterReminderCheck(self):
+        channel = self.bot.get_channel(config.LOG_CHANNEL_ID)
+        await channel.send(embed=simple_embed(self.bot.user, "scraper stopped.", color=discord.Color.orange()))
+        await asyncio.sleep(60)
+        self.checkReminder.restart()
 
     @scraper.error
     async def scraper_error(self, error):

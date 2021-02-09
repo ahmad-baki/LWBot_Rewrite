@@ -45,12 +45,11 @@ class Scraper(commands.Cog):
         if config.PREFIX == ",":
             self.scraper.start()
 
-    async def get_ads(self, c):
+    async def get_ads(self, c, failed_before=False):
         headers = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.125 Safari/537.36 Edg/84.0.522.59'
         }
         ads = []
-        channel = self.bot.get_channel(config.LOG_CHANNEL_ID)
         try:
             r = requests.get(url=f'{c["url"]}r{c["radius"]}', headers=headers)
             soup = BeautifulSoup(r.text, features="html5lib")
@@ -72,10 +71,14 @@ class Scraper(commands.Cog):
                 ad.url = c["base_url"] + title["href"]
                 ads.append(ad)
         except Exception as e:
+            channel = self.bot.get_channel(config.LOG_CHANNEL_ID)
             await channel.send(embed=simple_embed(self.bot.user, "error in scraper", color=discord.Color.orange()))
             await on_command_error(self.bot.get_channel(config.LOG_CHANNEL_ID), e)
-            return await self.get_ads(c)
-        await channel.send(embed=simple_embed(self.bot.user, "scraper worked without an error", color=discord.Color.greyple()))
+            return await self.get_ads(c, failed_before=True)
+
+        if failed_before:
+            channel = self.bot.get_channel(config.LOG_CHANNEL_ID)
+            await channel.send(embed=simple_embed(self.bot.user, "scraper worked without an error", color=discord.Color.greyple()))
         return ads
 
     @tasks.loop(seconds=300)

@@ -111,7 +111,7 @@ class Scraper(commands.Cog):
         channel = self.bot.get_channel(config.LOG_CHANNEL_ID)
         await channel.send(embed=simple_embed(self.bot.user, "scraper stopped.", color=discord.Color.orange()))
         await asyncio.sleep(60)
-        self.checkReminder.restart()
+        self.scraper.restart()
 
     @scraper.error
     async def scraper_error(self, error):

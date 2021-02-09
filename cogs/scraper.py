@@ -75,7 +75,7 @@ class Scraper(commands.Cog):
             await channel.send(embed=simple_embed(self.bot.user, "error in scraper", color=discord.Color.orange()))
             await on_command_error(self.bot.get_channel(config.LOG_CHANNEL_ID), e)
             return await self.get_ads(c)
-        await channel.send(embed=simple_embed(self.bot.user, "scraper worked without error", color=discord.Color.greyple()))
+        await channel.send(embed=simple_embed(self.bot.user, "scraper worked without an error", color=discord.Color.greyple()))
         return ads
 
     @tasks.loop(seconds=300)

@@ -72,8 +72,9 @@ class Scraper(commands.Cog):
                 ads.append(ad)
         except Exception as e:
             channel = self.bot.get_channel(config.LOG_CHANNEL_ID)
-            await channel.send(embed=simple_embed(self.bot.user, "scraper error", color=discord.Color.orange()))
+            await channel.send(embed=simple_embed(self.bot.user, "error in scraper", color=discord.Color.orange()))
             await on_command_error(self.bot.get_channel(config.LOG_CHANNEL_ID), e)
+            return await self.get_ads(c)
         return ads
 
     @tasks.loop(seconds=300)

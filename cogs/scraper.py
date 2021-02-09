@@ -22,7 +22,6 @@ class Anzeige():
         self.url = url
 
 
-
 def ad_to_embed(ad: Anzeige):
     e = discord.Embed(title=ad.title)
     e.description = ad.description
@@ -46,14 +45,13 @@ class Scraper(commands.Cog):
         if config.PREFIX == ",":
             self.scraper.start()
 
-        
-    async def get_ads(self, config):
+    async def get_ads(self, c):
         headers = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.125 Safari/537.36 Edg/84.0.522.59'
         }
         ads = []
         try:
-            r = requests.get(url=f'{config["url"]}r{config["radius"]}', headers=headers)
+            r = requests.get(url=f'{c["url"]}r{c["radius"]}', headers=headers)
             soup = BeautifulSoup(r.text, features="html5lib")
             results = soup.find("div", id="srchrslt-content")
             for i in results.find_all("article"):
@@ -62,24 +60,22 @@ class Scraper(commands.Cog):
                 details = i.find("div", {"class": "aditem-details"})
                 ad.price = details.find("strong").text
                 radius = details.contents[8].split()[-2:]
-                if float(radius[0]) > config["radius"]:
+                if float(radius[0]) > c["radius"]:
                     continue
                 ad.location = f"{details.contents[4].split()[-1]} {details.contents[6].split()[-1]} ({' '.join(radius)})"
-                ad.description = i.find(
-                    "div", {"class": "aditem-main"}).contents[3].contents[0]
-                ad.time = ' '.join(
-                    i.find("div", {"class": "aditem-addon"}).contents[0].split())
+                ad.description = i.find("div", {"class": "aditem-main"}).contents[3].contents[0]
+                ad.time = ' '.join(i.find("div", {"class": "aditem-addon"}).contents[0].split())
 
                 title = i.find("a", {"class": "ellipsis"})
                 ad.title = title.contents[0]
-                ad.url = config["base_url"] + title["href"]
+                ad.url = c["base_url"] + title["href"]
                 ads.append(ad)
         except Exception as e:
             channel = self.bot.get_channel(config.LOG_CHANNEL_ID)
             await channel.send(embed=simple_embed(self.bot.user, "scraper error", color=discord.Color.orange()))
             await on_command_error(self.bot.get_channel(config.LOG_CHANNEL_ID), e)
         return ads
-    
+
     @tasks.loop(seconds=300)
     async def scraper(self):
         ads = await self.get_ads(self.config)
@@ -117,6 +113,7 @@ class Scraper(commands.Cog):
         channel = self.bot.get_channel(config.LOG_CHANNEL_ID)
         await channel.send(embed=simple_embed(self.bot.user, "scraper error", color=discord.Color.orange()))
         await on_command_error(self.bot.get_channel(config.LOG_CHANNEL_ID), error)
-        
+
+
 def setup(bot):
     bot.add_cog(Scraper(bot))

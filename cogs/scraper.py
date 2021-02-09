@@ -100,13 +100,13 @@ class Scraper(commands.Cog):
             json.dump(data, myfile)
 
     @scraper.before_loop
-    async def beforeReminderCheck(self):
+    async def before_scraper(self):
         await self.bot.wait_until_ready()
         channel = self.bot.get_channel(config.LOG_CHANNEL_ID)
         await channel.send(embed=simple_embed(self.bot.user, "scraper start", color=discord.Color.green()))
 
     @scraper.after_loop
-    async def afterReminderCheck(self):
+    async def after_scraper(self):
         channel = self.bot.get_channel(config.LOG_CHANNEL_ID)
         await channel.send(embed=simple_embed(self.bot.user, "scraper stopped.", color=discord.Color.orange()))
         await asyncio.sleep(60)

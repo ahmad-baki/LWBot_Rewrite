@@ -204,7 +204,6 @@ bot.load_extension("cogs.debug")
 bot.load_extension("cogs.music")
 bot.load_extension("cogs.event")
 
-bot.load_extension("cogs.scraper")
 
 bot.add_cog(Ahmad(bot))
 

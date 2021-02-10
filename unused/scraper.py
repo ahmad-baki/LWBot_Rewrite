@@ -36,11 +36,11 @@ def ad_to_embed(ad: Anzeige):
 class Scraper(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.id = 272455097496240130
+        self.id = 0
         self.config = {
-            "url": "https://www.ebay-kleinanzeigen.de/s-mainz/anzeige:angebote/macbook-air-m1/k0l5315",
-            "base_url": "https://www.ebay-kleinanzeigen.de",
-            "radius": 150
+            "url": "",
+            "base_url": "",
+            "radius": 0
         }
         if config.PREFIX == ",":
             self.scraper.start()

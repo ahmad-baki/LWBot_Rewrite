@@ -149,12 +149,13 @@ class Moodle(commands.Cog):
         api.authenticate(un, pw)
         await message.edit(content="`Daten werden von Moodle abgefragt..`")
         a = api.getAssignments()
-        a.sort(key=lambda x: float('inf') if type(x.duedate) == int else datetime.datetime.timestamp(x.duedate))
         await message.edit(content="`Daten werden verarbeitet..`")
+        a.sort(key=lambda x: float('inf') if type(x.duedate) == int else datetime.datetime.timestamp(x.duedate))
         pages = Paginator(self.bot)
         for assignment in a:
             if (datetime.datetime.now() - datetime.datetime.fromtimestamp(assignment.timemodified)).days > 7:
-                continue
+                if assignment.duedate < datetime.datetime.now():
+                    continue
             description = BeautifulSoup(assignment.intro, "html5lib").get_text(separator="\n")
             if assignment.nosubmissions == 1:
                 description = "**Diese Aufgabe benötigt keine Abgabe**\n" + description

@@ -5,6 +5,7 @@ from discord.errors import HTTPException
 import ast
 import io
 from PIL import Image
+import typing
 
 import config
 from helper_functions import *
@@ -38,13 +39,16 @@ class Utility(commands.Cog):
         await ctx.message.delete()
 
     @commands.command()
-    async def pfpart(self, ctx):
+    async def pfpart(self, ctx, big: typing.Optional[bool] = False):
         """Zeigt dein Discord-Profilbild in ASCII-Art"""
         bites = await ctx.author.avatar_url.read()
         # im = Image.frombytes("RGB", (125, 125), bites, "raw")
         im = Image.open(io.BytesIO(bites))
         r = im.convert('1')
-        r.thumbnail((64, 64))
+        res = 64
+        if big:
+            res = 89
+        r.thumbnail((res, res))
         im = r
         pix = r.load()
 
@@ -81,7 +85,7 @@ class Utility(commands.Cog):
                 dots[y][x] = chr(int(dots[y][x], 16))
 
         e = simple_embed(ctx.author, "Dein Icon")
-        e.description = "64x64\n```"
+        e.description = "{0}x{0}\n```".format(str(res))
         for line in dots:
             e.description += ''.join(line) + "\n"
         e.description += "```"

@@ -154,7 +154,7 @@ class Moodle(commands.Cog):
         pages = Paginator(self.bot)
         for assignment in a:
             if (datetime.datetime.now() - datetime.datetime.fromtimestamp(assignment.timemodified)).days > 7:
-                if assignment.duedate < datetime.datetime.now():
+                if type(assignment.duedate) == int or assignment.duedate < datetime.datetime.now():
                     continue
             description = BeautifulSoup(assignment.intro, "html5lib").get_text(separator="\n")
             if assignment.nosubmissions == 1:

@@ -58,7 +58,7 @@ async def on_command_error(ctx, error):
 @bot.event
 async def on_ready():
     activity = discord.Activity(
-        type=discord.ActivityType.watching, name=config.STATUS_MSG)
+        type=discord.ActivityType.listening, name=config.STATUS_MSG)
     await bot.change_presence(activity=activity, status=discord.enums.Status.dnd)
     e = discord.Embed(title="Bot started")
     e.color = discord.Color.blurple()

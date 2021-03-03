@@ -203,6 +203,7 @@ bot.load_extension("cogs.moodle")
 bot.load_extension("cogs.debug")
 bot.load_extension("cogs.music")
 bot.load_extension("cogs.event")
+bot.load_extension("cogs.news")
 
 
 bot.add_cog(Ahmad(bot))

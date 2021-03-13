@@ -174,7 +174,7 @@ class Utility(commands.Cog):
         #     return None  # TODO Lass ihn motzen
 
     @commands.command()
-    async def latex(self, ctx, arg):
+    async def latex(self, ctx, *, arg):
         img = self.latexToImage(arg)
         with BytesIO() as image_binary:
             img.save(image_binary, 'PNG')

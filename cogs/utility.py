@@ -176,6 +176,7 @@ class Utility(commands.Cog):
     @commands.command()
     async def latex(self, ctx, *, arg):
         img = self.latexToImage(arg)
+        img = img.resize((img.width * 2, img.height * 2), Image.ANTIALIAS)
         with BytesIO() as image_binary:
             img.save(image_binary, 'PNG')
             image_binary.seek(0)

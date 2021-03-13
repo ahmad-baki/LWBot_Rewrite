@@ -172,6 +172,8 @@ class Utility(commands.Cog):
 
     @commands.command()
     async def latex(self, ctx, *, arg):
+        """Schickt ein Bild, welches dem angegebenen Latex-Code entspricht.
+        [Hier ist eine generelle Hilfe](https://de.wikipedia.org/wiki/Hilfe:TeX), [hier ist eine Liste an Sonderzeichen](https://de.wikibooks.org/wiki/LaTeX-Kompendium:_Sonderzeichen)"""
         arg = arg.strip("` ")
         img = self.latexToImage(arg)
         img = img.resize((int(img.width * 2), int(img.height * 2)))#, Image.ANTIALIAS)

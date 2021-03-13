@@ -162,10 +162,10 @@ class Utility(commands.Cog):
 
             newData = []
             for item in datas:
-                if item[3] != 255:
+                if item[0] == 0 and item[1] == 0 and item[2] == 0:
                     newData.append((255, 255, 255, 0))
                 else:
-                    newData.append(item)
+                    newData.append((255,255,255))
 
             image.putdata(newData)
             return image

@@ -165,16 +165,15 @@ class Utility(commands.Cog):
                 if item[0] == 0 and item[1] == 0 and item[2] == 0:
                     newData.append((255, 255, 255, 0))
                 else:
-                    newData.append(tuple([x * 25 for x in list(item)]))
+                    newData.append(tuple([x * 10 for x in list(item)]))
 
             image.putdata(newData)
             return image
 
-        # except ValueError:
-        #     return None  # TODO Lass ihn motzen
 
     @commands.command()
     async def latex(self, ctx, *, arg):
+        arg = arg.strip("` ")
         img = self.latexToImage(arg)
         img = img.resize((int(img.width * 1.5), int(img.height * 1.5)), Image.ANTIALIAS)
         with BytesIO() as image_binary:

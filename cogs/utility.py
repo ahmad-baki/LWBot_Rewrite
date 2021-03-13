@@ -165,7 +165,7 @@ class Utility(commands.Cog):
                 if item[0] == 0 and item[1] == 0 and item[2] == 0:
                     newData.append((255, 255, 255, 0))
                 else:
-                    newData.append(item * 50)
+                    newData.append(tuple([x * 50 for x in list(item)]))
 
             image.putdata(newData)
             return image

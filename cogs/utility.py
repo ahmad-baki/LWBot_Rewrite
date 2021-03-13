@@ -1,4 +1,3 @@
-from test.testlatex import latexToImage
 import discord
 from discord.ext import commands
 from discord.errors import HTTPException
@@ -153,7 +152,7 @@ class Utility(commands.Cog):
             pass
 
 
-    def latexToImage(formula):
+    def latexToImage(self, formula):
         # try:
             image = Image.open(pnglatex(r"\["+formula+r"\]", 'tmpFormula.png'))
 
@@ -176,7 +175,7 @@ class Utility(commands.Cog):
 
     @commands.command()
     async def latex(self, ctx, arg):
-        img = latexToImage(arg)
+        img = self.latexToImage(arg)
         with BytesIO() as image_binary:
             img.save(image_binary, 'PNG')
             image_binary.seek(0)

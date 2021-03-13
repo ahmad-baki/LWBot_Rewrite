@@ -162,7 +162,7 @@ class Utility(commands.Cog):
 
             newData = []
             for item in datas:
-                if item[0] == 0 and item[1] == 0 and item[2] == 0:
+                if item[3] != 255:
                     newData.append((255, 255, 255, 0))
                 else:
                     newData.append(item)
@@ -176,7 +176,7 @@ class Utility(commands.Cog):
     @commands.command()
     async def latex(self, ctx, *, arg):
         img = self.latexToImage(arg)
-        img = img.resize((img.width * 2, img.height * 2), Image.ANTIALIAS)
+        img = img.resize((img.width * 1.5, img.height * 1.5), Image.ANTIALIAS)
         with BytesIO() as image_binary:
             img.save(image_binary, 'PNG')
             image_binary.seek(0)

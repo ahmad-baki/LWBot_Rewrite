@@ -1,3 +1,4 @@
+from test.testlatex import latexToImage
 import discord
 from discord.ext import commands
 from discord.errors import HTTPException
@@ -6,7 +7,10 @@ import ast
 import io
 from PIL import Image
 import typing
-
+from PIL import Image
+from PIL.ImageOps import invert
+from pnglatex import pnglatex
+from io import BytesIO
 import config
 from helper_functions import *
 
@@ -148,6 +152,36 @@ class Utility(commands.Cog):
         except HTTPException:
             pass
 
+
+    def latexToImage(formula):
+        # try:
+            image = Image.open(pnglatex(r"\["+formula+r"\]", 'tmpFormula.png'))
+
+            image = invert(image)
+            image = image.convert("RGBA")
+            datas = image.getdata()
+
+            newData = []
+            for item in datas:
+                if item[0] == 0 and item[1] == 0 and item[2] == 0:
+                    newData.append((255, 255, 255, 0))
+                else:
+                    newData.append(item)
+
+            image.putdata(newData)
+            return image
+
+        # except ValueError:
+        #     return None  # TODO Lass ihn motzen
+
+    @commands.command()
+    async def latex(self, ctx, arg):
+        img = latexToImage(arg)
+        with BytesIO() as image_binary:
+            img.save(image_binary, 'PNG')
+            image_binary.seek(0)
+            await ctx.send(file=discord.File(fp=image_binary, filename='image.png'))
+
     @commands.Cog.listener()
     async def on_voice_state_update(self, member, before, after):
         afkChannel = member.guild.afk_channel
@@ -168,6 +202,8 @@ class Utility(commands.Cog):
             if after.voice != None:
                 if after.voice.channel != hell:
                     await after.move_to(hell)
+
+
 
 def setup(bot):
     bot.add_cog(Utility(bot))

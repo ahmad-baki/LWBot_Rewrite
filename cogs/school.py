@@ -19,7 +19,7 @@ class Schule(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
-        self.update_substitution_plan.start()
+        # self.update_substitution_plan.start()
 
     async def cog_check(self, ctx):
         if ctx.guild.id == config.SERVER_ID:

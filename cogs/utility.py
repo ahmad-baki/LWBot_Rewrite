@@ -153,22 +153,21 @@ class Utility(commands.Cog):
 
 
     def latexToImage(self, formula):
-        # try:
-            image = Image.open(pnglatex(r"\["+formula+r"\]", 'tmpFormula.png'))
+        image = Image.open(pnglatex(r"\["+formula+r"\]", 'tmpFormula.png'))
 
-            image = invert(image)
-            image = image.convert("RGBA")
-            datas = image.getdata()
+        image = invert(image)
+        image = image.convert("RGBA")
+        datas = image.getdata()
 
-            newData = []
-            for item in datas:
-                if item[0] == 0 and item[1] == 0 and item[2] == 0:
-                    newData.append((255, 255, 255, 0))
-                else:
-                    newData.append(tuple([x * 10 for x in list(item)]))
+        newData = []
+        for item in datas:
+            if item[0] == 0 and item[1] == 0 and item[2] == 0:
+                newData.append((255, 255, 255, 0))
+            else:
+                newData.append(item)
 
-            image.putdata(newData)
-            return image
+        image.putdata(newData)
+        return image
 
 
     @commands.command()

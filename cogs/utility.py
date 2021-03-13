@@ -153,7 +153,7 @@ class Utility(commands.Cog):
 
 
     def latexToImage(self, formula):
-        image = Image.open(pnglatex(r"\["+formula+r"\]", 'tmpFormula.png'))
+        image = Image.open(pnglatex(r"$"+formula+r"$", 'tmpFormula.png'))
 
         image = invert(image)
         image = image.convert("RGBA")
@@ -174,7 +174,7 @@ class Utility(commands.Cog):
     async def latex(self, ctx, *, arg):
         arg = arg.strip("` ")
         img = self.latexToImage(arg)
-        img = img.resize((int(img.width * 1.5), int(img.height * 1.5)), Image.ANTIALIAS)
+        img = img.resize((int(img.width * 1.5), int(img.height * 1.5)))#, Image.ANTIALIAS)
         with BytesIO() as image_binary:
             img.save(image_binary, 'PNG')
             image_binary.seek(0)

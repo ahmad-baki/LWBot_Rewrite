@@ -96,7 +96,7 @@ class Utility(commands.Cog):
         await ctx.send(embed=e)
 
     # https://gist.github.com/nitros12/2c3c265813121492655bc95aa54da6b9 geklaut und überarbeitet
-    @commands.is_owner()
+    # @commands.is_owner()
     @commands.command(name="eval", aliases=["ev", "evaluate"])
     async def _eval(self, ctx, *, cmd):
         """Führt Code aus und sendet das Ergebnis der letzten Zeile, falls vorhanden. (devs only)
